@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Admin - FKarting</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-layout">
+<aside class="sidebar">
+    <h2>🏁 FKarting</h2>
+    <ul>
+        <li data-section="dashboard">Dashboard</li>
+        <li data-section="championships">Campeonatos</li>
+        <li data-section="drivers">Pilotos</li>
+        <li data-section="results">Resultados</li>
+        <li id="logout">Volver al sitio</li>
+    </ul>
+</aside>
+<main class="content">
+    <section id="dashboard" class="section">
+        <h1>Panel Administrativo</h1>
+        <p>Gestión del campeonato.</p>
+        <div class="stats">
+            <div class="stat-card" id="statDrivers">Pilotos: 0</div>
+            <div class="stat-card" id="statResults">Resultados: 0</div>
+            <div class="stat-card" id="statChamps">Campeonatos: 0</div>
+        </div>
+    </section>
+
+    <section id="championships" class="section hidden">
+        <h1>Campeonatos</h1>
+        <div class="form-row">
+            <input type="text" id="yearInput" placeholder="Año (ej: 2026)">
+            <button id="addYear">Agregar</button>
+        </div>
+        <ul id="yearList"></ul>
+    </section>
+
+    <section id="drivers" class="section hidden">
+        <h1>Pilotos</h1>
+        <div class="form-row">
+            <input type="text" id="driverName" placeholder="Nombre del piloto">
+            <input type="text" id="driverTeam" placeholder="Equipo">
+            <button id="addDriver">Agregar</button>
+        </div>
+        <ul id="driverList"></ul>
+        <button id="saveDrivers" class="save-btn">💾 Guardar Pilotos</button>
+        <span class="save-msg" id="saveMsgDrivers"></span>
+    </section>
+
+    <section id="results" class="section hidden">
+        <h1>Resultados</h1>
+        <div class="form-row">
+            <input type="text" id="resultDriver" placeholder="Nombre del piloto">
+            <input type="number" id="resultPoints" placeholder="Puntos" min="0">
+            <button id="addResult">Agregar</button>
+        </div>
+        <ul id="resultList"></ul>
+        <button id="saveResults" class="save-btn">💾 Guardar Resultados</button>
+        <span class="save-msg" id="saveMsgResults"></span>
+    </section>
+</main>
+</div>
+<script src="js/admin.js"></script>
+</body>
+</html>
