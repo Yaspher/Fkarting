@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>FKarting - Campeonato Nacional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="navbar">
+    <div class="container">
+        <div class="logo">🏁 FKarting</div>
+        <nav>
+            <ul>
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#ranking">Ranking</a></li>
+                <li><a href="#resultados">Resultados</a></li>
+                <li><a href="#pilotos">Pilotos</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<section class="hero">
+    <div class="container">
+        <h1>Campeonato 2026</h1>
+        <p>Velocidad. Precisión. Competencia.</p>
+        <button id="btnNextRace">Ver Próxima Carrera</button>
+    </div>
+</section>
+<section id="ranking" class="section">
+    <div class="container">
+        <h2>Ranking General</h2>
+        <table id="rankingTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Piloto</th>
+                    <th>Equipo</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</section>
+<section id="resultados" class="section dark">
+    <div class="container">
+        <h2>Última Carrera</h2>
+        <div id="resultsList"></div>
+    </div>
+</section>
+<section id="pilotos" class="section">
+    <div class="container">
+        <h2>Pilotos Destacados</h2>
+        <div class="drivers-grid" id="driversGrid"></div>
+    </div>
+</section>
+<footer>
+    <div class="container">
+        <p>© 2026 FKarting 
+            <a href="admin.html">Administración</a> 
+            - Todos los derechos reservados
+        </p>
+    </div>
+</footer>
+<!-- MODAL -->
+<div id="raceModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2>Próxima Carrera</h2>
+        <p><strong>Fecha:</strong> 15 Marzo 2026</p>
+        <p><strong>Lugar:</strong> Autódromo Nacional</p>
+        <p><strong>Hora:</strong> 10:00 AM</p>
+        <button class="modal-button" id="closeModalBtn">Cerrar</button>
+    </div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>
