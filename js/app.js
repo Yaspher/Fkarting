@@ -1,8 +1,8 @@
 // ── Datos por defecto (se usan si el Admin aún no guardó nada) ──
 const defaultRanking = [
-    { position: 1, name: "Carlos Martínez", team: "Red Speed",    points: 125 },
-    { position: 2, name: "Luis Gómez",      team: "Blue Racing",  points: 110 },
-    { position: 3, name: "Andrés Peña",     team: "Black Motors", points: 98  }
+    { position: 1, name: "Carlos Martínez",    points: 125 },
+    { position: 2, name: "Luis Gómez",  points: 110 },
+    { position: 3, name: "Andrés Peña", points: 98  }
 ];
 const defaultResults = [
     { driver: "Carlos Martínez", points: 25 },
@@ -20,7 +20,7 @@ function getData(key, fallback) {
     }
 }
 
-const adminDrivers  = getData("fk_drivers",  null);   // [{name, team}]
+const adminDrivers  = getData("fk_drivers",  null);   // [{name}]
 const adminResults  = getData("fk_results",  null);   // [{driver, points}]
 
 // ── Construir ranking ──
@@ -33,7 +33,8 @@ if (adminResults && adminResults.length > 0) {
     const teamMap   = {};
 
     // Si hay pilotos registrados en admin, mapear equipo
-    if (adminDrivers) {
+    if (adminDrivers) 
+    {
         adminDrivers.forEach(d => { teamMap[d.name] = d.team; });
     }
 
@@ -60,7 +61,6 @@ ranking.forEach(d => {
     rankingTable.innerHTML += `<tr>
         <td>${d.position}</td>
         <td>${d.name}</td>
-        <td>${d.team}</td>
         <td>${d.points}</td>
     </tr>`;
 });
@@ -71,7 +71,6 @@ ranking.forEach(d => {
     driversGrid.innerHTML += `<div class="driver-card">
         <h3>#${d.position}</h3>
         <h4>${d.name}</h4>
-        <p>${d.team}</p>
     </div>`;
 });
 
