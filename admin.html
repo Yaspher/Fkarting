@@ -8,6 +8,7 @@
 </head>
 <body>
 <div class="admin-layout">
+
 <aside class="sidebar">
     <h2>🏁 FKarting</h2>
     <ul>
@@ -15,52 +16,64 @@
         <li data-section="championships">Campeonatos</li>
         <li data-section="drivers">Pilotos</li>
         <li data-section="results">Resultados</li>
-        <li id="logout">Volver al sitio</li>
+        <li id="logout">← Volver al sitio</li>
     </ul>
 </aside>
+
 <main class="content">
+
+    <!-- DASHBOARD -->
     <section id="dashboard" class="section">
         <h1>Panel Administrativo</h1>
-        <p>Gestión del campeonato.</p>
+        <p>Gestión del campeonato FKarting.</p>
         <div class="stats">
-            <div class="stat-card" id="statDrivers">Pilotos: 0</div>
-            <div class="stat-card" id="statResults">Resultados: 0</div>
-            <div class="stat-card" id="statChamps">Campeonatos: 0</div>
+            <div class="stat-card" id="statDrivers">Pilotos: —</div>
+            <div class="stat-card" id="statResults">Resultados: —</div>
+            <div class="stat-card" id="statChamps">Campeonatos: —</div>
         </div>
     </section>
 
+    <!-- CAMPEONATOS -->
     <section id="championships" class="section hidden">
         <h1>Campeonatos</h1>
         <div class="form-row">
-            <input type="text" id="yearInput" placeholder="Año (ej: 2026)">
+            <input type="number" id="yearInput"  placeholder="Año (ej: 2026)" min="2000" max="2099">
+            <input type="text"   id="champDesc"  placeholder="Descripción (opcional)">
             <button id="addYear">Agregar</button>
         </div>
+        <span class="save-msg" id="saveMsgChamp"></span>
         <ul id="yearList"></ul>
     </section>
 
+    <!-- PILOTOS -->
     <section id="drivers" class="section hidden">
         <h1>Pilotos</h1>
         <div class="form-row">
-            <input type="text" id="driverName" placeholder="Nombre del piloto">
-            <input type="text" id="driverTeam" placeholder="Equipo">
+            <input type="text"   id="driverName"   placeholder="Nombre del piloto">
+            <input type="number" id="driverNumber"  placeholder="Número (ej: 7)" min="1">
             <button id="addDriver">Agregar</button>
         </div>
-        <ul id="driverList"></ul>
-        <button id="saveDrivers" class="save-btn">💾 Guardar Pilotos</button>
         <span class="save-msg" id="saveMsgDrivers"></span>
+        <ul id="driverList"></ul>
     </section>
 
+    <!-- RESULTADOS -->
     <section id="results" class="section hidden">
         <h1>Resultados</h1>
         <div class="form-row">
-            <input type="text" id="resultDriver" placeholder="Nombre del piloto">
-            <input type="number" id="resultPoints" placeholder="Puntos" min="0">
-            <button id="addResult">Agregar</button>
+            <select id="resultCampeonato"><option value="">Campeonato...</option></select>
+            <select id="resultCarrera"><option value="">Carrera...</option></select>
         </div>
-        <ul id="resultList"></ul>
-        <button id="saveResults" class="save-btn">💾 Guardar Resultados</button>
+        <div class="form-row">
+            <select id="resultPiloto"><option value="">Piloto...</option></select>
+            <input type="number" id="resultPosicion" placeholder="Posición" min="1">
+            <input type="number" id="resultPoints"   placeholder="Puntos"   min="0">
+            <button id="addResult">Guardar</button>
+        </div>
         <span class="save-msg" id="saveMsgResults"></span>
+        <ul id="resultList"></ul>
     </section>
+
 </main>
 </div>
 <script src="js/admin.js"></script>
