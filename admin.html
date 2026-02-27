@@ -4,78 +4,234 @@
 <meta charset="UTF-8">
 <title>Admin - FKarting</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="CSS/admin.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="admin-layout">
 
-<aside class="sidebar">
-    <h2>🏁 FKarting</h2>
-    <ul>
-        <li data-section="dashboard">Dashboard</li>
-        <li data-section="championships">Campeonatos</li>
-        <li data-section="drivers">Pilotos</li>
-        <li data-section="results">Resultados</li>
-        <li id="logout">← Volver al sitio</li>
-    </ul>
-</aside>
+  <aside class="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+          <line x1="4" y1="22" x2="4" y2="15"/>
+        </svg>
+      </div>
+      <div>
+        <p class="sidebar-logo-title">FKARTING</p>
+        <p class="sidebar-logo-sub">Admin</p>
+      </div>
+    </div>
 
-<main class="content">
+    <!-- Nav -->
+    <nav class="sidebar-nav">
+      <span class="sidebar-nav-label">Secciones</span>
 
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="section">
-        <h1>Panel Administrativo</h1>
-        <p>Gestión del campeonato FKarting.</p>
+      <li class="sidebar-item active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+        Dashboard
+      </li>
+
+      <li class="sidebar-item" data-section="championships">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <path d="M8 21h8m-4-4v4m-7-9h.01M19 12h.01M3 7h18v5a9 9 0 01-18 0V7z"/>
+        </svg>
+        Campeonatos
+      </li>
+
+      <li class="sidebar-item" data-section="drivers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        Pilotos
+      </li>
+
+      <li class="sidebar-item" data-section="results">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Resultados
+      </li>
+    </nav>
+
+    <!-- Back -->
+    <div class="sidebar-back">
+      <a id="logout" href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Volver al sitio
+      </a>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- TOP BAR -->
+    <header class="admin-header">
+      <div>
+        <h1 class="admin-header-title" id="headerTitle">Panel Administrativo</h1>
+        <p class="admin-header-sub">Panel de Administración · FKarting</p>
+      </div>
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span class="status-text">Sistema activo</span>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <div class="content-inner">
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section">
+        <p class="section-note">Gestión del campeonato FKarting.</p>
         <div class="stats">
-            <div class="stat-card" id="statDrivers">Pilotos: —</div>
-            <div class="stat-card" id="statResults">Resultados: —</div>
-            <div class="stat-card" id="statChamps">Campeonatos: —</div>
+          <div class="stat-card" id="statDrivers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+            <div>
+              <p class="stat-label">Pilotos</p>
+              <p class="stat-value">—</p>
+            </div>
+          </div>
+          <div class="stat-card" id="statResults">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <div>
+              <p class="stat-label">Resultados</p>
+              <p class="stat-value">—</p>
+            </div>
+          </div>
+          <div class="stat-card" id="statChamps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
+              <path d="M8 21h8m-4-4v4m-7-9h.01M19 12h.01M3 7h18v5a9 9 0 01-18 0V7z"/>
+            </svg>
+            <div>
+              <p class="stat-label">Campeonatos</p>
+              <p class="stat-value">—</p>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    <!-- CAMPEONATOS -->
-    <section id="championships" class="section hidden">
-        <h1>Campeonatos</h1>
+      <!-- CAMPEONATOS -->
+      <section id="championships" class="section hidden">
+        <div class="section-header">
+          <p class="section-count" id="champCount">0 campeonatos registrados</p>
+        </div>
         <div class="form-row">
-            <input type="number" id="yearInput"  placeholder="Año (ej: 2026)" min="2000" max="2099">
-            <input type="text"   id="champDesc"  placeholder="Descripción (opcional)">
-            <button id="addYear">Agregar</button>
+          <div class="form-group">
+            <label class="form-label">Año</label>
+            <input type="number" id="yearInput" class="form-input" placeholder="Ej: 2026" min="2000" max="2099">
+          </div>
+          <div class="form-group form-group-wide">
+            <label class="form-label">Descripción (opcional)</label>
+            <input type="text" id="champDesc" class="form-input" placeholder="Descripción del campeonato">
+          </div>
+          <div class="form-group form-group-btn">
+            <label class="form-label">&nbsp;</label>
+            <button id="addYear" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Agregar
+            </button>
+          </div>
         </div>
         <span class="save-msg" id="saveMsgChamp"></span>
-        <ul id="yearList"></ul>
-    </section>
+        <ul id="yearList" class="item-list"></ul>
+      </section>
 
-    <!-- PILOTOS -->
-    <section id="drivers" class="section hidden">
-        <h1>Pilotos</h1>
+      <!-- PILOTOS -->
+      <section id="drivers" class="section hidden">
+        <div class="section-header">
+          <p class="section-count" id="driverCount">0 pilotos registrados</p>
+        </div>
         <div class="form-row">
-            <input type="text"   id="driverName"   placeholder="Nombre del piloto">
-            <input type="number" id="driverNumber"  placeholder="Número (ej: 7)" min="1">
-            <button id="addDriver">Agregar</button>
+          <div class="form-group form-group-wide">
+            <label class="form-label">Nombre del piloto</label>
+            <input type="text" id="driverName" class="form-input" placeholder="Nombre completo">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Número</label>
+            <input type="number" id="driverNumber" class="form-input" placeholder="Ej: 7" min="1">
+          </div>
+          <div class="form-group form-group-btn">
+            <label class="form-label">&nbsp;</label>
+            <button id="addDriver" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Agregar
+            </button>
+          </div>
         </div>
         <span class="save-msg" id="saveMsgDrivers"></span>
-        <ul id="driverList"></ul>
-    </section>
+        <ul id="driverList" class="item-list"></ul>
+      </section>
 
-    <!-- RESULTADOS -->
-    <section id="results" class="section hidden">
-        <h1>Resultados</h1>
-        <div class="form-row">
-            <select id="resultCampeonato"><option value="">Campeonato...</option></select>
-            <select id="resultCarrera"><option value="">Carrera...</option></select>
+      <!-- RESULTADOS -->
+      <section id="results" class="section hidden">
+        <div class="section-header">
+          <p class="section-count" id="resultCount">0 resultados registrados</p>
         </div>
         <div class="form-row">
-            <select id="resultPiloto"><option value="">Piloto...</option></select>
-            <input type="number" id="resultPosicion" placeholder="Posición" min="1">
-            <input type="number" id="resultPoints"   placeholder="Puntos"   min="0">
-            <button id="addResult">Guardar</button>
+          <div class="form-group">
+            <label class="form-label">Campeonato</label>
+            <select id="resultCampeonato" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Carrera</label>
+            <select id="resultCarrera" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Piloto</label>
+            <select id="resultPiloto" class="form-select">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Posición</label>
+            <input type="number" id="resultPosicion" class="form-input" placeholder="1" min="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Puntos</label>
+            <input type="number" id="resultPoints" class="form-input" placeholder="0" min="0">
+          </div>
+          <div class="form-group form-group-btn">
+            <label class="form-label">&nbsp;</label>
+            <button id="addResult" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+              </svg>
+              Guardar
+            </button>
+          </div>
         </div>
         <span class="save-msg" id="saveMsgResults"></span>
-        <ul id="resultList"></ul>
-    </section>
+        <ul id="resultList" class="item-list"></ul>
+      </section>
 
-</main>
+    </div><!-- /content-inner -->
+  </main>
 </div>
-<script src="js/admin.js"></script>
+
+<script src="admin.js"></script>
 </body>
 </html>

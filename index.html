@@ -4,12 +4,24 @@
     <meta charset="UTF-8">
     <title>FKarting - Campeonato Nacional</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/styles.css">
 </head>
 <body>
+
+<!-- ── NAVBAR ── -->
 <header class="navbar">
-    <div class="container">
-        <div class="logo">🏁 FKarting</div>
+    <div class="container navbar-inner">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+            </div>
+            <span class="logo-text">FKARTING</span>
+        </div>
         <nav>
             <ul>
                 <li><a href="#">Inicio</a></li>
@@ -18,61 +30,132 @@
                 <li><a href="#pilotos">Pilotos</a></li>
             </ul>
         </nav>
+        <a href="admin.html" class="navbar-admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+            Admin
+        </a>
     </div>
 </header>
+
+<!-- ── HERO ── -->
 <section class="hero">
-    <div class="container">
-        <h1>Campeonato 2026</h1>
-        <p>Velocidad. Precisión. Competencia.</p>
-        <button id="btnNextRace">Ver Próxima Carrera</button>
+    <div class="hero-overlay"></div>
+    <div class="container hero-inner">
+        <p class="hero-eyebrow">Temporada Oficial</p>
+        <h1 class="hero-title">Campeonato<br><span>2026</span></h1>
+        <p class="hero-sub">Velocidad. Precisión. Competencia.</p>
+        <div class="hero-actions">
+            <button id="btnNextRace" class="btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Próxima Carrera
+            </button>
+            <a href="#ranking" class="btn-ghost">Ver Ranking</a>
+        </div>
     </div>
+    <!-- decorative stripe -->
+    <div class="hero-stripe"></div>
 </section>
+
+<!-- ── RANKING ── -->
 <section id="ranking" class="section">
     <div class="container">
-        <h2>Ranking General</h2>
-        <table id="rankingTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Piloto</th>
-                    <th>Puntos</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Ranking General</h2>
+        </div>
+        <div class="table-wrapper">
+            <table id="rankingTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Piloto</th>
+                        <th>Puntos</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </section>
-<section id="resultados" class="section dark">
+
+<!-- ── ÚLTIMA CARRERA ── -->
+<section id="resultados" class="section section-dark">
     <div class="container">
-        <h2>Última Carrera</h2>
-        <div id="resultsList"></div>
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Última Carrera</h2>
+        </div>
+        <div id="resultsList" class="results-list"></div>
     </div>
 </section>
+
+<!-- ── PILOTOS ── -->
 <section id="pilotos" class="section">
     <div class="container">
-        <h2>Pilotos Destacados</h2>
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Pilotos Destacados</h2>
+        </div>
         <div class="drivers-grid" id="driversGrid"></div>
     </div>
 </section>
-<footer>
-    <div class="container">
-        <p>© 2026 FKarting 
-            <a href="admin.html">Administración</a> 
-            - Todos los derechos reservados
-        </p>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="footer-logo">
+            <div class="logo-icon logo-icon-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+            </div>
+            <span class="logo-text">FKARTING</span>
+        </div>
+        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados</p>
+        <a href="admin.html" class="footer-admin">Administración</a>
     </div>
 </footer>
-<!-- MODAL -->
+
+<!-- ── MODAL ── -->
 <div id="raceModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" id="closeModal">&times;</span>
-        <h2>Próxima Carrera</h2>
-        <p><strong>Fecha:</strong> 15 Marzo 2026</p>
-        <p><strong>Lugar:</strong> Autódromo Nacional</p>
-        <p><strong>Hora:</strong> 10:00 AM</p>
-        <button class="modal-button" id="closeModalBtn">Cerrar</button>
+    <div class="modal-box">
+        <button class="modal-close" id="closeModal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <h2 class="modal-title">Próxima Carrera</h2>
+        <div class="modal-fields">
+            <div class="modal-field">
+                <span class="modal-field-label">Fecha</span>
+                <span class="modal-field-value">15 Marzo 2026</span>
+            </div>
+            <div class="modal-field">
+                <span class="modal-field-label">Lugar</span>
+                <span class="modal-field-value">Autódromo Nacional</span>
+            </div>
+            <div class="modal-field">
+                <span class="modal-field-label">Hora</span>
+                <span class="modal-field-value">10:00 AM</span>
+            </div>
+        </div>
+        <button class="btn-primary btn-full" id="closeModalBtn">Cerrar</button>
     </div>
 </div>
-<script src="js/app.js"></script>
+
+<script src="app.js"></script>
 </body>
 </html>
