@@ -558,7 +558,7 @@ ul { list-style: none; }
 
 .driver-cat.senior  { background: rgba(127,29,29,0.35); color: #f87171; }
 .driver-cat.junior  { background: rgba(120,53,15,0.35);  color: #fbbf24; }
-.driver-cat.***** { background: var(--gray-800);       color: var(--gray-400); }
+.driver-cat.other { background: var(--gray-800);       color: var(--gray-400); }
 
 .driver-pts {
   font-family: var(--font-display);
