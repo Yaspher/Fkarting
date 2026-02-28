@@ -11,7 +11,9 @@
 <body>
 <div class="admin-layout">
 
+  <!-- ── SIDEBAR ──────────────────────────────────────── -->
   <aside class="sidebar">
+
     <!-- Logo -->
     <div class="sidebar-logo">
       <div class="sidebar-logo-icon">
@@ -53,11 +55,27 @@
         Pilotos
       </li>
 
-      <li class="sidebar-item" data-section="results">
+      <li class="sidebar-item" data-section="carreras">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+          <line x1="4" y1="22" x2="4" y2="15"/>
+        </svg>
+        Carreras
+      </li>
+
+      <li class="sidebar-item" data-section="tiempos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Tiempos
+      </li>
+
+      <li class="sidebar-item" data-section="ranking">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
-        Resultados
+        Ranquin
       </li>
     </nav>
 
@@ -72,6 +90,7 @@
     </div>
   </aside>
 
+  <!-- ── MAIN ─────────────────────────────────────────── -->
   <main class="content">
 
     <!-- TOP BAR -->
@@ -89,7 +108,7 @@
     <!-- CONTENT AREA -->
     <div class="content-inner">
 
-      <!-- DASHBOARD -->
+      <!-- ── DASHBOARD ───────────────────────────────── -->
       <section id="dashboard" class="section">
         <p class="section-note">Gestión del campeonato FKarting.</p>
         <div class="stats">
@@ -99,16 +118,7 @@
             </svg>
             <div>
               <p class="stat-label">Pilotos</p>
-              <p class="stat-value">—</p>
-            </div>
-          </div>
-          <div class="stat-card" id="statResults">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-            <div>
-              <p class="stat-label">Resultados</p>
-              <p class="stat-value">—</p>
+              <p class="stat-value" id="statDriversVal">—</p>
             </div>
           </div>
           <div class="stat-card" id="statChamps">
@@ -117,13 +127,22 @@
             </svg>
             <div>
               <p class="stat-label">Campeonatos</p>
-              <p class="stat-value">—</p>
+              <p class="stat-value" id="statChampsVal">—</p>
+            </div>
+          </div>
+          <div class="stat-card" id="statRanking">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <div>
+              <p class="stat-label">En Ranquin</p>
+              <p class="stat-value" id="statRankingVal">—</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- CAMPEONATOS -->
+      <!-- ── CAMPEONATOS ─────────────────────────────── -->
       <section id="championships" class="section hidden">
         <div class="section-header">
           <p class="section-count" id="champCount">0 campeonatos registrados</p>
@@ -151,85 +170,286 @@
         <ul id="yearList" class="item-list"></ul>
       </section>
 
-      <!-- PILOTOS -->
+      <!-- ── PILOTOS ─────────────────────────────────── -->
       <section id="drivers" class="section hidden">
         <div class="section-header">
           <p class="section-count" id="driverCount">0 pilotos registrados</p>
-        </div>
-        <div class="form-row">
-          <div class="form-group form-group-wide">
-            <label class="form-label">Nombre del piloto</label>
-            <input type="text" id="driverName" class="form-input" placeholder="Nombre completo">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Número</label>
-            <input type="number" id="driverNumber" class="form-input" placeholder="Ej: 7" min="1">
-          </div>
-          <div class="form-group form-group-btn">
-            <label class="form-label">&nbsp;</label>
-            <button id="addDriver" class="btn-primary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Agregar
-            </button>
-          </div>
+          <button id="btnNewDriver" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nuevo Piloto
+          </button>
         </div>
         <span class="save-msg" id="saveMsgDrivers"></span>
-        <ul id="driverList" class="item-list"></ul>
+        <div class="table-wrap">
+          <table class="pilots-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th class="col-name">Nombre</th>
+                <th class="col-status">Estado</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody id="driverList"></tbody>
+          </table>
+        </div>
       </section>
 
-      <!-- RESULTADOS -->
-      <section id="results" class="section hidden">
+      <!-- ── CARRERAS ─────────────────────────────────── -->
+      <section id="carreras" class="section hidden">
         <div class="section-header">
-          <p class="section-count" id="resultCount">0 resultados registrados</p>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
+          <div class="section-filter">
             <label class="form-label">Campeonato</label>
-            <select id="resultCampeonato" class="form-select">
-              <option value="">Seleccionar...</option>
-            </select>
+            <select id="carrerasCampeonato" class="form-select" style="min-width:200px"></select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Carrera</label>
-            <select id="resultCarrera" class="form-select">
-              <option value="">Seleccionar...</option>
-            </select>
-          </div>
+          <button id="btnNewCarrera" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nueva Carrera
+          </button>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Piloto</label>
-            <select id="resultPiloto" class="form-select">
-              <option value="">Seleccionar...</option>
+        <span class="save-msg" id="saveMsgCarreras"></span>
+        <div class="table-wrap">
+          <table class="pilots-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Circuito</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="carrerasList"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── TIEMPOS ─────────────────────────────────── -->
+      <section id="tiempos" class="section hidden">
+        <div class="section-header">
+          <div class="section-filters">
+            <div class="filter-group">
+              <label class="form-label">Campeonato</label>
+              <select id="tiemposCampeonato" class="form-select" style="min-width:160px"></select>
+            </div>
+            <div class="filter-group">
+              <label class="form-label">Carrera</label>
+              <select id="tiemposCarrera" class="form-select" style="min-width:200px">
+                <option value="">Seleccionar carrera...</option>
+              </select>
+            </div>
+          </div>
+          <button id="btnNewTiempo" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Registrar Tiempo
+          </button>
+        </div>
+        <span class="save-msg" id="saveMsgTiempos"></span>
+        <div class="table-wrap">
+          <table class="pilots-table">
+            <thead>
+              <tr>
+                <th>Piloto</th>
+                <th>Tiempo</th>
+                <th>Vuelta Rápida</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tiemposList"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── RANQUIN ─────────────────────────────────── -->
+      <section id="ranking" class="section hidden">
+        <div class="ranking-top">
+          <div class="form-group" style="min-width:200px">
+            <label class="form-label">Campeonato</label>
+            <select id="rankingCampeonato" class="form-select">
+              <option value="">Cargando...</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Posición</label>
-            <input type="number" id="resultPosicion" class="form-input" placeholder="1" min="1">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Puntos</label>
-            <input type="number" id="resultPoints" class="form-input" placeholder="0" min="0">
-          </div>
-          <div class="form-group form-group-btn">
-            <label class="form-label">&nbsp;</label>
-            <button id="addResult" class="btn-primary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
-                <path d="M9 11l3 3L22 4"/>
-                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-              </svg>
-              Guardar
-            </button>
-          </div>
+          <button id="btnAddRanking" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Agregar Piloto al Ranquin
+          </button>
         </div>
-        <span class="save-msg" id="saveMsgResults"></span>
-        <ul id="resultList" class="item-list"></ul>
+        <span class="save-msg" id="saveMsgRanking"></span>
+        <p class="section-note" style="margin-top:8px">
+          Los datos se ordenan automáticamente por puntos. Haz clic en ✎ para editar un registro.
+        </p>
+        <div id="rankingList" class="ranking-list"></div>
       </section>
 
     </div><!-- /content-inner -->
   </main>
+</div>
+
+<!-- ── MODAL PILOTOS ──────────────────────────────────── -->
+<div id="driverModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="driverModalTitle">Nuevo Piloto</h3>
+      <button class="modal-close" id="btnCloseDriverModal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="driverEditId">
+      <div class="modal-grid">
+        <div class="modal-field full">
+          <label class="form-label">Nombre del piloto</label>
+          <input type="text" id="driverName" class="form-input" placeholder="Nombre completo">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Número</label>
+          <input type="number" id="driverNumber" class="form-input" placeholder="Ej: 7" min="1">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Estado</label>
+          <select id="driverEstado" class="form-select">
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelDriverModal" class="btn-ghost">Cancelar</button>
+        <button id="btnSaveDriver" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL CARRERAS ─────────────────────────────────── -->
+<div id="carreraModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="carreraModalTitle">Nueva Carrera</h3>
+      <button class="modal-close" id="btnCloseCarreraModal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="carreraEditId">
+      <div class="modal-grid">
+        <div class="modal-field full">
+          <label class="form-label">Nombre de la carrera</label>
+          <input type="text" id="carreraNombre" class="form-input" placeholder="Ej: GP Circuito Norte">
+        </div>
+        <div class="modal-field full">
+          <label class="form-label">Circuito</label>
+          <input type="text" id="carreraCircuito" class="form-input" placeholder="Ej: Circuito Norte Internacional">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Fecha</label>
+          <input type="date" id="carreraFecha" class="form-input">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Estado</label>
+          <select id="carreraCompletada" class="form-select">
+            <option value="false">Pendiente</option>
+            <option value="true">Completada</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelCarreraModal" class="btn-ghost">Cancelar</button>
+        <button id="btnSaveCarrera" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL TIEMPOS ──────────────────────────────────── -->
+<div id="tiempoModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="tiempoModalTitle">Registrar Tiempo</h3>
+      <button class="modal-close" id="btnCloseTiempoModal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tiempoEditId">
+      <div class="modal-grid">
+        <div class="modal-field full">
+          <label class="form-label">Piloto</label>
+          <select id="tiempoPiloto" class="form-select">
+            <option value="">Seleccionar piloto...</option>
+          </select>
+        </div>
+        <div class="modal-field full">
+          <label class="form-label">Tiempo <span style="color:var(--gray-500);font-size:0.7rem;text-transform:none;letter-spacing:0">(formato MM:SS.mmm — ej: 01:12.450)</span></label>
+          <input type="text" id="tiempoValor" class="form-input" placeholder="01:12.450">
+        </div>
+        <p class="modal-note">🏁 La vuelta rápida por carrera se calcula automáticamente.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelTiempoModal" class="btn-ghost">Cancelar</button>
+        <button id="btnSaveTiempo" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL RANQUIN ──────────────────────────────────── -->
+<div id="rankingModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="rankingModalTitle">Agregar al Ranquin</h3>
+      <button class="modal-close" id="btnCloseModal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rankingEditId">
+      <div class="modal-grid">
+        <div class="modal-field full">
+          <label class="form-label">Piloto</label>
+          <select id="rankingPiloto" class="form-select">
+            <option value="">Seleccionar piloto...</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Puntos</label>
+          <input type="number" id="rankingPuntos" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Carreras</label>
+          <input type="number" id="rankingCarreras" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Victorias</label>
+          <input type="number" id="rankingVictorias" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Podios</label>
+          <input type="number" id="rankingPodios" class="form-input" placeholder="0" min="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelModal" class="btn-ghost">Cancelar</button>
+        <button id="btnSaveRanking" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="js/admin.js"></script>
