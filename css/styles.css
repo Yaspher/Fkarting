@@ -343,6 +343,78 @@ ul { list-style: none; }
   text-transform: uppercase;
 }
 
+/* ============================================================
+   PODIO TOP 3
+   ============================================================ */
+
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.podium-item {
+  text-align: center;
+  position: relative;
+}
+
+.podium-name {
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.podium-points {
+  background: #22c55e;
+  color: #000;
+  font-weight: 900;
+  font-family: var(--font-display);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.podium-box {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2.5rem;
+  color: rgba(255,255,255,0.2);
+  border-radius: 10px 10px 0 0;
+}
+
+.p1 .podium-box {
+  height: 180px;
+  background: #8b5a0a;
+}
+
+.p2 .podium-box {
+  height: 140px;
+  background: #374151;
+}
+
+.p3 .podium-box {
+  height: 120px;
+  background: #7c2d12;
+}
+
+.podium-position {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.p1 .podium-position { color: var(--gold); }
+.p2 .podium-position { color: var(--silver); }
+.p3 .podium-position { color: var(--bronze); }
 
 /* ============================================================
    RANKING TABLE
