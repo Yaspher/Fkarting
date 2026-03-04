@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>FKarting — Acceso Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+    /* ── Variables (autocontenido, no depende de styles.css) ── */
+    :root {
+        --bg:          #080808;
+        --bg-card:     #0e0e0e;
+        --border:      rgba(127,29,29,0.30);
+        --border-soft: rgba(127,29,29,0.20);
+        --border-dim:  rgba(127,29,29,0.12);
+        --red:         #dc2626;
+        --red-700:     #b91c1c;
+        --red-500:     #ef4444;
+        --red-900:     #7f1d1d;
+        --white:       #ffffff;
+        --gray-500:    #6b7280;
+        --gray-600:    #4b5563;
+        --gray-700:    #374151;
+        --font-display: 'Barlow Condensed', sans-serif;
+        --font-body:    'Barlow', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        background: var(--bg);
+        color: #d1d5db;
+        font-family: var(--font-body);
+    }
+
+    /* Logo */
+    .logo-icon {
+        width: 40px; height: 40px;
+        border-radius: 8px;
+        background: var(--red-700);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--white);
+    }
+    .logo-icon svg { width: 20px; height: 20px; }
+    .logo-text {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 1.5rem;
+        letter-spacing: 0.06em;
+        color: var(--white);
+    }
+
+    /* Page layout */
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-page::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 40%, rgba(185,28,28,0.10) 0%, transparent 65%);
+        pointer-events: none;
+    }
+
+    /* Card */
+    .login-card {
+        position: relative;
+        z-index: 1;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 44px 40px 36px;
+        width: 90%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+    }
+
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        border-radius: 16px 16px 0 0;
+        background: linear-gradient(to right, transparent, var(--red-700), var(--red), var(--red-700), transparent);
+    }
+
+    .login-logo { display: flex; align-items: center; gap: 10px; }
+
+    .login-heading { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+    .login-heading h1 {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 1.5rem;
+        color: var(--white);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .login-heading p { font-size: 0.8rem; color: var(--gray-600); }
+
+    /* Form */
+    .login-form { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--gray-500);
+    }
+    .field input {
+        background: rgba(0,0,0,0.4);
+        border: 1px solid var(--border-soft);
+        border-radius: 8px;
+        padding: 11px 14px;
+        color: var(--white);
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.15s;
+        width: 100%;
+    }
+    .field input:focus  { border-color: var(--red-700); }
+    .field input::placeholder { color: var(--gray-700); }
+
+    /* Error */
+    .login-error {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: rgba(127,29,29,0.2);
+        border: 1px solid var(--red-900);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.82rem;
+        color: #f87171;
+        width: 100%;
+    }
+    .login-error.visible { display: flex; }
+    .login-error svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Button */
+    .btn-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        background: var(--red-700);
+        color: var(--white);
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        font-weight: 700;
+        padding: 12px 22px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        transition: background 0.15s, transform 0.1s;
+        margin-top: 4px;
+    }
+    .btn-login svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .btn-login:hover { background: var(--red); transform: translateY(-1px); }
+</style>
+
+</head>
+<body>
+
+<div class="login-page">
+    <div class="login-card">
+
+        <div class="login-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+            </div>
+            <span class="logo-text">FKARTING</span>
+        </div>
+
+        <div class="login-heading">
+            <h1>Panel de Administración</h1>
+            <p>Acceso restringido — solo personal autorizado</p>
+        </div>
+
+        <div class="login-form">
+            <div class="field">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" placeholder="usuario" autocomplete="username">
+            </div>
+            <div class="field">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <div class="login-error" id="loginError">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Usuario o contraseña incorrectos.
+            </div>
+
+            <button class="btn-primary btn-login" id="btnLogin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+                Ingresar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ── Credenciales ── Cámbialas aquí
+    const CREDENTIALS = {
+        usuario: "admin",
+        password: "fkarting2026"
+    };
+
+    const SESSION_KEY = "fk_admin_auth";
+
+    // Si ya está logueado, saltar directo
+    if (sessionStorage.getItem(SESSION_KEY) === "true") {
+        window.location.replace("admin.html");
+    }
+
+    function doLogin() {
+        const user = document.getElementById("username").value.trim();
+        const pass = document.getElementById("password").value;
+        const err  = document.getElementById("loginError");
+
+        if (user === CREDENTIALS.usuario && pass === CREDENTIALS.password) {
+            sessionStorage.setItem(SESSION_KEY, "true");
+            window.location.replace("admin.html");
+        } else {
+            err.classList.add("visible");
+            document.getElementById("password").value = "";
+            document.getElementById("password").focus();
+        }
+    }
+
+    document.getElementById("btnLogin").addEventListener("click", doLogin);
+
+    // Permitir Enter en cualquier campo
+    document.getElementById("username").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+    document.getElementById("password").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+</script>
+
+</body>
+</html>
