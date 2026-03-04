@@ -565,7 +565,7 @@ ul { list-style: none; }
 
 .drivers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
 }
 
@@ -573,11 +573,11 @@ ul { list-style: none; }
   background: var(--bg-card);
   border: 1px solid var(--border-dim);
   border-radius: 12px;
-  padding: 24px 20px;
+  padding: 28px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   text-align: center;
   transition: border-color 0.2s, transform 0.2s, background 0.2s;
   position: relative;
@@ -600,14 +600,12 @@ ul { list-style: none; }
   background: rgba(14,14,14,0.98);
 }
 
-.driver-card:hover::before {
-  opacity: 1;
-}
+.driver-card:hover::before { opacity: 1; }
 
 .driver-num {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   color: var(--red);
   line-height: 1;
 }
@@ -616,37 +614,52 @@ ul { list-style: none; }
   font-weight: 700;
   font-size: 1rem;
   color: var(--white);
+  margin-bottom: 12px;
 }
 
-.driver-cat {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+/* Stats row: Campeonatos | Podios */
+.driver-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
 }
 
-.driver-cat.senior  { background: rgba(127,29,29,0.35); color: #f87171; }
-.driver-cat.junior  { background: rgba(120,53,15,0.35);  color: #fbbf24; }
-.driver-cat.other { background: var(--gray-800);       color: var(--gray-400); }
+.driver-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px;
+  gap: 2px;
+}
 
-.driver-pts {
+.driver-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-dim);
+  flex-shrink: 0;
+}
+
+.driver-stat-value {
   font-family: var(--font-display);
   font-weight: 900;
   font-size: 1.4rem;
-  color: var(--gray-300);
+  color: var(--red-500);
   line-height: 1;
 }
 
-.driver-pts-label {
-  font-size: 0.65rem;
+.driver-stat-label {
+  font-size: 0.6rem;
   color: var(--gray-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  font-weight: 600;
 }
-
 
 /* ============================================================
    FOOTER
