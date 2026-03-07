@@ -14,14 +14,14 @@ async function sbGet(table, params = "") {
 }
 
 // ── Ranking ────────────────────────────────────
-export const getPodiumTop3    = () => sbGet("ranking_general", "order=total_puntos.desc&limit=3");
-export const getRankingTop3   = () => sbGet("ranking", "select=puntos,carreras,piloto(nombre)&order=puntos.desc&limit=3");
-export const getPilotosTop6   = () => sbGet("ranking_general", "order=total_puntos.desc&limit=6");
+export const getRankingVista  = () => sbGet("vista_ranking", "select=Campeonato,Piloto,Puntos,Vitorias,Podios");
+
+// ── Tiempos ────────────────────────────────────
+export const getTiempoVista   = () => sbGet("vista_tiempos", "select=SecTiempo,SecCarrera,SecPiloto,Tiempos,VueltaRapida,NombrePiloto");
+
+// ── Pilotos ────────────────────────────────────
+export const getPilotosVista  = () => sbGet("vista_piloto",  "select=Id,Nombre,Numero,Campeonato,Victorias,Podios");
 
 // ── Carreras ───────────────────────────────────
 export const getUltimaCarrera = () => sbGet("carrera", "completada=eq.true&order=fecha.desc&limit=1");
-export const getResultados    = (id) => sbGet("resultado", `id_carrera=eq.${id}&order=posicion.asc&select=posicion,puntos,piloto(nombre)`);
-
-// ── Pilotos ────────────────────────────────────
-export const getPilotosActivos = () => sbGet("piloto", "activo=eq.true&order=numero.asc");
-export const getPilotosVista   = () => sbGet("vista_piloto", "select=Id,Nombre,Numero,Campeonato,Podios");
+export const getResultados    = (id) => sbGet("resultado", `id_carrera=eq.${id}&order=posicion.asc&select=posicion,puntos,piloto:id_piloto(pilo_nombre)`);

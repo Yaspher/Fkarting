@@ -1,93 +1,133 @@
 // ══════════════════════════════════════════════
 //  FKarting - app.js
-//  Solo consume el DAL y maneja el DOM
 // ══════════════════════════════════════════════
 
 import {
-    getPodiumTop3,
-    getRankingTop3,
-    getPilotosTop6,
+    getRankingVista,
+    getPilotosVista,
+    getTiempoVista,
     getUltimaCarrera,
-    getResultados,
-    getPilotosActivos,
-    getPilotosVista
+    getResultados
 } from './conection.js';
-
-
-// ── Podio Top 3 ────────────────────────────────
-async function loadPodium() {
-    const container = document.getElementById("podiumContainer");
-    try {
-        const data = await getPodiumTop3();
-
-        if (!data || data.length === 0) {
-            container.innerHTML = "<p>Sin datos aún</p>";
-            return;
-        }
-
-        // Orden visual: P2 - P1 - P3
-        const positions = [data[1], data[0], data[2]];
-        const classes   = ["p2", "p1", "p3"];
-        const labels    = ["P2", "P1", "P3"];
-
-        container.innerHTML = positions.map((d, i) => {
-            if (!d) return "";
-            return `
-                <div class="podium-item ${classes[i]}">
-                    <div class="podium-position">${labels[i]}</div>
-                    <div class="podium-name">${d.nombre}</div>
-                    <div class="podium-points">${d.total_puntos} pts</div>
-                    <div class="podium-box">${labels[i].replace("P", "")}</div>
-                </div>`;
-        }).join("");
-
-    } catch (err) {
-        console.error("Podium:", err);
-        container.innerHTML = "<p>Error al cargar podio</p>";
-    }
-}
 
 
 // ── Ranking General ────────────────────────────
 async function loadRanking() {
-    const tbody = document.querySelector("#rankingTable tbody");
+    const container = document.getElementById("rankingList");
     try {
-        const data = await getRankingTop3();
+        const [ranking, pilotos] = await Promise.all([
+            getRankingVista(),
+            getPilotosVista()
+        ]);
 
-        if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="padding:20px">Sin datos aún</td></tr>`;
+        if (!ranking || ranking.length === 0) {
+            container.innerHTML = `<p class="empty-msg">Sin datos aún.</p>`;
             return;
         }
 
-        tbody.innerHTML = data.map((d, i) => `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${d.piloto?.nombre ?? "—"}</td>
-                <td>${d.carreras}</td>
-                <td>${d.puntos}</td>
-            </tr>
-        `).join("");
+        const pilotoMap = Object.fromEntries(
+            (pilotos ?? []).map(p => [p.Id, p])
+        );
+
+        const medals   = ["🥇", "🥈", "🥉"];
+        const posClass = ["pos-gold", "pos-silver", "pos-bronze"];
+
+        container.innerHTML = ranking.map((d, i) => {
+            const piloto = pilotoMap[d.Piloto];
+            const nombre = piloto?.Nombre ?? `Piloto #${d.Piloto}`;
+            const numero = piloto?.Numero ?? "—";
+
+            return `
+            <div class="ranking-row ${posClass[i] ?? ''}">
+                <div class="ranking-pos">
+                    <span class="ranking-medal">${medals[i] ?? i + 1}</span>
+                    <span class="ranking-num">#${numero}</span>
+                </div>
+                <div class="ranking-name">${nombre}</div>
+                <div class="ranking-stats">
+                    <div class="rstat">
+                        <span class="rstat-val">${d.Vitorias ?? 0}</span>
+                        <span class="rstat-lbl">Victorias</span>
+                    </div>
+                    <div class="rstat">
+                        <span class="rstat-val">${d.Podios ?? 0}</span>
+                        <span class="rstat-lbl">Podios</span>
+                    </div>
+                </div>
+                <div class="ranking-pts">
+                    ${d.Puntos}
+                    <span class="ranking-pts-lbl">pts</span>
+                </div>
+            </div>`;
+        }).join("");
 
     } catch (err) {
         console.error("Ranking:", err);
-        tbody.innerHTML = `<tr><td colspan="4">Error al cargar ranking</td></tr>`;
+        container.innerHTML = `<p class="empty-msg">Error al cargar ranking.</p>`;
     }
 }
 
 
-// ── Última Carrera completada ──────────────────
+// ── Mejor Tiempo ───────────────────────────────
+async function loadMejorTiempo() {
+    const container = document.getElementById("mejorTiempoList");
+    try {
+        const data = await getTiempoVista();
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p class="empty-msg">Sin tiempos registrados.</p>`;
+            return;
+        }
+
+        const sorted = [...data].sort((a, b) => {
+            const tA = a.Tiempos ?? "";
+            const tB = b.Tiempos ?? "";
+            return tA.localeCompare(tB);
+        });
+
+        container.innerHTML = sorted.map((d, i) => {
+            const esRapida = d.VueltaRapida === true;
+            return `
+            <div class="tiempo-row ${esRapida ? "vuelta-rapida" : ""}">
+                <div class="tiempo-pos">${i + 1}</div>
+                <div class="tiempo-nombre">${d.NombrePiloto ?? "—"}</div>
+                ${esRapida ? `<span class="tiempo-badge">⚡ Vuelta Rápida</span>` : ""}
+                <div class="tiempo-valor">${formatTiempo(d.Tiempos)}</div>
+            </div>`;
+        }).join("");
+
+    } catch (err) {
+        console.error("Mejor Tiempo:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar tiempos.</p>`;
+    }
+}
+
+// Convierte interval de PostgreSQL "00:01:23.456" → "1:23.456"
+function formatTiempo(t) {
+    if (!t) return "—";
+    const parts = t.split(":");
+    if (parts.length === 3) {
+        const min = parseInt(parts[1], 10);
+        const seg = parseFloat(parts[2]).toFixed(3);
+        return `${min}:${seg.padStart(6, "0")}`;
+    }
+    return t;
+}
+
+
+// ── Última Carrera ─────────────────────────────
 async function loadUltimaCarrera() {
     const container = document.getElementById("resultsList");
     try {
         const carreras = await getUltimaCarrera();
 
         if (!carreras || carreras.length === 0) {
-            container.innerHTML = "<p>No hay carreras completadas aún.</p>";
+            container.innerHTML = "<p class='empty-msg'>No hay carreras completadas aún.</p>";
             return;
         }
 
-        const carrera   = carreras[0];
-        const fechaStr  = carrera.fecha
+        const carrera  = carreras[0];
+        const fechaStr = carrera.fecha
             ? new Date(carrera.fecha).toLocaleDateString("es-DO", {
                 day: "numeric", month: "long", year: "numeric"
               })
@@ -95,19 +135,30 @@ async function loadUltimaCarrera() {
 
         const resultados = await getResultados(carrera.id_carrera);
 
+        const posClass = (pos) => {
+            if (pos === 1) return "p1";
+            if (pos === 2) return "p2";
+            if (pos === 3) return "p3";
+            return "px";
+        };
+
         container.innerHTML = `
-            <p style="margin-bottom:14px;opacity:.65;font-size:13px;letter-spacing:.5px;">
-                📍 ${carrera.nombre}${carrera.circuito ? " · " + carrera.circuito : ""}
-                ${fechaStr ? " · " + fechaStr : ""}
-            </p>
-            ${resultados.map(r =>
-                `<p>${r.posicion}°&nbsp; ${r.piloto.nombre} — <strong>${r.puntos} pts</strong></p>`
-            ).join("")}
+            <div class="carrera-meta">
+                <span class="carrera-meta-icon">📍</span>
+                <span>${carrera.nombre}${carrera.circuito ? " · " + carrera.circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
+            </div>
+            ${resultados.map(r => `
+                <div class="result-item">
+                    <div class="result-pos ${posClass(r.posicion)}">${r.posicion}</div>
+                    <div class="result-name">${r.piloto.pilo_nombre}</div>
+                    <div class="result-pts">${r.puntos}<span class="result-pts-label">pts</span></div>
+                </div>
+            `).join("")}
         `;
 
     } catch (err) {
         console.error("Última carrera:", err);
-        container.innerHTML = "<p>Error al cargar resultados.</p>";
+        container.innerHTML = "<p class='empty-msg'>Error al cargar resultados.</p>";
     }
 }
 
@@ -119,7 +170,7 @@ async function loadPilotos() {
         const data = await getPilotosVista();
 
         if (!data || data.length === 0) {
-            grid.innerHTML = "<p>No hay pilotos registrados.</p>";
+            grid.innerHTML = "<p class='empty-msg'>No hay pilotos registrados.</p>";
             return;
         }
 
@@ -134,6 +185,11 @@ async function loadPilotos() {
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
+                        <span class="driver-stat-value">${d.Victorias ?? 0}</span>
+                        <span class="driver-stat-label">Victorias</span>
+                    </div>
+                    <div class="driver-stat-divider"></div>
+                    <div class="driver-stat">
                         <span class="driver-stat-value">${d.Podios ?? 0}</span>
                         <span class="driver-stat-label">Podios</span>
                     </div>
@@ -143,7 +199,7 @@ async function loadPilotos() {
 
     } catch (err) {
         console.error("Pilotos:", err);
-        grid.innerHTML = "<p>Error al cargar pilotos.</p>";
+        grid.innerHTML = "<p class='empty-msg'>Error al cargar pilotos.</p>";
     }
 }
 
@@ -159,8 +215,8 @@ window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 // ── Arrancar ───────────────────────────────────
 async function init() {
     await Promise.all([
-        loadPodium(),
         loadRanking(),
+        loadMejorTiempo(),
         loadUltimaCarrera(),
         loadPilotos()
     ]);

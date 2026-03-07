@@ -48,6 +48,30 @@ body {
   color: var(--gray-300);
   font-family: var(--font-body);
   line-height: 1.6;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animación flash en el fondo */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(127, 29, 29, 0.15) 0%, transparent 70%);
+  animation: flash-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes flash-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 a { text-decoration: none; }
@@ -222,7 +246,7 @@ ul { list-style: none; }
   position: relative;
   background:
     linear-gradient(to bottom, rgba(8,8,8,0.30) 0%, rgba(8,8,8,0.80) 70%, rgba(8,8,8,1) 100%),
-    url('https://images.unsplash.com/photo-1549921296-3a6b6fdd2c91') center / cover no-repeat;
+    url('https://images.unsplash.com/photo-1549921296-3a6b6fdd2c91?w=1920&q=80') center / cover no-repeat;
   padding: 130px 0 100px;
   overflow: hidden;
 }
@@ -344,156 +368,205 @@ ul { list-style: none; }
 }
 
 /* ============================================================
-   PODIO TOP 3
+   RANKING LIST
    ============================================================ */
 
-.podium {
+.ranking-list {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 40px;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.podium-item {
-  text-align: center;
-  position: relative;
-}
-
-.podium-name {
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 8px;
-}
-
-.podium-points {
-  background: #22c55e;
-  color: #000;
-  font-weight: 900;
-  font-family: var(--font-display);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
-  display: inline-block;
-}
-
-.podium-box {
-  width: 120px;
+.ranking-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 2.5rem;
-  color: rgba(255,255,255,0.2);
-  border-radius: 10px 10px 0 0;
-}
-
-.p1 .podium-box {
-  height: 180px;
-  background: #8b5a0a;
-}
-
-.p2 .podium-box {
-  height: 140px;
-  background: #374151;
-}
-
-.p3 .podium-box {
-  height: 120px;
-  background: #7c2d12;
-}
-
-.podium-position {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 900;
-  margin-bottom: 6px;
-}
-
-.p1 .podium-position { color: var(--gold); }
-.p2 .podium-position { color: var(--silver); }
-.p3 .podium-position { color: var(--bronze); }
-
-/* ============================================================
-   RANKING TABLE
-   ============================================================ */
-
-.table-wrapper {
+  gap: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
   border-radius: 12px;
-  border: 1px solid var(--border);
+  padding: 16px 24px;
+  position: relative;
   overflow: hidden;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
 }
 
-#rankingTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+.ranking-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 12px 0 0 12px;
+  background: var(--border-dim);
+  transition: background 0.2s;
 }
 
-#rankingTable thead tr {
-  background: var(--bg-dark);
-  border-bottom: 1px solid var(--border);
+.ranking-row:hover {
+  background: rgba(14,14,14,0.98);
+  border-color: var(--border-soft);
+  transform: translateX(3px);
 }
 
-#rankingTable thead th {
-  padding: 13px 20px;
-  text-align: left;
-  font-size: 0.7rem;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
+/* Accent bar por posición */
+.pos-gold   { border-color: rgba(234,179,8,0.25); }
+.pos-silver { border-color: rgba(209,213,219,0.18); }
+.pos-bronze { border-color: rgba(217,119,6,0.25); }
+
+.pos-gold::before   { background: var(--gold); }
+.pos-silver::before { background: var(--silver); }
+.pos-bronze::before { background: var(--bronze); }
+
+/* Posición + número */
+.ranking-pos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+  gap: 2px;
 }
 
-#rankingTable thead th:last-child { text-align: right; }
-
-#rankingTable tbody tr {
-  border-bottom: 1px solid var(--border-dim);
-  transition: background 0.15s;
+.ranking-medal {
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
-#rankingTable tbody tr:last-child { border-bottom: none; }
-
-#rankingTable tbody tr:hover {
-  background: rgba(127,29,29,0.07);
-}
-
-#rankingTable tbody td {
-  padding: 14px 20px;
-  vertical-align: middle;
-}
-
-#rankingTable tbody td:last-child { text-align: right; }
-
-/* Position column */
-#rankingTable tbody tr:nth-child(1) td:first-child { color: var(--gold);   font-weight: 900; }
-#rankingTable tbody tr:nth-child(2) td:first-child { color: var(--silver); font-weight: 900; }
-#rankingTable tbody tr:nth-child(3) td:first-child { color: var(--bronze); font-weight: 900; }
-
-#rankingTable tbody td:first-child {
+.ranking-num {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--gray-600);
-  min-width: 48px;
+  letter-spacing: 0.05em;
 }
 
-/* Pilot name */
-#rankingTable tbody td:nth-child(2) {
+/* Nombre */
+.ranking-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 1rem;
   color: var(--white);
+}
+
+/* Stats: victorias + podios */
+.ranking-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.rstat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.rstat-val {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: var(--gray-300);
+  line-height: 1;
+}
+
+.rstat-lbl {
+  font-size: 0.6rem;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   font-weight: 600;
 }
 
-/* Points */
-#rankingTable tbody td:last-child {
+/* Puntos */
+.ranking-pts {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.15rem;
+  font-size: 1.8rem;
   color: var(--red-500);
+  line-height: 1;
+  text-align: right;
+  min-width: 80px;
 }
 
+.ranking-pts-lbl {
+  font-size: 0.65rem;
+  color: var(--gray-600);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-left: 2px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .ranking-row { gap: 12px; padding: 14px 16px; }
+  .ranking-stats { gap: 14px; }
+  .ranking-pts { font-size: 1.4rem; min-width: 60px; }
+}
+
+/* ── MEJOR TIEMPO ──────────────────────────── */
+.tiempos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tiempo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 14px 20px;
+  transition: border-color .2s;
+}
+
+.tiempo-row:hover {
+  border-color: rgba(255,255,255,0.18);
+}
+
+.tiempo-row.vuelta-rapida {
+  border-color: #e10600;
+  background: rgba(225, 6, 0, 0.07);
+}
+
+.tiempo-pos {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.25);
+  width: 36px;
+}
+
+.tiempo-nombre {
+  flex: 1;
+  padding: 0 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.tiempo-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid #a855f7;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin-right: 14px;
+  text-transform: uppercase;
+}
+
+.tiempo-valor {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+}
 
 /* ============================================================
    RESULTADOS / ÚLTIMA CARRERA
@@ -558,6 +631,25 @@ ul { list-style: none; }
   margin-left: 2px;
 }
 
+.carrera-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.82rem;
+  color: var(--gray-600);
+  letter-spacing: 0.03em;
+}
+
+.carrera-meta-icon {
+  font-size: 1rem;
+}
+
+.empty-msg {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  padding: 20px 0;
+}
 
 /* ============================================================
    PILOTOS GRID
