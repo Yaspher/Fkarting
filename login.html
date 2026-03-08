@@ -6,176 +6,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-
     <style>
-    /* ── Variables (autocontenido, no depende de styles.css) ── */
-    :root {
-        --bg:          #080808;
-        --bg-card:     #0e0e0e;
-        --border:      rgba(127,29,29,0.30);
-        --border-soft: rgba(127,29,29,0.20);
-        --border-dim:  rgba(127,29,29,0.12);
-        --red:         #dc2626;
-        --red-700:     #b91c1c;
-        --red-500:     #ef4444;
-        --red-900:     #7f1d1d;
-        --white:       #ffffff;
-        --gray-500:    #6b7280;
-        --gray-600:    #4b5563;
-        --gray-700:    #374151;
-        --font-display: 'Barlow Condensed', sans-serif;
-        --font-body:    'Barlow', sans-serif;
-    }
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        /* Fondo decorativo */
+        .login-page::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 40%, rgba(185,28,28,0.10) 0%, transparent 65%);
+            pointer-events: none;
+        }
 
-    body {
-        background: var(--bg);
-        color: #d1d5db;
-        font-family: var(--font-body);
-    }
+        .login-card {
+            position: relative;
+            z-index: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 44px 40px 36px;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
 
-    /* Logo */
-    .logo-icon {
-        width: 40px; height: 40px;
-        border-radius: 8px;
-        background: var(--red-700);
-        display: flex; align-items: center; justify-content: center;
-        color: var(--white);
-    }
-    .logo-icon svg { width: 20px; height: 20px; }
-    .logo-text {
-        font-family: var(--font-display);
-        font-weight: 900;
-        font-size: 1.5rem;
-        letter-spacing: 0.06em;
-        color: var(--white);
-    }
+        /* Stripe top */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+            background: linear-gradient(to right, transparent, var(--red-700), var(--red), var(--red-700), transparent);
+        }
 
-    /* Page layout */
-    .login-page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--bg);
-        position: relative;
-        overflow: hidden;
-    }
+        .login-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .login-page::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(ellipse at 50% 40%, rgba(185,28,28,0.10) 0%, transparent 65%);
-        pointer-events: none;
-    }
+        .login-logo .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
 
-    /* Card */
-    .login-card {
-        position: relative;
-        z-index: 1;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 44px 40px 36px;
-        width: 90%;
-        max-width: 400px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 28px;
-    }
+        .login-logo .logo-text {
+            font-size: 1.5rem;
+        }
 
-    .login-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        border-radius: 16px 16px 0 0;
-        background: linear-gradient(to right, transparent, var(--red-700), var(--red), var(--red-700), transparent);
-    }
+        .login-heading {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
 
-    .login-logo { display: flex; align-items: center; gap: 10px; }
+        .login-heading h1 {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
 
-    .login-heading { text-align: center; display: flex; flex-direction: column; gap: 4px; }
-    .login-heading h1 {
-        font-family: var(--font-display);
-        font-weight: 900;
-        font-size: 1.5rem;
-        color: var(--white);
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-    }
-    .login-heading p { font-size: 0.8rem; color: var(--gray-600); }
+        .login-heading p {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+        }
 
-    /* Form */
-    .login-form { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+        .login-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
 
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--gray-500);
-    }
-    .field input {
-        background: rgba(0,0,0,0.4);
-        border: 1px solid var(--border-soft);
-        border-radius: 8px;
-        padding: 11px 14px;
-        color: var(--white);
-        font-family: var(--font-body);
-        font-size: 0.9rem;
-        outline: none;
-        transition: border-color 0.15s;
-        width: 100%;
-    }
-    .field input:focus  { border-color: var(--red-700); }
-    .field input::placeholder { color: var(--gray-700); }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-    /* Error */
-    .login-error {
-        display: none;
-        align-items: center;
-        gap: 8px;
-        background: rgba(127,29,29,0.2);
-        border: 1px solid var(--red-900);
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 0.82rem;
-        color: #f87171;
-        width: 100%;
-    }
-    .login-error.visible { display: flex; }
-    .login-error svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .field label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray-500);
+        }
 
-    /* Button */
-    .btn-login {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        background: var(--red-700);
-        color: var(--white);
-        font-family: var(--font-body);
-        font-size: 0.9rem;
-        font-weight: 700;
-        padding: 12px 22px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        transition: background 0.15s, transform 0.1s;
-        margin-top: 4px;
-    }
-    .btn-login svg { width: 16px; height: 16px; flex-shrink: 0; }
-    .btn-login:hover { background: var(--red); transform: translateY(-1px); }
-</style>
+        .field input {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            padding: 11px 14px;
+            color: var(--white);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.15s;
+            width: 100%;
+        }
 
+        .field input:focus {
+            border-color: var(--red-700);
+        }
+
+        .field input::placeholder {
+            color: var(--gray-700);
+        }
+
+        .login-error {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(127,29,29,0.2);
+            border: 1px solid var(--red-900);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            color: #f87171;
+            width: 100%;
+        }
+
+        .login-error.visible {
+            display: flex;
+        }
+
+        .login-error svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .btn-login {
+            width: 100%;
+            justify-content: center;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
 
@@ -248,14 +230,6 @@
         const pass = document.getElementById("password").value;
         const err  = document.getElementById("loginError");
 
-        if (user === CREDENTIALS.usuario && pass === CREDENTIALS.password) {
-            sessionStorage.setItem(SESSION_KEY, "true");
-            window.location.replace("admin.html");
-        } else {
-            err.classList.add("visible");
-            document.getElementById("password").value = "";
-            document.getElementById("password").focus();
-        }
     }
 
     document.getElementById("btnLogin").addEventListener("click", doLogin);
