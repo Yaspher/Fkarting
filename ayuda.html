@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>FKarting — Guía del Campeonato</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<header class="navbar">
+    <div class="container navbar-inner">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+            </div>
+            <span class="logo-text">FKARTING</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="index.html#ranking">Ranking</a></li>
+                <li><a href="index.html#resultados">Resultados</a></li>
+                <li><a href="index.html#pilotos">Pilotos</a></li>
+            </ul>
+        </nav>
+        <a href="login.html" class="navbar-admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+            Admin
+        </a>
+    </div>
+</header>
+
+<!-- ── HERO AYUDA ── -->
+<section class="help-hero">
+    <div class="help-hero-overlay"></div>
+    <div class="container help-hero-inner">
+        <p class="hero-eyebrow">Documentación Oficial</p>
+        <h1 class="hero-title">Guía del<br><span>Campeonato</span></h1>
+        <p class="hero-sub">Todo lo que necesitas saber sobre puntos, rankings y tiempos.</p>
+        <p class="hero-sub">Version v1</p>
+    </div>
+    <div class="hero-stripe"></div>
+</section>
+
+<!-- ── NAV INTERNA ── -->
+<div class="help-nav-bar">
+    <div class="container help-nav-inner">
+        <a href="#puntos" class="help-nav-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Sistema de Puntos
+        </a>
+        <a href="#ranking" class="help-nav-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Ranking y Campeonato
+        </a>
+        <a href="#vuelta" class="help-nav-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Vuelta Rápida
+        </a>
+    </div>
+</div>
+
+<!-- ── BACK BUTTON ── -->
+<div style="background: var(--bg-dark); border-bottom: 1px solid var(--border-dim); padding: 8px 0;">
+    <div class="container">
+        <a href="index.html" class="btn-back-top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Volver al inicio
+        </a>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 1 — SISTEMA DE PUNTOS
+══════════════════════════════════════ -->
+<section id="puntos" class="section">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Sistema de Puntos</h2>
+        </div>
+
+        <p class="help-intro">
+            FKarting utiliza el sistema de puntos oficial de la Fórmula 1. Los puntos se otorgan a los
+            <strong>10 primeros clasificados</strong> de cada carrera y se acumulan a lo largo del campeonato.
+        </p>
+
+        <!-- Tabla de puntos -->
+        <div class="pts-grid">
+
+            <!-- P1 destacado -->
+            <div class="pts-card pts-p1">
+                <div class="pts-pos-label">Posición</div>
+                <div class="pts-pos">1°</div>
+                <div class="pts-medal">🥇</div>
+                <div class="pts-val">25</div>
+                <div class="pts-val-label">puntos</div>
+            </div>
+
+            <div class="pts-card pts-p2">
+                <div class="pts-pos-label">Posición</div>
+                <div class="pts-pos">2°</div>
+                <div class="pts-medal">🥈</div>
+                <div class="pts-val">18</div>
+                <div class="pts-val-label">puntos</div>
+            </div>
+
+            <div class="pts-card pts-p3">
+                <div class="pts-pos-label">Posición</div>
+                <div class="pts-pos">3°</div>
+                <div class="pts-medal">🥉</div>
+                <div class="pts-val">15</div>
+                <div class="pts-val-label">puntos</div>
+            </div>
+
+            <!-- P4–P10 en lista -->
+            <div class="pts-rest">
+                <div class="pts-rest-title">Resto de posiciones</div>
+                <div class="pts-rest-list">
+                    <div class="pts-rest-row"><span class="pts-rest-pos">4°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:48%"></div></div><span class="pts-rest-pts">12 pts</span></div>
+                    <div class="pts-rest-row"><span class="pts-rest-pos">5°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:40%"></div></div><span class="pts-rest-pts">10 pts</span></div>
+                    <div class="pts-rest-row"><span class="pts-rest-pos">6°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:32%"></div></div><span class="pts-rest-pts">8 pts</span></div>
+                    <div class="pts-rest-row"><span class="pts-rest-pos">7°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:24%"></div></div><span class="pts-rest-pts">6 pts</span></div>
+                    <div class="pts-rest-row"><span class="pts-rest-pos">8°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:16%"></div></div><span class="pts-rest-pts">4 pts</span></div>
+                    <div class="pts-rest-row"><span class="pts-rest-pos">9°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:8%"></div></div><span class="pts-rest-pts">2 pts</span></div>
+                    <div class="pts-rest-row"><span class="pts-rest-pos">10°</span><div class="pts-rest-bar-wrap"><div class="pts-rest-bar" style="width:4%"></div></div><span class="pts-rest-pts">1 pt</span></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Nota -->
+        <div class="help-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Los pilotos clasificados por fuera del top 10 <strong>no reciben puntos</strong> por esa carrera, pero su participación sí se registra en el historial.
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 2 — RANKING Y CAMPEONATO
+══════════════════════════════════════ -->
+<section id="ranking" class="section section-dark">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Ranking y Campeonato</h2>
+        </div>
+
+        <p class="help-intro">
+            El campeonato se determina por la acumulación de puntos obtenidos en todas las carreras de la temporada.
+            Al finalizar la temporada, el piloto con más puntos se corona <strong>Campeón FKarting</strong>.
+        </p>
+
+        <div class="help-cards">
+
+            <div class="help-card">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <h3>Acumulación de Puntos</h3>
+                <p>Los puntos de todas las carreras se suman al total del piloto en el ranking general. No hay descarte de resultados — cada carrera cuenta.</p>
+            </div>
+
+            <div class="help-card">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3>Desempate</h3>
+                <p>Si dos pilotos terminan con los mismos puntos, se prioriza el que tenga <strong>más victorias</strong>. Si persiste el empate, se comparan los segundos lugares, y así sucesivamente.</p>
+            </div>
+
+            <div class="help-card">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                </div>
+                <h3>Ranking en Vivo</h3>
+                <p>El ranking se actualiza automáticamente tras cada carrera. Los cambios de posición se reflejan en tiempo real en la página principal.</p>
+            </div>
+
+            <div class="help-card">
+                <div class="help-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+                </div>
+                <h3>Campeón de Temporada</h3>
+                <p>Al concluir la última carrera del año, el líder del ranking es proclamado <strong>Campeón del Campeonato FKarting</strong>. Su nombre queda registrado en el historial oficial.</p>
+            </div>
+
+        </div>
+
+        <!-- Timeline visual del campeonato -->
+        <div class="help-timeline">
+            <div class="help-timeline-title">Flujo de una temporada</div>
+            <div class="help-timeline-steps">
+                <div class="ht-step">
+                    <div class="ht-dot"></div>
+                    <div class="ht-content">
+                        <span class="ht-label">Inicio de temporada</span>
+                        <span class="ht-desc">Registro de pilotos y publicación del calendario de carreras</span>
+                    </div>
+                </div>
+                <div class="ht-line"></div>
+                <div class="ht-step">
+                    <div class="ht-dot"></div>
+                    <div class="ht-content">
+                        <span class="ht-label">Jornadas de carrera</span>
+                        <span class="ht-desc">Cada carrera otorga puntos — el ranking se actualiza al terminar</span>
+                    </div>
+                </div>
+                <div class="ht-line"></div>
+                <div class="ht-step">
+                    <div class="ht-dot"></div>
+                    <div class="ht-content">
+                        <span class="ht-label">Última carrera</span>
+                        <span class="ht-desc">Los puntos finales determinan al campeón y el podio del campeonato</span>
+                    </div>
+                </div>
+                <div class="ht-line"></div>
+                <div class="ht-step ht-step-final">
+                    <div class="ht-dot ht-dot-gold"></div>
+                    <div class="ht-content">
+                        <span class="ht-label" style="color:var(--gold)">🏆 Campeón coronado</span>
+                        <span class="ht-desc">El piloto con más puntos es el Campeón FKarting de la temporada</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SECCIÓN 3 — VUELTA RÁPIDA
+══════════════════════════════════════ -->
+<section id="vuelta" class="section">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Vuelta Rápida</h2>
+        </div>
+
+        <div class="vr-layout">
+
+            <div class="vr-explainer">
+                <p class="help-intro">
+                    La <strong>Vuelta Rápida</strong> es el tiempo de vuelta más bajo registrado por un piloto
+                    durante una carrera. Se identifica con el badge <span class="vr-inline-badge">⚡ Vuelta Rápida</span>
+                    en la sección de mejores tiempos.
+                </p>
+
+                <div class="vr-steps">
+                    <div class="vr-step">
+                        <div class="vr-step-num">1</div>
+                        <div class="vr-step-body">
+                            <strong>Registro por vuelta</strong>
+                            <span>Cada vuelta completada por cada piloto queda registrada con su tiempo exacto en el sistema.</span>
+                        </div>
+                    </div>
+                    <div class="vr-step">
+                        <div class="vr-step-num">2</div>
+                        <div class="vr-step-body">
+                            <strong>Mejor tiempo individual</strong>
+                            <span>Del total de vueltas de cada piloto, se toma únicamente la vuelta más rápida como su tiempo representativo.</span>
+                        </div>
+                    </div>
+                    <div class="vr-step">
+                        <div class="vr-step-num">3</div>
+                        <div class="vr-step-body">
+                            <strong>Comparación entre pilotos</strong>
+                            <span>Los mejores tiempos de todos los pilotos se comparan entre sí. El menor tiempo de la carrera recibe el badge de Vuelta Rápida.</span>
+                        </div>
+                    </div>
+                    <div class="vr-step">
+                        <div class="vr-step-num">4</div>
+                        <div class="vr-step-body">
+                            <strong>Lectura del tiempo</strong>
+                            <span>Los tiempos se muestran en formato <code>M:SS.mmm</code> — minutos, segundos y milisegundos. Por ejemplo, <code>1:23.456</code> son 1 minuto, 23 segundos y 456 milisegundos.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo visual -->
+            <div class="vr-example">
+                <div class="vr-example-title">Ejemplo de pantalla</div>
+                <div class="vr-mockup">
+                    <div class="vr-mock-row vr-mock-fast">
+                        <span class="vr-mock-pos">1</span>
+                        <span class="vr-mock-name">YASPHER</span>
+                        <span class="vr-mock-badge">⚡ Vuelta Rápida</span>
+                        <span class="vr-mock-time">0:59.800</span>
+                    </div>
+                    <div class="vr-mock-row">
+                        <span class="vr-mock-pos">2</span>
+                        <span class="vr-mock-name">WALI</span>
+                        <span class="vr-mock-time">0:59.990</span>
+                    </div>
+                    <div class="vr-mock-row">
+                        <span class="vr-mock-pos">3</span>
+                        <span class="vr-mock-name">PRUEBA</span>
+                        <span class="vr-mock-time">1:00.000</span>
+                    </div>
+                </div>
+                <div class="vr-example-note">
+                    El piloto con el tiempo más bajo recibe el badge especial y aparece primero en la lista.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="footer-logo">
+            <div class="logo-icon logo-icon-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                    <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+            </div>
+            <span class="logo-text">FKARTING</span>
+        </div>
+        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados</p>
+        <a href="login.html" class="footer-admin">Administración</a>
+    </div>
+</footer>
+
+<style>
+/* ── HELP HERO ── */
+.help-hero {
+  position: relative;
+  background:
+    linear-gradient(to bottom, rgba(8,8,8,0.5) 0%, rgba(8,8,8,0.85) 60%, rgba(8,8,8,1) 100%),
+    url('https://images.unsplash.com/photo-1549921296-3a6b6fdd2c91?w=1920&q=80') center / cover no-repeat;
+  padding: 90px 0 70px;
+  overflow: hidden;
+}
+
+.help-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 40% 50%, rgba(185,28,28,0.10) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.help-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.help-hero-inner .hero-title {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+}
+
+/* ── HELP NAV BAR ── */
+.help-nav-bar {
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 64px;
+  z-index: 90;
+}
+
+.help-nav-inner {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+  overflow-x: auto;
+}
+
+.help-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--gray-500);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+
+.help-nav-link svg { width: 14px; height: 14px; }
+
+.help-nav-link:hover {
+  color: var(--white);
+  background: rgba(127,29,29,0.15);
+}
+
+/* ── HELP INTRO ── */
+.help-intro {
+  font-size: 0.95rem;
+  color: var(--gray-400);
+  line-height: 1.7;
+  max-width: 700px;
+  margin-bottom: 32px;
+}
+
+.help-intro strong { color: var(--white); }
+
+/* ── PUNTOS GRID ── */
+.pts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 2fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pts-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 28px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-dim);
+}
+
+.pts-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.pts-p1 { border-color: rgba(234,179,8,0.3); }
+.pts-p2 { border-color: rgba(209,213,219,0.2); }
+.pts-p3 { border-color: rgba(217,119,6,0.25); }
+
+.pts-p1::before { background: var(--gold); box-shadow: 0 0 12px rgba(234,179,8,0.5); }
+.pts-p2::before { background: var(--silver); }
+.pts-p3::before { background: var(--bronze); }
+
+.pts-pos-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gray-600);
+}
+
+.pts-pos {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--gray-500);
+}
+
+.pts-medal { font-size: 2rem; margin: 4px 0; }
+
+.pts-val {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.pts-p1 .pts-val { color: var(--gold); text-shadow: 0 0 20px rgba(234,179,8,0.35); }
+.pts-p2 .pts-val { color: var(--silver); }
+.pts-p3 .pts-val { color: var(--bronze); }
+
+.pts-val-label {
+  font-size: 0.65rem;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+/* Columna rest P4-P10 */
+.pts-rest {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 14px;
+  padding: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pts-rest-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+
+.pts-rest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pts-rest-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pts-rest-pos {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  min-width: 28px;
+}
+
+.pts-rest-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pts-rest-bar {
+  height: 100%;
+  background: var(--red-700);
+  border-radius: 2px;
+}
+
+.pts-rest-pts {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: var(--red-500);
+  min-width: 42px;
+  text-align: right;
+}
+
+/* ── HELP NOTE ── */
+.help-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(127,29,29,0.1);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  line-height: 1.6;
+}
+
+.help-note svg { width: 16px; height: 16px; color: var(--red-500); flex-shrink: 0; margin-top: 2px; }
+.help-note strong { color: var(--white); }
+
+/* ── HELP CARDS ── */
+.help-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.help-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 12px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.help-card:hover {
+  border-color: var(--border);
+  transform: translateY(-2px);
+}
+
+.help-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(127,29,29,0.2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--red-500);
+}
+
+.help-card-icon svg { width: 18px; height: 18px; }
+
+.help-card h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.help-card p {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  line-height: 1.65;
+}
+
+.help-card p strong { color: var(--gray-300); }
+
+/* ── TIMELINE ── */
+.help-timeline {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 14px;
+  padding: 28px 28px;
+}
+
+.help-timeline-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gray-600);
+  margin-bottom: 20px;
+}
+
+.help-timeline-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+
+.ht-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ht-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--red-700);
+  border: 2px solid var(--red-900);
+  flex-shrink: 0;
+}
+
+.ht-dot-gold {
+  background: var(--gold);
+  border-color: rgba(234,179,8,0.4);
+  box-shadow: 0 0 8px rgba(234,179,8,0.4);
+}
+
+.ht-line {
+  flex: 1;
+  min-width: 20px;
+  height: 1px;
+  background: var(--border-dim);
+}
+
+.ht-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ht-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--white);
+  letter-spacing: 0.03em;
+}
+
+.ht-desc {
+  font-size: 0.72rem;
+  color: var(--gray-600);
+  max-width: 160px;
+}
+
+/* ── VUELTA RÁPIDA ── */
+.vr-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+.vr-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-dim);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.vr-step {
+  display: flex;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-dim);
+  transition: background 0.15s;
+}
+
+.vr-step:last-child { border-bottom: none; }
+.vr-step:hover { background: rgba(127,29,29,0.05); }
+
+.vr-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(127,29,29,0.2);
+  border: 1px solid var(--red-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--red-500);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vr-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vr-step-body strong {
+  font-size: 0.9rem;
+  color: var(--white);
+  font-weight: 700;
+}
+
+.vr-step-body span {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+.vr-step-body code {
+  font-family: monospace;
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.07);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--gray-300);
+}
+
+.vr-inline-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #a855f7;
+  background: rgba(168,85,247,0.12);
+  border: 1px solid #a855f7;
+  border-radius: 4px;
+  padding: 1px 7px;
+  letter-spacing: 0.05em;
+}
+
+/* Mockup ejemplo */
+.vr-example {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 120px;
+}
+
+.vr-example-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gray-600);
+}
+
+.vr-mockup {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vr-mock-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.vr-mock-row:last-child { border-bottom: none; }
+
+.vr-mock-row.vr-mock-fast {
+  background: rgba(225,6,0,0.07);
+  border-color: rgba(225,6,0,0.25);
+}
+
+.vr-mock-pos {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.2);
+  min-width: 24px;
+}
+
+.vr-mock-name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--white);
+  letter-spacing: 0.04em;
+}
+
+.vr-mock-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #a855f7;
+  background: rgba(168,85,247,0.12);
+  border: 1px solid #a855f7;
+  border-radius: 4px;
+  padding: 2px 7px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.vr-mock-time {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--white);
+  letter-spacing: 0.05em;
+}
+
+.vr-example-note {
+  font-size: 0.75rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+}
+
+.btn-back-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 0;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.btn-back-top svg {
+    width: 14px;
+    height: 14px;
+}
+
+.btn-back-top:hover {
+    color: var(--white);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .pts-grid { grid-template-columns: repeat(3, 1fr); }
+  .pts-rest { grid-column: 1 / -1; }
+  .vr-layout { grid-template-columns: 1fr; }
+  .vr-example { position: static; }
+}
+
+@media (max-width: 600px) {
+  .pts-grid { grid-template-columns: 1fr; }
+  .help-cards { grid-template-columns: 1fr; }
+  .help-timeline-steps { flex-direction: column; align-items: flex-start; }
+  .ht-line { width: 1px; height: 20px; min-width: 0; }
+}
+</style>
+
+</body>
+</html>
