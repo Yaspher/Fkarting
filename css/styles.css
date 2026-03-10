@@ -368,141 +368,205 @@ ul { list-style: none; }
 }
 
 /* ============================================================
-   RANKING LIST
+   RANKING — COLUMNAS VERTICALES ESTILO F1
    ============================================================ */
 
 .ranking-list {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+  min-height: 380px;
+  width: 100%;        /* ocupa todo el container padre */
 }
 
-.ranking-row {
+.ranking-col {
+  flex: 1 1 0;        /* las 3 columnas se reparten igual */
+  min-width: 0;       /* evita overflow */
+  max-width: 300px;   /* tope razonable */
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-dim);
-  border-radius: 12px;
-  padding: 16px 24px;
+  gap: 0;
   position: relative;
-  overflow: hidden;
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
 }
 
-.ranking-row::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  border-radius: 12px 0 0 12px;
-  background: var(--border-dim);
-  transition: background 0.2s;
-}
-
-.ranking-row:hover {
-  background: rgba(14,14,14,0.98);
-  border-color: var(--border-soft);
-  transform: translateX(3px);
-}
-
-/* Accent bar por posición */
-.pos-gold   { border-color: rgba(234,179,8,0.25); }
-.pos-silver { border-color: rgba(209,213,219,0.18); }
-.pos-bronze { border-color: rgba(217,119,6,0.25); }
-
-.pos-gold::before   { background: var(--gold); }
-.pos-silver::before { background: var(--silver); }
-.pos-bronze::before { background: var(--bronze); }
-
-/* Posición + número */
-.ranking-pos {
+/* ── Info encima de la barra ── */
+.ranking-col-top {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 48px;
-  gap: 2px;
+  gap: 4px;
+  margin-bottom: 12px;
+  z-index: 1;
 }
 
-.ranking-medal {
-  font-size: 1.6rem;
-  line-height: 1;
-}
-
-.ranking-num {
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--gray-600);
-  letter-spacing: 0.05em;
-}
-
-/* Nombre */
-.ranking-name {
-  flex: 1;
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--white);
-}
-
-/* Stats: victorias + podios */
-.ranking-stats {
-  display: flex;
-  gap: 24px;
-}
-
-.rstat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-
-.rstat-val {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1.2rem;
-  color: var(--gray-300);
-  line-height: 1;
-}
-
-.rstat-lbl {
-  font-size: 0.6rem;
-  color: var(--gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-}
-
-/* Puntos */
-.ranking-pts {
-  font-family: var(--font-display);
-  font-weight: 900;
+.ranking-col-medal {
   font-size: 1.8rem;
-  color: var(--red-500);
   line-height: 1;
-  text-align: right;
-  min-width: 80px;
+  filter: drop-shadow(0 0 8px rgba(234,179,8,0.4));
 }
 
-.ranking-pts-lbl {
+.ranking-col-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.ranking-col-kart {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gray-600);
+  letter-spacing: 0.08em;
+}
+
+/* ── Barra vertical ── */
+.ranking-bar-wrap {
+  width: 100%;
+  position: relative;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.ranking-bar {
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Colores por posición */
+.pos-gold   .ranking-bar {
+  background: linear-gradient(180deg, rgba(234,179,8,0.22) 0%, rgba(234,179,8,0.08) 100%);
+  border: 1px solid rgba(234,179,8,0.3);
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 rgba(234,179,8,0.4), 0 -4px 20px rgba(234,179,8,0.12);
+}
+
+.pos-silver .ranking-bar {
+  background: linear-gradient(180deg, rgba(209,213,219,0.18) 0%, rgba(209,213,219,0.06) 100%);
+  border: 1px solid rgba(209,213,219,0.2);
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 rgba(209,213,219,0.3), 0 -4px 20px rgba(209,213,219,0.06);
+}
+
+.pos-bronze .ranking-bar {
+  background: linear-gradient(180deg, rgba(217,119,6,0.20) 0%, rgba(217,119,6,0.07) 100%);
+  border: 1px solid rgba(217,119,6,0.25);
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 rgba(217,119,6,0.35), 0 -4px 20px rgba(217,119,6,0.1);
+}
+
+/* Puntos dentro de la barra */
+.ranking-bar-pts {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2.8rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.pos-gold   .ranking-bar-pts { color: var(--gold); text-shadow: 0 0 20px rgba(234,179,8,0.4); }
+.pos-silver .ranking-bar-pts { color: var(--silver); }
+.pos-bronze .ranking-bar-pts { color: var(--bronze); }
+
+.ranking-bar-pts-lbl {
   font-size: 0.65rem;
   color: var(--gray-600);
   font-family: var(--font-body);
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 2px;
+}
+
+/* Diferencia con el líder */
+.ranking-bar-gap {
+  margin-top: auto;
+  margin-bottom: 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gray-600);
+  letter-spacing: 0.04em;
+}
+
+/* ── Base de la columna (stats) ── */
+.ranking-col-base {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.ranking-col-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  gap: 2px;
+}
+
+.ranking-col-stat + .ranking-col-stat {
+  border-left: 1px solid var(--border-dim);
+}
+
+.col-stat-val {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.pos-gold   .col-stat-val { color: var(--gold); }
+.pos-silver .col-stat-val { color: var(--silver); }
+.pos-bronze .col-stat-val { color: var(--bronze); }
+
+.col-stat-lbl {
+  font-size: 0.58rem;
+  color: var(--gray-600);
+  text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-left: 2px;
+  font-weight: 600;
 }
 
-/* Responsive */
+/* ── Línea base ── */
+.ranking-baseline {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin-top: 0;
+}
+
+/* ── Responsive ── */
 @media (max-width: 600px) {
-  .ranking-row { gap: 12px; padding: 14px 16px; }
-  .ranking-stats { gap: 14px; }
-  .ranking-pts { font-size: 1.4rem; min-width: 60px; }
+  .ranking-list { gap: 8px; min-height: 280px; }
+  .ranking-bar-pts { font-size: 2rem; }
+  .ranking-col-name { font-size: 0.9rem; }
 }
 
-/* ── MEJOR TIEMPO ──────────────────────────── */
+
+
+/* ============================================================
+   MEJOR TIEMPO
+   ============================================================ */
+
 .tiempos-list {
   display: flex;
   flex-direction: column;

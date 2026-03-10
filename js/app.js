@@ -6,8 +6,7 @@ import {
     getRankingVista,
     getPilotosVista,
     getTiempoVista,
-    getUltimaCarrera,
-    getResultados
+    getCarreraVista
 } from './conection.js';
 
 
@@ -31,42 +30,64 @@ async function loadRanking() {
 
         const medals   = ["🥇", "🥈", "🥉"];
         const posClass = ["pos-gold", "pos-silver", "pos-bronze"];
+        const maxPts   = ranking[0]?.Puntos ?? 1;
 
-        container.innerHTML = ranking.map((d, i) => {
-            const piloto = pilotoMap[d.Piloto];
-            const nombre = piloto?.Nombre ?? `Piloto #${d.Piloto}`;
-            const numero = piloto?.Numero ?? "—";
+        // Alturas base: P1=280px, P2=210px, P3=160px
+        const heights  = [280, 210, 160];
+
+        // Orden visual: P2 — P1 — P3
+        const orden = [1, 0, 2];
+
+        const cols = orden.map(i => {
+            const d = ranking[i];
+            if (!d) return "";
+
+            const piloto   = pilotoMap[d.Piloto];
+            const nombre   = piloto?.Nombre ?? `Piloto #${d.Piloto}`;
+            const numero   = piloto?.Numero ?? "—";
+            const altura   = heights[i] ?? 140;
+            const diff     = i === 0
+                ? `<span style="color:var(--gold);font-weight:900">Líder</span>`
+                : `-${maxPts - d.Puntos} pts`;
 
             return `
-            <div class="ranking-row ${posClass[i] ?? ''}">
-                <div class="ranking-pos">
-                    <span class="ranking-medal">${medals[i] ?? i + 1}</span>
-                    <span class="ranking-num">#${numero}</span>
+            <div class="ranking-col ${posClass[i]}">
+
+                <div class="ranking-col-top">
+                    <span class="ranking-col-medal">${medals[i]}</span>
+                    <span class="ranking-col-name">${nombre}</span>
+                    <span class="ranking-col-kart">#${numero}</span>
                 </div>
-                <div class="ranking-name">${nombre}</div>
-                <div class="ranking-stats">
-                    <div class="rstat">
-                        <span class="rstat-val">${d.Vitorias ?? 0}</span>
-                        <span class="rstat-lbl">Victorias</span>
+
+                <div class="ranking-bar-wrap">
+                    <div class="ranking-bar" style="height:${altura}px">
+                        <div class="ranking-bar-pts">${d.Puntos}</div>
+                        <div class="ranking-bar-pts-lbl">puntos</div>
+                        <div class="ranking-bar-gap">${diff}</div>
                     </div>
-                    <div class="rstat">
-                        <span class="rstat-val">${d.Podios ?? 0}</span>
-                        <span class="rstat-lbl">Podios</span>
+                </div>
+
+                <div class="ranking-col-base">
+                    <div class="ranking-col-stat">
+                        <span class="col-stat-val">${d.Vitorias ?? 0}</span>
+                        <span class="col-stat-lbl">Victorias</span>
+                    </div>
+                    <div class="ranking-col-stat">
+                        <span class="col-stat-val">${d.Podios ?? 0}</span>
+                        <span class="col-stat-lbl">Podios</span>
                     </div>
                 </div>
-                <div class="ranking-pts">
-                    ${d.Puntos}
-                    <span class="ranking-pts-lbl">pts</span>
-                </div>
+
             </div>`;
         }).join("");
+
+        container.innerHTML = cols ;
 
     } catch (err) {
         console.error("Ranking:", err);
         container.innerHTML = `<p class="empty-msg">Error al cargar ranking.</p>`;
     }
 }
-
 
 // ── Mejor Tiempo ───────────────────────────────
 async function loadMejorTiempo() {
@@ -119,21 +140,21 @@ function formatTiempo(t) {
 async function loadUltimaCarrera() {
     const container = document.getElementById("resultsList");
     try {
-        const carreras = await getUltimaCarrera();
+        const data = await getCarreraVista();
 
-        if (!carreras || carreras.length === 0) {
+        if (!data || data.length === 0) {
             container.innerHTML = "<p class='empty-msg'>No hay carreras completadas aún.</p>";
             return;
         }
 
-        const carrera  = carreras[0];
-        const fechaStr = carrera.fecha
-            ? new Date(carrera.fecha).toLocaleDateString("es-DO", {
+        // Todos los rows son de la misma carrera (RangoCarrera = 1)
+        const { NombreCarrera, Circuito, Fecha } = data[0];
+
+        const fechaStr = Fecha
+            ? new Date(Fecha).toLocaleDateString("es-DO", {
                 day: "numeric", month: "long", year: "numeric"
               })
             : "";
-
-        const resultados = await getResultados(carrera.id_carrera);
 
         const posClass = (pos) => {
             if (pos === 1) return "p1";
@@ -145,13 +166,13 @@ async function loadUltimaCarrera() {
         container.innerHTML = `
             <div class="carrera-meta">
                 <span class="carrera-meta-icon">📍</span>
-                <span>${carrera.nombre}${carrera.circuito ? " · " + carrera.circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
+                <span>${NombreCarrera}${Circuito ? " · " + Circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
             </div>
-            ${resultados.map(r => `
+            ${data.map(r => `
                 <div class="result-item">
-                    <div class="result-pos ${posClass(r.posicion)}">${r.posicion}</div>
-                    <div class="result-name">${r.piloto.pilo_nombre}</div>
-                    <div class="result-pts">${r.puntos}<span class="result-pts-label">pts</span></div>
+                    <div class="result-pos ${posClass(r.Posicion)}">${r.Posicion}</div>
+                    <div class="result-name">${r.NombrePiloto}</div>
+                    <div class="result-pts">${r.Puntos}<span class="result-pts-label">pts</span></div>
                 </div>
             `).join("")}
         `;
@@ -161,7 +182,6 @@ async function loadUltimaCarrera() {
         container.innerHTML = "<p class='empty-msg'>Error al cargar resultados.</p>";
     }
 }
-
 
 // ── Pilotos Destacados ─────────────────────────
 async function loadPilotos() {

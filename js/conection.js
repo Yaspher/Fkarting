@@ -13,6 +13,10 @@ async function sbGet(table, params = "") {
     return res.json();
 }
 
+// ══════════════════════════════════════════════
+//  Vistas Frontales
+// ══════════════════════════════════════════════
+
 // ── Ranking ────────────────────────────────────
 export const getRankingVista  = () => sbGet("vista_ranking", "select=Campeonato,Piloto,Puntos,Vitorias,Podios");
 
@@ -23,5 +27,4 @@ export const getTiempoVista   = () => sbGet("vista_tiempos", "select=SecTiempo,S
 export const getPilotosVista  = () => sbGet("vista_piloto",  "select=Id,Nombre,Numero,Campeonato,Victorias,Podios");
 
 // ── Carreras ───────────────────────────────────
-export const getUltimaCarrera = () => sbGet("carrera", "completada=eq.true&order=fecha.desc&limit=1");
-export const getResultados    = (id) => sbGet("resultado", `id_carrera=eq.${id}&order=posicion.asc&select=posicion,puntos,piloto:id_piloto(pilo_nombre)`);
+export const getCarreraVista = () => sbGet("vista_carrera",  "select=id_carrera,NombreCarrera,Circuito,Fecha,Posicion,Puntos,NombrePiloto&RangoCarrera=eq.1");

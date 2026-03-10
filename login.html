@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         .login-page {
             min-height: 100vh;
@@ -157,6 +158,35 @@
             justify-content: center;
             margin-top: 4px;
         }
+        
+        .btn-back {
+          position: relative;
+          z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--gray-600);
+          font-family: var(--font-body);
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-decoration: none;
+          padding: 8px 16px;
+          border-radius: 8px;
+          border: 1px solid rgba(127,29,29,0.20);
+          margin-top: 16px;
+          transition: color 0.15s, border-color 0.15s;
+      }
+
+      .btn-back svg {
+          width: 14px;
+          height: 14px;
+      }
+      
+      .btn-back:hover {
+          color: var(--white);
+          border-color: rgba(127,29,29,0.45);
+      }
+        
     </style>
 </head>
 <body>
@@ -207,7 +237,13 @@
                 Ingresar
             </button>
         </div>
-
+        
+          <a href="index.html" class="btn-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Volver al inicio
+        </a>
     </div>
 </div>
 
