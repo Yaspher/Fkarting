@@ -14,7 +14,7 @@ async function sbGet(table, params = "") {
 }
 
 // ══════════════════════════════════════════════
-//  Vistas Frontales
+//  Vistas Index
 // ══════════════════════════════════════════════
 
 // ── Ranking ────────────────────────────────────
@@ -28,3 +28,9 @@ export const getPilotosVista  = () => sbGet("vista_piloto",  "select=Id,Nombre,N
 
 // ── Carreras ───────────────────────────────────
 export const getCarreraVista = () => sbGet("vista_carrera",  "select=id_carrera,NombreCarrera,Circuito,Fecha,Posicion,Puntos,NombrePiloto&RangoCarrera=eq.1");
+
+// ══════════════════════════════════════════════
+//  ---- Admin
+// ══════════════════════════════════════════════
+
+
