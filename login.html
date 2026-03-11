@@ -248,7 +248,7 @@
 </div>
 
 <script>
-    // ── Credenciales ── Cámbialas aquí
+    // ── Credenciales ──
     const CREDENTIALS = {
         usuario: "admin",
         password: "fkarting2026"
@@ -266,11 +266,17 @@
         const pass = document.getElementById("password").value;
         const err  = document.getElementById("loginError");
 
+        if (user === CREDENTIALS.usuario && pass === CREDENTIALS.password) {
+            sessionStorage.setItem(SESSION_KEY, "true");
+            window.location.replace("admin.html");
+        } else {
+            err.classList.add("visible");
+            document.getElementById("password").value = "";
+            document.getElementById("password").focus();
+        }
     }
 
     document.getElementById("btnLogin").addEventListener("click", doLogin);
-
-    // Permitir Enter en cualquier campo
     document.getElementById("username").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
     document.getElementById("password").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
 </script>
