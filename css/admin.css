@@ -548,7 +548,6 @@ a  { text-decoration: none; }
 
 /* Column widths */
 .col-num     { width: 64px; }
-.col-name    { }
 .col-stat    { width: 110px; }
 .col-status  { width: 130px; }
 .col-actions { width: 80px; }
