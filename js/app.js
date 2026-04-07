@@ -1,5 +1,6 @@
 // ══════════════════════════════════════════════
-//  FKarting - app.js
+//  FKarting — app.js
+//  Solo lógica UI · Todas las queries en connection.js
 // ══════════════════════════════════════════════
 
 import {
@@ -10,7 +11,34 @@ import {
 } from './conection.js';
 
 
-// ── Ranking General ────────────────────────────
+// ════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════
+
+// Convierte interval de PostgreSQL "00:01:23.456" → "1:23.456"
+function formatTiempo(t) {
+    if (!t) return "—";
+    const parts = t.split(":");
+    if (parts.length === 3) {
+        const min = parseInt(parts[1], 10);
+        const seg = parseFloat(parts[2]).toFixed(3);
+        return `${min}:${seg.padStart(6, "0")}`;
+    }
+    return t;
+}
+
+function posClass(pos) {
+    if (pos === 1) return "p1";
+    if (pos === 2) return "p2";
+    if (pos === 3) return "p3";
+    return "px";
+}
+
+
+// ════════════════════════════════════════════════════════════════
+//  RANKING GENERAL
+// ════════════════════════════════════════════════════════════════
+
 async function loadRanking() {
     const container = document.getElementById("rankingList");
     try {
@@ -19,39 +47,33 @@ async function loadRanking() {
             getPilotosVista()
         ]);
 
-        if (!ranking || ranking.length === 0) {
+        if (!ranking?.length) {
             container.innerHTML = `<p class="empty-msg">Sin datos aún.</p>`;
             return;
         }
 
-        const pilotoMap = Object.fromEntries(
-            (pilotos ?? []).map(p => [p.Id, p])
-        );
-
-        const medals   = ["🥇", "🥈", "🥉"];
-        const posClass = ["pos-gold", "pos-silver", "pos-bronze"];
-        const maxPts   = ranking[0]?.Puntos ?? 1;
-
-        // Alturas base: P1=280px, P2=210px, P3=160px
-        const heights  = [280, 210, 160];
+        const pilotoMap = Object.fromEntries((pilotos ?? []).map(p => [p.Id, p]));
+        const medals    = ["🥇", "🥈", "🥉"];
+        const posClss   = ["pos-gold", "pos-silver", "pos-bronze"];
+        const heights   = [280, 210, 160];
+        const maxPts    = ranking[0]?.Puntos ?? 1;
 
         // Orden visual: P2 — P1 — P3
         const orden = [1, 0, 2];
 
-        const cols = orden.map(i => {
+        container.innerHTML = orden.map(i => {
             const d = ranking[i];
             if (!d) return "";
 
-            const piloto   = pilotoMap[d.Piloto];
-            const nombre   = piloto?.Nombre ?? `Piloto #${d.Piloto}`;
-            const numero   = piloto?.Numero ?? "—";
-            const altura   = heights[i] ?? 140;
-            const diff     = i === 0
+            const piloto = pilotoMap[d.Piloto];
+            const nombre = piloto?.Nombre ?? `Piloto #${d.Piloto}`;
+            const numero = piloto?.Numero ?? "—";
+            const diff   = i === 0
                 ? `<span style="color:var(--gold);font-weight:900">Líder</span>`
                 : `-${maxPts - d.Puntos} pts`;
 
             return `
-            <div class="ranking-col ${posClass[i]}">
+            <div class="ranking-col ${posClss[i]}">
 
                 <div class="ranking-col-top">
                     <span class="ranking-col-medal">${medals[i]}</span>
@@ -60,7 +82,7 @@ async function loadRanking() {
                 </div>
 
                 <div class="ranking-bar-wrap">
-                    <div class="ranking-bar" style="height:${altura}px">
+                    <div class="ranking-bar" style="height:${heights[i]}px">
                         <div class="ranking-bar-pts">${d.Puntos}</div>
                         <div class="ranking-bar-pts-lbl">puntos</div>
                         <div class="ranking-bar-gap">${diff}</div>
@@ -81,30 +103,30 @@ async function loadRanking() {
             </div>`;
         }).join("");
 
-        container.innerHTML = cols ;
-
     } catch (err) {
         console.error("Ranking:", err);
         container.innerHTML = `<p class="empty-msg">Error al cargar ranking.</p>`;
     }
 }
 
-// ── Mejor Tiempo ───────────────────────────────
+
+// ════════════════════════════════════════════════════════════════
+//  MEJOR TIEMPO
+// ════════════════════════════════════════════════════════════════
+
 async function loadMejorTiempo() {
     const container = document.getElementById("mejorTiempoList");
     try {
         const data = await getTiempoVista();
 
-        if (!data || data.length === 0) {
+        if (!data?.length) {
             container.innerHTML = `<p class="empty-msg">Sin tiempos registrados.</p>`;
             return;
         }
 
-        const sorted = [...data].sort((a, b) => {
-            const tA = a.Tiempos ?? "";
-            const tB = b.Tiempos ?? "";
-            return tA.localeCompare(tB);
-        });
+        const sorted = [...data].sort((a, b) =>
+            (a.Tiempos ?? "").localeCompare(b.Tiempos ?? "")
+        );
 
         container.innerHTML = sorted.map((d, i) => {
             const esRapida = d.VueltaRapida === true;
@@ -123,74 +145,63 @@ async function loadMejorTiempo() {
     }
 }
 
-// Convierte interval de PostgreSQL "00:01:23.456" → "1:23.456"
-function formatTiempo(t) {
-    if (!t) return "—";
-    const parts = t.split(":");
-    if (parts.length === 3) {
-        const min = parseInt(parts[1], 10);
-        const seg = parseFloat(parts[2]).toFixed(3);
-        return `${min}:${seg.padStart(6, "0")}`;
-    }
-    return t;
-}
 
+// ════════════════════════════════════════════════════════════════
+//  ÚLTIMA CARRERA
+// ════════════════════════════════════════════════════════════════
 
-// ── Última Carrera ─────────────────────────────
 async function loadUltimaCarrera() {
     const container = document.getElementById("resultsList");
     try {
         const data = await getCarreraVista();
 
-        if (!data || data.length === 0) {
-            container.innerHTML = "<p class='empty-msg'>No hay carreras completadas aún.</p>";
+        if (!data?.length) {
+            container.innerHTML = `<p class="empty-msg">No hay carreras completadas aún.</p>`;
             return;
         }
 
-        // Todos los rows son de la misma carrera (RangoCarrera = 1)
-        const { NombreCarrera, Circuito, Fecha } = data[0];
+        const ultimaId   = data[0].id_carrera;
+        const resultados = data.filter(r => r.id_carrera === ultimaId);
+        const { nombre, circuito, fecha } = resultados[0];
 
-        const fechaStr = Fecha
-            ? new Date(Fecha).toLocaleDateString("es-DO", {
+        const fechaStr = fecha
+            ? new Date(fecha).toLocaleDateString("es-DO", {
                 day: "numeric", month: "long", year: "numeric"
               })
             : "";
 
-        const posClass = (pos) => {
-            if (pos === 1) return "p1";
-            if (pos === 2) return "p2";
-            if (pos === 3) return "p3";
-            return "px";
-        };
-
         container.innerHTML = `
             <div class="carrera-meta">
                 <span class="carrera-meta-icon">📍</span>
-                <span>${NombreCarrera}${Circuito ? " · " + Circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
+                <span>${nombre}${circuito ? " · " + circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
             </div>
-            ${data.map(r => `
+            ${resultados.map(r => `
                 <div class="result-item">
-                    <div class="result-pos ${posClass(r.Posicion)}">${r.Posicion}</div>
-                    <div class="result-name">${r.NombrePiloto}</div>
-                    <div class="result-pts">${r.Puntos}<span class="result-pts-label">pts</span></div>
+                    <div class="result-pos ${posClass(r.posicion)}">${r.posicion}</div>
+                    <div class="result-name">${r.pilo_nombre}</div>
+                    <div class="result-pts">${r.puntos}<span class="result-pts-label">pts</span></div>
                 </div>
             `).join("")}
         `;
 
     } catch (err) {
         console.error("Última carrera:", err);
-        container.innerHTML = "<p class='empty-msg'>Error al cargar resultados.</p>";
+        container.innerHTML = `<p class="empty-msg">Error al cargar resultados.</p>`;
     }
 }
 
-// ── Pilotos Destacados ─────────────────────────
+
+// ════════════════════════════════════════════════════════════════
+//  PILOTOS DESTACADOS
+// ════════════════════════════════════════════════════════════════
+
 async function loadPilotos() {
     const grid = document.getElementById("driversGrid");
     try {
         const data = await getPilotosVista();
 
-        if (!data || data.length === 0) {
-            grid.innerHTML = "<p class='empty-msg'>No hay pilotos registrados.</p>";
+        if (!data?.length) {
+            grid.innerHTML = `<p class="empty-msg">No hay pilotos registrados.</p>`;
             return;
         }
 
@@ -219,12 +230,15 @@ async function loadPilotos() {
 
     } catch (err) {
         console.error("Pilotos:", err);
-        grid.innerHTML = "<p class='empty-msg'>Error al cargar pilotos.</p>";
+        grid.innerHTML = `<p class="empty-msg">Error al cargar pilotos.</p>`;
     }
 }
 
 
-// ── Modal Próxima Carrera ──────────────────────
+// ════════════════════════════════════════════════════════════════
+//  MODAL PRÓXIMA CARRERA
+// ════════════════════════════════════════════════════════════════
+
 const modal = document.getElementById("raceModal");
 document.getElementById("btnNextRace").onclick   = () => modal.style.display = "flex";
 document.getElementById("closeModal").onclick    = () => modal.style.display = "none";
@@ -232,7 +246,10 @@ document.getElementById("closeModalBtn").onclick = () => modal.style.display = "
 window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 
 
-// ── Arrancar ───────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+//  ARRANCAR
+// ════════════════════════════════════════════════════════════════
+
 async function init() {
     await Promise.all([
         loadRanking(),
