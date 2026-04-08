@@ -28,12 +28,12 @@ function formatTiempo(t) {
 }
 
 function posClass(pos) {
+    pos = parseInt(pos);
     if (pos === 1) return "p1";
     if (pos === 2) return "p2";
     if (pos === 3) return "p3";
     return "px";
 }
-
 
 // ════════════════════════════════════════════════════════════════
 //  RANKING GENERAL
