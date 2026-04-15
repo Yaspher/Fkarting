@@ -27,6 +27,18 @@ function formatTiempo(t) {
     return t;
 }
 
+// Convierte interval "HH:MM:SS.mmm" → segundos totales (para ordenar numéricamente)
+function intervalToSec(t) {
+    if (!t) return Infinity;
+    const parts = t.split(":");
+    if (parts.length === 3) {
+        return parseInt(parts[0], 10) * 3600
+             + parseInt(parts[1], 10) * 60
+             + parseFloat(parts[2]);
+    }
+    return Infinity;
+}
+
 function posClass(pos) {
     pos = parseInt(pos);
     if (pos === 1) return "p1";
@@ -34,6 +46,7 @@ function posClass(pos) {
     if (pos === 3) return "p3";
     return "px";
 }
+
 
 // ════════════════════════════════════════════════════════════════
 //  RANKING GENERAL
@@ -124,12 +137,14 @@ async function loadMejorTiempo() {
             return;
         }
 
+        // ✅ FIX: ordenar por conversión numérica a segundos en lugar de localeCompare
         const sorted = [...data].sort((a, b) =>
-            (a.Tiempos ?? "").localeCompare(b.Tiempos ?? "")
+            intervalToSec(a.Tiempos) - intervalToSec(b.Tiempos)
         );
 
         container.innerHTML = sorted.map((d, i) => {
-            const esRapida = d.VueltaRapida === true;
+            // ✅ FIX: manejar booleano tanto nativo como string
+            const esRapida = d.VueltaRapida === true || d.VueltaRapida === "true";
             return `
             <div class="tiempo-row ${esRapida ? "vuelta-rapida" : ""}">
                 <div class="tiempo-pos">${i + 1}</div>
@@ -160,8 +175,17 @@ async function loadUltimaCarrera() {
             return;
         }
 
-        const ultimaId   = data[0].id_carrera;
-        const resultados = data.filter(r => r.id_carrera === ultimaId);
+        const ultimaId = data[0].id_carrera;
+
+        // ✅ FIX: usar == (igualdad flexible) para evitar fallos por
+        //    discrepancia de tipo string/number en id_carrera
+        const resultados = data.filter(r => r.id_carrera == ultimaId);
+
+        if (!resultados.length) {
+            container.innerHTML = `<p class="empty-msg">No hay resultados para la última carrera.</p>`;
+            return;
+        }
+
         const { nombre, circuito, fecha } = resultados[0];
 
         const fechaStr = fecha
@@ -173,13 +197,13 @@ async function loadUltimaCarrera() {
         container.innerHTML = `
             <div class="carrera-meta">
                 <span class="carrera-meta-icon">📍</span>
-                <span>${nombre}${circuito ? " · " + circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
+                <span>${nombre ?? ""}${circuito ? " · " + circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
             </div>
             ${resultados.map(r => `
                 <div class="result-item">
                     <div class="result-pos ${posClass(r.posicion)}">${r.posicion}</div>
-                    <div class="result-name">${r.pilo_nombre}</div>
-                    <div class="result-pts">${r.puntos}<span class="result-pts-label">pts</span></div>
+                    <div class="result-name">${r.pilo_nombre ?? "—"}</div>
+                    <div class="result-pts">${r.puntos ?? 0}<span class="result-pts-label">pts</span></div>
                 </div>
             `).join("")}
         `;
