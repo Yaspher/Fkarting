@@ -27,6 +27,18 @@ function formatTiempo(t) {
     return t;
 }
 
+// Convierte interval "HH:MM:SS.mmm" → segundos totales (para ordenar numéricamente)
+function intervalToSec(t) {
+    if (!t) return Infinity;
+    const parts = t.split(":");
+    if (parts.length === 3) {
+        return parseInt(parts[0], 10) * 3600
+             + parseInt(parts[1], 10) * 60
+             + parseFloat(parts[2]);
+    }
+    return Infinity;
+}
+
 function posClass(pos) {
     pos = parseInt(pos);
     if (pos === 1) return "p1";
@@ -34,6 +46,17 @@ function posClass(pos) {
     if (pos === 3) return "p3";
     return "px";
 }
+
+// ✅ Lee un campo probando múltiples variantes de nombre (PascalCase, lowercase, snake_case)
+function field(row, ...keys) {
+    for (const k of keys) {
+        if (row[k] !== undefined && row[k] !== null) return row[k];
+        const lower = k.toLowerCase();
+        if (row[lower] !== undefined && row[lower] !== null) return row[lower];
+    }
+    return null;
+}
+
 
 // ════════════════════════════════════════════════════════════════
 //  RANKING GENERAL
@@ -74,13 +97,11 @@ async function loadRanking() {
 
             return `
             <div class="ranking-col ${posClss[i]}">
-
                 <div class="ranking-col-top">
                     <span class="ranking-col-medal">${medals[i]}</span>
                     <span class="ranking-col-name">${nombre}</span>
                     <span class="ranking-col-kart">#${numero}</span>
                 </div>
-
                 <div class="ranking-bar-wrap">
                     <div class="ranking-bar" style="height:${heights[i]}px">
                         <div class="ranking-bar-pts">${d.Puntos}</div>
@@ -88,7 +109,6 @@ async function loadRanking() {
                         <div class="ranking-bar-gap">${diff}</div>
                     </div>
                 </div>
-
                 <div class="ranking-col-base">
                     <div class="ranking-col-stat">
                         <span class="col-stat-val">${d.Vitorias ?? 0}</span>
@@ -99,7 +119,6 @@ async function loadRanking() {
                         <span class="col-stat-lbl">Podios</span>
                     </div>
                 </div>
-
             </div>`;
         }).join("");
 
@@ -124,24 +143,35 @@ async function loadMejorTiempo() {
             return;
         }
 
+        // Debug: confirma los nombres de columna reales que devuelve Supabase
+        console.log("[MejorTiempo] columnas:", Object.keys(data[0]));
+
+        // ✅ FIX: ordenar por segundos, no por string
         const sorted = [...data].sort((a, b) =>
-            (a.Tiempos ?? "").localeCompare(b.Tiempos ?? "")
+            intervalToSec(field(a, "Tiempos", "tiempos"))
+          - intervalToSec(field(b, "Tiempos", "tiempos"))
         );
 
         container.innerHTML = sorted.map((d, i) => {
-            const esRapida = d.VueltaRapida === true;
+            // ✅ FIX: leer campos con fallback a minúsculas
+            const tiempos      = field(d, "Tiempos",      "tiempos");
+            const nombrePiloto = field(d, "NombrePiloto", "nombrepiloto", "nombre_piloto");
+            const vueltaRapida = field(d, "VueltaRapida", "vueltarapida", "vuelta_rapida");
+            const esRapida     = vueltaRapida === true || vueltaRapida === "true";
+
             return `
             <div class="tiempo-row ${esRapida ? "vuelta-rapida" : ""}">
                 <div class="tiempo-pos">${i + 1}</div>
-                <div class="tiempo-nombre">${d.NombrePiloto ?? "—"}</div>
+                <div class="tiempo-nombre">${nombrePiloto ?? "—"}</div>
                 ${esRapida ? `<span class="tiempo-badge">⚡ Vuelta Rápida</span>` : ""}
-                <div class="tiempo-valor">${formatTiempo(d.Tiempos)}</div>
+                <div class="tiempo-valor">${formatTiempo(tiempos)}</div>
             </div>`;
         }).join("");
 
     } catch (err) {
-        console.error("Mejor Tiempo:", err);
-        container.innerHTML = `<p class="empty-msg">Error al cargar tiempos.</p>`;
+        console.error("Mejor Tiempo error:", err);
+        // ✅ Muestra el mensaje real de Supabase para facilitar diagnóstico
+        container.innerHTML = `<p class="empty-msg">Error al cargar tiempos.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
     }
 }
 
@@ -160,9 +190,23 @@ async function loadUltimaCarrera() {
             return;
         }
 
+        // Debug: confirma los nombres de columna reales que devuelve Supabase
+        console.log("[UltimaCarrera] columnas:", Object.keys(data[0]));
+
         const ultimaId   = data[0].id_carrera;
-        const resultados = data.filter(r => r.id_carrera === ultimaId);
-        const { nombre, circuito, fecha } = resultados[0];
+
+        // ✅ FIX: == flexible para no fallar por discrepancia string/number
+        const resultados = data.filter(r => r.id_carrera == ultimaId);
+
+        if (!resultados.length) {
+            container.innerHTML = `<p class="empty-msg">No hay resultados para la última carrera.</p>`;
+            return;
+        }
+
+        // ✅ FIX: leer campos con fallback a minúsculas
+        const nombre   = field(resultados[0], "nombre",   "Nombre");
+        const circuito = field(resultados[0], "circuito", "Circuito");
+        const fecha    = field(resultados[0], "fecha",    "Fecha");
 
         const fechaStr = fecha
             ? new Date(fecha).toLocaleDateString("es-DO", {
@@ -173,20 +217,25 @@ async function loadUltimaCarrera() {
         container.innerHTML = `
             <div class="carrera-meta">
                 <span class="carrera-meta-icon">📍</span>
-                <span>${nombre}${circuito ? " · " + circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
+                <span>${nombre ?? ""}${circuito ? " · " + circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
             </div>
-            ${resultados.map(r => `
+            ${resultados.map(r => {
+                const posicion   = field(r, "posicion",    "Posicion");
+                const piloNombre = field(r, "pilo_nombre", "pilonombre", "pilo_Nombre");
+                const puntos     = field(r, "puntos",      "Puntos");
+                return `
                 <div class="result-item">
-                    <div class="result-pos ${posClass(r.posicion)}">${r.posicion}</div>
-                    <div class="result-name">${r.pilo_nombre}</div>
-                    <div class="result-pts">${r.puntos}<span class="result-pts-label">pts</span></div>
-                </div>
-            `).join("")}
+                    <div class="result-pos ${posClass(posicion)}">${posicion ?? "—"}</div>
+                    <div class="result-name">${piloNombre ?? "—"}</div>
+                    <div class="result-pts">${puntos ?? 0}<span class="result-pts-label">pts</span></div>
+                </div>`;
+            }).join("")}
         `;
 
     } catch (err) {
-        console.error("Última carrera:", err);
-        container.innerHTML = `<p class="empty-msg">Error al cargar resultados.</p>`;
+        console.error("Última carrera error:", err);
+        // ✅ Muestra el mensaje real de Supabase para facilitar diagnóstico
+        container.innerHTML = `<p class="empty-msg">Error al cargar resultados.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
     }
 }
 

@@ -61,14 +61,16 @@ async function sbDelete(table, id, idField) {
 export const getRankingVista = () =>
     sbGet("vista_ranking", "select=Campeonato,Piloto,Puntos,Vitorias,Podios");
 
+// ✅ FIX: select=* para evitar error por mayúsculas en nombres de columna
 export const getTiempoVista = () =>
-    sbGet("vista_tiempos", "select=SecTiempo,SecCarrera,SecPiloto,Tiempos,VueltaRapida,NombrePiloto");
+    sbGet("vista_tiempos", "select=*");
 
 export const getPilotosVista = () =>
     sbGet("vista_piloto", "select=Id,Nombre,Numero,Campeonato,Victorias,Podios");
 
+// ✅ FIX: select=* para evitar error por nombre de columna incorrecto
 export const getCarreraVista = () =>
-    sbGet("vista_carrera", "select=id_carrera,nombre,circuito,fecha,posicion,puntos,pilo_nombre&order=fecha.desc,posicion.asc");
+    sbGet("vista_carrera", "select=*&order=fecha.desc,posicion.asc");
 
 
 // ════════════════════════════════════════════════════════════════
