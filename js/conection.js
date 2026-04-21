@@ -70,7 +70,7 @@ export const getPilotosVista = () =>
 
 // ✅ FIX: select=* para evitar error por nombre de columna incorrecto
 export const getCarreraVista = () =>
-    sbGet("vista_carrera", "select=*&order=fecha.desc,posicion.asc");
+    sbGet("vista_carrera", "select=*");
 
 
 // ════════════════════════════════════════════════════════════════
