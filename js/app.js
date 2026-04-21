@@ -193,6 +193,16 @@ async function loadUltimaCarrera() {
         // Debug: confirma los nombres de columna reales que devuelve Supabase
         console.log("[UltimaCarrera] columnas:", Object.keys(data[0]));
 
+        // ✅ FIX: ordenar en JS para evitar problemas de mayúsculas en order= de PostgREST
+        data.sort((a, b) => {
+            const fa = field(a, "Fecha", "fecha") ?? "";
+            const fb = field(b, "Fecha", "fecha") ?? "";
+            if (fb > fa) return 1;
+            if (fb < fa) return -1;
+            return (parseInt(field(a, "posicion", "Posicion")) || 0)
+                 - (parseInt(field(b, "posicion", "Posicion")) || 0);
+        });
+
         const ultimaId   = data[0].id_carrera;
 
         // ✅ FIX: == flexible para no fallar por discrepancia string/number
