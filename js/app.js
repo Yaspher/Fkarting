@@ -231,7 +231,7 @@ async function loadUltimaCarrera() {
             </div>
             ${resultados.map(r => {
                 const posicion   = field(r, "posicion",    "Posicion");
-                const piloNombre = field(r, "pilo_nombre", "pilonombre", "pilo_Nombre");
+                const piloNombre = field(r, "pilo_nombre", "pilonombre", "pilo_Nombre", "NombrePiloto");
                 const puntos     = field(r, "puntos",      "Puntos");
                 return `
                 <div class="result-item">
