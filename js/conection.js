@@ -1,10 +1,17 @@
 // ══════════════════════════════════════════════
-//  FKarting — connection.js
+//  FKarting — conection.js  v1.0
 //  Capa de Acceso a Datos (DAL)
 //  Único archivo que habla con Supabase.
+//
+//  SEGURIDAD: La key sb_publishable es pública por diseño en Supabase.
+//  La seguridad real depende de Row Level Security (RLS) activo
+//  en todas las tablas. Verificar en el dashboard de Supabase antes
+//  de lanzar a producción.
 // ══════════════════════════════════════════════
 
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
+
+// Esta key es pública (sb_publishable) — seguridad depende de RLS en Supabase
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 
 const sbHeaders = {
@@ -14,61 +21,85 @@ const sbHeaders = {
     "Prefer":        "return=representation"
 };
 
+// Timeout global para todos los fetches (ms)
+const FETCH_TIMEOUT = 10_000;
+
 
 // ════════════════════════════════════════════════════════════════
 //  HELPERS INTERNOS — no se exportan
 // ════════════════════════════════════════════════════════════════
 
+// ✅ Crea un fetch con timeout automático de 10 segundos
+function fetchWithTimeout(url, options = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+    return fetch(url, { ...options, signal: controller.signal })
+        .catch(err => {
+            if (err.name === "AbortError") throw new Error("Tiempo de espera agotado. Verifica tu conexión.");
+            throw err;
+        })
+        .finally(() => clearTimeout(timer));
+}
+
 async function sbGet(table, params = "") {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, { headers: sbHeaders });
+    const res = await fetchWithTimeout(
+        `${SUPABASE_URL}/rest/v1/${table}?${params}`,
+        { headers: sbHeaders }
+    );
     if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
 
 async function sbPost(table, body) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-        method: "POST",
-        headers: sbHeaders,
-        body: JSON.stringify(body)
-    });
+    const res = await fetchWithTimeout(
+        `${SUPABASE_URL}/rest/v1/${table}`,
+        { method: "POST", headers: sbHeaders, body: JSON.stringify(body) }
+    );
     if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
 
 async function sbPatch(table, id, idField, body) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${idField}=eq.${id}`, {
-        method: "PATCH",
-        headers: sbHeaders,
-        body: JSON.stringify(body)
-    });
+    const res = await fetchWithTimeout(
+        `${SUPABASE_URL}/rest/v1/${table}?${idField}=eq.${id}`,
+        { method: "PATCH", headers: sbHeaders, body: JSON.stringify(body) }
+    );
     if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
 
+// ✅ FIX: sbDelete ahora detecta si el registro no existía
 async function sbDelete(table, id, idField) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${idField}=eq.${id}`, {
-        method: "DELETE",
-        headers: sbHeaders
-    });
+    const res = await fetchWithTimeout(
+        `${SUPABASE_URL}/rest/v1/${table}?${idField}=eq.${id}`,
+        {
+            method: "DELETE",
+            // return=representation hace que Supabase devuelva las filas eliminadas
+            headers: { ...sbHeaders, "Prefer": "return=representation" }
+        }
+    );
     if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    if (!data.length) throw new Error("Registro no encontrado o ya fue eliminado.");
+    return data;
 }
 
 
 // ════════════════════════════════════════════════════════════════
-//  VISTAS — Consultas de solo lectura
+//  VISTAS — Consultas de solo lectura (índice público)
 // ════════════════════════════════════════════════════════════════
 
 export const getRankingVista = () =>
     sbGet("vista_ranking", "select=Campeonato,Piloto,Puntos,Vitorias,Podios");
 
-// ✅ FIX: select=* para evitar error por mayúsculas en nombres de columna
+// select=* porque los nombres de columna en estas vistas usan PascalCase
 export const getTiempoVista = () =>
     sbGet("vista_tiempos", "select=*");
 
 export const getPilotosVista = () =>
     sbGet("vista_piloto", "select=Id,Nombre,Numero,Campeonato,Victorias,Podios");
 
-// ✅ FIX: select=* para evitar error por nombre de columna incorrecto
+// Sin order= para evitar errores por case-sensitivity; el sort se hace en app.js
 export const getCarreraVista = () =>
     sbGet("vista_carrera", "select=*");
 
@@ -105,7 +136,6 @@ export const deleteCampeonato = (id) => sbDelete("campeonato", id, "id_campeonat
 
 export const getPilotos             = () => sbGet("vista_piloto", "order=Id.asc");
 export const getPilotoById          = (id) => sbGet("piloto", `id_piloto=eq.${id}`);
-export const getPilotosActivos      = () => sbGet("piloto", "pilo_activo=eq.true&order=pilo_numero.asc");
 export const getPilotosActivosAdmin = () => sbGet("piloto", "pilo_activo=eq.true&order=pilo_nombre.asc&select=id_piloto,pilo_nombre,pilo_numero");
 export const getPilotosActivosCount = () => sbGet("piloto", "pilo_activo=eq.true&select=id_piloto");
 
@@ -131,7 +161,6 @@ export const deletePiloto = (id) => sbDelete("piloto", id, "id_piloto");
 
 export const getCarrerasByCampeonato    = (id) => sbGet("carrera", `id_campeonato=eq.${id}&order=fecha.asc`);
 export const getCarrerasByCampeonatoId  = (id) => sbGet("carrera", `id_campeonato=eq.${id}&order=fecha.asc&select=id_carrera,nombre,circuito,fecha,completada`);
-export const getUltimaCarrera           = ()   => sbGet("carrera", "completada=eq.true&order=fecha.desc&limit=1");
 export const getUltimaCarreraCompletada = (id) => sbGet("carrera", `id_campeonato=eq.${id}&completada=eq.true&order=fecha.desc&limit=1`);
 export const getCarreraById             = (id) => sbGet("carrera", `id_carrera=eq.${id}`);
 
@@ -143,11 +172,8 @@ export const deleteCarrera = (id) => sbDelete("carrera", id, "id_carrera");
 // ════════════════════════════════════════════════════════════════
 //  RESULTADOS
 //  Tabla: resultado | Campos: res_posicion, res_puntos, res_tiempo_seg, res_vueltas
-//  Nota: tiempo_seg usa formato interval de Postgres → "00:MM:SS.mmm"
+//  Nota: res_tiempo_seg usa formato interval de Postgres → "00:MM:SS.mmm"
 // ════════════════════════════════════════════════════════════════
-
-export const getResultados = (id) =>
-    sbGet("resultado", `id_carrera=eq.${id}&order=res_posicion.asc&select=res_posicion,res_puntos,res_tiempo_seg,res_vueltas,piloto(pilo_nombre)`);
 
 export const getResultadosByCarrera = (id) =>
     sbGet("resultado", `id_carrera=eq.${id}&order=res_posicion.asc&select=id_resultado,res_posicion,res_puntos,res_tiempo_seg,res_vueltas,piloto(id_piloto,pilo_nombre,pilo_numero)`);
@@ -181,15 +207,6 @@ export const deleteResultado = (id) => sbDelete("resultado", id, "id_resultado")
 //  RANKING
 //  Tabla: ranking | Campos: ran_puntos, ran_carreras, ran_victorias, ran_podios
 // ════════════════════════════════════════════════════════════════
-
-export const getRankingTop3 = () =>
-    sbGet("ranking", "select=ran_puntos,ran_carreras,piloto(pilo_nombre)&order=ran_puntos.desc&limit=3");
-
-export const getPodiumTop3 = () =>
-    sbGet("ranking", "select=ran_puntos,ran_carreras,piloto(pilo_nombre,pilo_numero)&order=ran_puntos.desc&limit=3");
-
-export const getPilotosTop6 = () =>
-    sbGet("ranking", "select=ran_puntos,ran_carreras,ran_victorias,ran_podios,piloto(pilo_nombre,pilo_numero)&order=ran_puntos.desc&limit=6");
 
 export const getRankingByCampeonato = (id) =>
     sbGet("ranking", `id_campeonato=eq.${id}&order=ran_puntos.desc&select=id_ranking,ran_puntos,ran_carreras,ran_victorias,ran_podios,ran_showranking,piloto(id_piloto,pilo_nombre,pilo_numero)`);
@@ -225,13 +242,3 @@ export const deleteRanking = (id) => sbDelete("ranking", id, "id_ranking");
 export const getTablaPuntos       = () => sbGet("tablapuntosbase", "order=id_tablapuntosbase.asc");
 export const upsertPuntosPosicion = (id, puntos) => sbPatch("tablapuntosbase", id, "id_tablapuntosbase", { tpb_puntos: puntos });
 export const initPuntosFila       = (id, puntos) => sbPost("tablapuntosbase", { id_tablapuntosbase: id, tpb_puntos: puntos });
-
-
-// ════════════════════════════════════════════════════════════════
-//  DASHBOARD
-//  Conteos rápidos para el panel administrativo
-// ════════════════════════════════════════════════════════════════
-
-export const getDashboardPilotos     = () => sbGet("piloto",     "select=id_piloto");
-export const getDashboardCampeonatos = () => sbGet("campeonato", "select=id_campeonato");
-export const getDashboardRanking     = () => sbGet("ranking",    "select=id_ranking");
