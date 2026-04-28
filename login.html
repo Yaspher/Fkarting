@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>FKarting — Acceso Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ✅ No indexar esta página -->
+    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
@@ -18,7 +20,6 @@
             overflow: hidden;
         }
 
-        /* Fondo decorativo */
         .login-page::before {
             content: '';
             position: absolute;
@@ -42,7 +43,6 @@
             gap: 28px;
         }
 
-        /* Stripe top */
         .login-card::before {
             content: '';
             position: absolute;
@@ -58,14 +58,8 @@
             gap: 10px;
         }
 
-        .login-logo .logo-icon {
-            width: 40px;
-            height: 40px;
-        }
-
-        .login-logo .logo-text {
-            font-size: 1.5rem;
-        }
+        .login-logo .logo-icon { width: 40px; height: 40px; }
+        .login-logo .logo-text { font-size: 1.5rem; }
 
         .login-heading {
             text-align: center;
@@ -122,12 +116,13 @@
             width: 100%;
         }
 
-        .field input:focus {
-            border-color: var(--red-700);
-        }
+        .field input:focus { border-color: var(--red-700); }
+        .field input::placeholder { color: var(--gray-700); }
 
-        .field input::placeholder {
-            color: var(--gray-700);
+        /* ✅ Estado deshabilitado durante el cooldown */
+        .field input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .login-error {
@@ -143,9 +138,7 @@
             width: 100%;
         }
 
-        .login-error.visible {
-            display: flex;
-        }
+        .login-error.visible { display: flex; }
 
         .login-error svg {
             width: 15px;
@@ -157,36 +150,38 @@
             width: 100%;
             justify-content: center;
             margin-top: 4px;
+            transition: opacity 0.15s;
         }
-        
-        .btn-back {
-          position: relative;
-          z-index: 1;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          color: var(--gray-600);
-          font-family: var(--font-body);
-          font-size: 0.8rem;
-          font-weight: 600;
-          text-decoration: none;
-          padding: 8px 16px;
-          border-radius: 8px;
-          border: 1px solid rgba(127,29,29,0.20);
-          margin-top: 16px;
-          transition: color 0.15s, border-color 0.15s;
-      }
 
-      .btn-back svg {
-          width: 14px;
-          height: 14px;
-      }
-      
-      .btn-back:hover {
-          color: var(--white);
-          border-color: rgba(127,29,29,0.45);
-      }
-        
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gray-600);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(127,29,29,0.20);
+            margin-top: 16px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .btn-back svg { width: 14px; height: 14px; }
+
+        .btn-back:hover {
+            color: var(--white);
+            border-color: rgba(127,29,29,0.45);
+        }
     </style>
 </head>
 <body>
@@ -225,7 +220,7 @@
                     <line x1="12" y1="8" x2="12" y2="12"/>
                     <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
-                Usuario o contraseña incorrectos.
+                <span id="loginErrorMsg">Usuario o contraseña incorrectos.</span>
             </div>
 
             <button class="btn-primary btn-login" id="btnLogin">
@@ -237,8 +232,8 @@
                 Ingresar
             </button>
         </div>
-        
-          <a href="index.html" class="btn-back">
+
+        <a href="index.html" class="btn-back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"/>
             </svg>
@@ -248,12 +243,8 @@
 </div>
 
 <script>
-    // ── Credenciales ──
-    const CREDENTIALS = {
-        usuario: "admin",
-        password: "fkarting2026"
-    };
-
+    // ── Credenciales (temporal — mover a Supabase Auth en v2) ──
+    const CREDENTIALS = { usuario: "admin", password: "fkarting2026" };
     const SESSION_KEY = "fk_admin_auth";
 
     // Si ya está logueado, saltar directo
@@ -261,7 +252,47 @@
         window.location.replace("admin.html");
     }
 
+    // ✅ Control de intentos fallidos — cooldown de 3s por intento
+    let failedAttempts = 0;
+    let locked = false;
+
+    function setLocked(seconds) {
+        locked = true;
+        const btn      = document.getElementById("btnLogin");
+        const userInput = document.getElementById("username");
+        const passInput = document.getElementById("password");
+        const msgEl    = document.getElementById("loginErrorMsg");
+        const errEl    = document.getElementById("loginError");
+
+        btn.disabled      = true;
+        userInput.disabled = true;
+        passInput.disabled = true;
+
+        let remaining = seconds;
+        errEl.classList.add("visible");
+
+        const tick = () => {
+            msgEl.textContent = `Demasiados intentos. Espera ${remaining}s...`;
+            if (remaining <= 0) {
+                locked = false;
+                btn.disabled       = false;
+                userInput.disabled = false;
+                passInput.disabled = false;
+                msgEl.textContent  = "Usuario o contraseña incorrectos.";
+                errEl.classList.remove("visible");
+                passInput.value = "";
+                passInput.focus();
+                return;
+            }
+            remaining--;
+            setTimeout(tick, 1000);
+        };
+        tick();
+    }
+
     function doLogin() {
+        if (locked) return;
+
         const user = document.getElementById("username").value.trim();
         const pass = document.getElementById("password").value;
         const err  = document.getElementById("loginError");
@@ -270,9 +301,13 @@
             sessionStorage.setItem(SESSION_KEY, "true");
             window.location.replace("admin.html");
         } else {
+            failedAttempts++;
             err.classList.add("visible");
             document.getElementById("password").value = "";
-            document.getElementById("password").focus();
+
+            // ✅ Cooldown progresivo: 3s, 6s, 10s, 15s...
+            const cooldown = Math.min(3 * failedAttempts, 15);
+            setLocked(cooldown);
         }
     }
 
