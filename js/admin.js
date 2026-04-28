@@ -1,7 +1,12 @@
 // ══════════════════════════════════════════════
-//  FKarting — admin.js
+//  FKarting — admin.js  v1.0
 //  Solo lógica UI · Todas las queries en connection.js
 // ══════════════════════════════════════════════
+
+// ✅ AUTH GUARD — redirige si no está autenticado
+if (sessionStorage.getItem("fk_admin_auth") !== "true") {
+    window.location.replace("login.html");
+}
 
 import {
     // Dashboard
@@ -47,7 +52,6 @@ const sectionTitles = {
 //  HELPERS
 // ════════════════════════════════════════════════════════════════
 
-// Convierte interval de Postgres "00:01:23.456" → "01:23.456"
 function formatInterval(interval) {
     if (!interval) return "—";
     const match = String(interval).match(/(\d+):(\d+):(\d+(?:\.\d+)?)/);
@@ -58,7 +62,6 @@ function formatInterval(interval) {
     return `${String(mm).padStart(2, "0")}:${ss.padStart(6, "0")}`;
 }
 
-// Convierte "MM:SS.mmm" → interval Postgres "00:MM:SS.mmm"
 function toInterval(str) {
     str = str.trim();
     const match = str.match(/^(\d{1,2}):(\d{2})\.(\d{1,3})$/);
@@ -71,7 +74,6 @@ function toInterval(str) {
     return `00:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}.${ms}`;
 }
 
-// Convierte interval Postgres a segundos (para comparar tiempos)
 function intervalToSeconds(interval) {
     if (!interval) return 0;
     const match = String(interval).match(/(\d+):(\d+):(\d+(?:\.\d+)?)/);
@@ -87,8 +89,20 @@ function showMsg(id, text, ms = 4000) {
     el._t = setTimeout(() => el.textContent = "", ms);
 }
 
+// ✅ FIX: escAttr completo — previene XSS en innerHTML
 function escAttr(s) {
-    return String(s).replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// Estado de carga genérico para tablas
+function setTableLoading(tbodyId, cols) {
+    document.getElementById(tbodyId).innerHTML =
+        `<tr><td colspan="${cols}" class="table-empty" style="opacity:.5">Cargando...</td></tr>`;
 }
 
 
@@ -115,7 +129,12 @@ document.querySelectorAll(".sidebar-item[data-section]").forEach(item => {
     });
 });
 
-document.getElementById("logout").onclick = () => { window.location.href = "index.html"; };
+// ✅ FIX: Logout limpia sessionStorage antes de redirigir
+document.getElementById("logout").onclick = (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem("fk_admin_auth");
+    window.location.href = "index.html";
+};
 
 
 // ════════════════════════════════════════════════════════════════
@@ -138,14 +157,13 @@ async function loadDashboard() {
             return;
         }
 
-        // ── Progreso del campeonato ───────────────────────
         const carreras    = await getCarrerasByCampeonatoId(camp.id_campeonato);
         const completadas = carreras.filter(c => c.completada).length;
         const pct         = carreras.length ? Math.round((completadas / carreras.length) * 100) : 0;
 
         document.getElementById("dashCampeonatoBody").innerHTML = `
-            <div class="dash-champ-name">${camp.camp_ano}</div>
-            <div class="dash-champ-desc">${camp.camp_descripcion ?? "Sin descripción"}</div>
+            <div class="dash-champ-name">${escAttr(String(camp.camp_ano))}</div>
+            <div class="dash-champ-desc">${escAttr(camp.camp_descripcion ?? "Sin descripción")}</div>
             <div class="progress-wrap">
                 <div class="progress-label">
                     <span>${completadas} de ${carreras.length} carreras completadas</span>
@@ -156,7 +174,6 @@ async function loadDashboard() {
                 </div>
             </div>`;
 
-        // ── Top 3 ranking ─────────────────────────────────
         const top3 = await getRankingTop3ByCampeonato(camp.id_campeonato);
         if (top3.length) {
             const colors = ["var(--gold)", "var(--silver)", "var(--bronze)"];
@@ -165,7 +182,7 @@ async function loadDashboard() {
             document.getElementById("dashTop3Body").innerHTML = `
                 <div class="dash-podium">
                     ${top3.map((r, i) => {
-                        const nombre = r.piloto?.pilo_nombre ?? "—";
+                        const nombre = escAttr(r.piloto?.pilo_nombre ?? "—");
                         const numero = r.piloto?.pilo_numero ? `#${r.piloto.pilo_numero} ` : "";
                         return `
                             <div class="dash-podium-item ${clases[i]}">
@@ -182,7 +199,6 @@ async function loadDashboard() {
             document.getElementById("dashTop3Body").innerHTML = `<p class="dash-empty">Aún no hay datos en el ranquin.</p>`;
         }
 
-        // ── Última carrera ────────────────────────────────
         const ultimaArr = await getUltimaCarreraCompletada(camp.id_campeonato);
         const ultima    = ultimaArr[0] ?? null;
 
@@ -202,7 +218,6 @@ async function loadDashboard() {
             getResultadosCompletos(ultima.id_carrera)
         ]);
 
-        // Podio última carrera
         const resColors = ["var(--gold)", "var(--silver)", "var(--bronze)"];
         document.getElementById("dashUltimaCarreraBody").innerHTML = `
             <div class="dash-ultima-meta">
@@ -221,7 +236,7 @@ async function loadDashboard() {
             </div>
             <div class="dash-ultima-resultados">
                 ${resultadosTop3.map(r => {
-                    const nombre = r.piloto?.pilo_nombre ?? "—";
+                    const nombre = escAttr(r.piloto?.pilo_nombre ?? "—");
                     const numero = r.piloto?.pilo_numero ? `#${r.piloto.pilo_numero}` : "";
                     return `
                         <div class="dash-res-item">
@@ -236,13 +251,12 @@ async function loadDashboard() {
                 }).join("")}
             </div>`;
 
-        // Vuelta más rápida
         const conTiempo = resultadosAll.filter(r => r.res_tiempo_seg && intervalToSeconds(r.res_tiempo_seg) > 0);
         if (conTiempo.length) {
             const rapido = conTiempo.reduce((best, r) =>
                 intervalToSeconds(r.res_tiempo_seg) < intervalToSeconds(best.res_tiempo_seg) ? r : best
             );
-            const nombre = rapido.piloto?.pilo_nombre ?? "—";
+            const nombre = escAttr(rapido.piloto?.pilo_nombre ?? "—");
             const numero = rapido.piloto?.pilo_numero ? `#${rapido.piloto.pilo_numero}` : "";
             document.getElementById("dashMasRapidoBody").innerHTML = `
                 <div class="dash-stat-hero">
@@ -254,11 +268,10 @@ async function loadDashboard() {
             document.getElementById("dashMasRapidoBody").innerHTML = `<p class="dash-empty">Sin tiempos registrados en esta carrera.</p>`;
         }
 
-        // Más vueltas
         const conVueltas = resultadosAll.filter(r => r.res_vueltas > 0);
         if (conVueltas.length) {
             const lider  = conVueltas.reduce((best, r) => r.res_vueltas > best.res_vueltas ? r : best);
-            const nombre = lider.piloto?.pilo_nombre ?? "—";
+            const nombre = escAttr(lider.piloto?.pilo_nombre ?? "—");
             const numero = lider.piloto?.pilo_numero ? `#${lider.piloto.pilo_numero}` : "";
             document.getElementById("dashMasVueltasBody").innerHTML = `
                 <div class="dash-stat-hero">
@@ -278,10 +291,10 @@ async function loadDashboard() {
 
 // ════════════════════════════════════════════════════════════════
 //  CAMPEONATOS
-//  Campos: camp_ano, camp_descripcion, camp_activo
 // ════════════════════════════════════════════════════════════════
 
 async function loadChampionships() {
+    setTableLoading("yearList", 4);
     try {
         const data = await getCampeonatos();
         document.getElementById("champCount").textContent =
@@ -316,8 +329,6 @@ async function loadChampionships() {
     }
 }
 
-// ── Modal Campeonatos ──────────────────────────────────────────
-
 document.getElementById("btnNewChamp").onclick         = () => openChampModal();
 document.getElementById("btnCloseChampModal").onclick  = closeChampModal;
 document.getElementById("btnCancelChampModal").onclick = closeChampModal;
@@ -345,7 +356,6 @@ async function openChampModal(id = null) {
     }
     document.getElementById("champModal").classList.remove("hidden");
 }
-window.openChampModal = openChampModal;
 
 function closeChampModal() {
     document.getElementById("champModal").classList.add("hidden");
@@ -389,15 +399,14 @@ async function handleDeleteChamp(id) {
         alert("Error al eliminar: " + err.message);
     }
 }
-window.handleDeleteChamp = handleDeleteChamp;
 
 
 // ════════════════════════════════════════════════════════════════
 //  PILOTOS
-//  Campos: pilo_nombre, pilo_numero, pilo_activo
 // ════════════════════════════════════════════════════════════════
 
 async function loadDrivers() {
+    setTableLoading("driverList", 7);
     try {
         const data = await getPilotos();
         document.getElementById("driverCount").textContent =
@@ -405,7 +414,7 @@ async function loadDrivers() {
 
         const tbody = document.getElementById("driverList");
         if (!data.length) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--gray-600)">No hay pilotos registrados aún.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="table-empty">No hay pilotos registrados aún.</td></tr>`;
             return;
         }
 
@@ -438,8 +447,6 @@ async function loadDrivers() {
     }
 }
 
-// ── Modal Pilotos ──────────────────────────────────────────────
-
 document.getElementById("btnNewDriver").onclick         = () => openDriverModal();
 document.getElementById("btnCloseDriverModal").onclick  = closeDriverModal;
 document.getElementById("btnCancelDriverModal").onclick = closeDriverModal;
@@ -465,7 +472,6 @@ async function openDriverModal(id = null) {
     }
     document.getElementById("driverModal").classList.remove("hidden");
 }
-window.openDriverModal = openDriverModal;
 
 function closeDriverModal() {
     document.getElementById("driverModal").classList.add("hidden");
@@ -491,7 +497,6 @@ document.getElementById("btnSaveDriver").onclick = async () => {
         }
         closeDriverModal();
         await loadDrivers();
-        await loadDashboard();
     } catch (err) {
         const msg = err.message.includes("piloto_pilo_numero_key")
             ? "⚠️ Ese número ya está en uso"
@@ -505,13 +510,11 @@ async function handleDeleteDriver(id) {
     try {
         await deletePiloto(id);
         await loadDrivers();
-        await loadDashboard();
         showMsg("saveMsgDrivers", "✅ Piloto eliminado");
     } catch (err) {
         alert("No se puede eliminar: tiene datos de ranking asociados.");
     }
 }
-window.handleDeleteDriver = handleDeleteDriver;
 
 
 // ════════════════════════════════════════════════════════════════
@@ -524,7 +527,7 @@ async function loadCarrerasSection() {
         const sel = document.getElementById("carrerasCampeonato");
         sel.innerHTML = campeonatos.length
             ? campeonatos.map(c =>
-                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + c.camp_descripcion : ""}</option>`
+                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + escAttr(c.camp_descripcion) : ""}</option>`
               ).join("")
             : `<option value="">Sin campeonatos</option>`;
 
@@ -539,6 +542,7 @@ document.getElementById("carrerasCampeonato").addEventListener("change", async f
 });
 
 async function loadCarrerasByCamp(id_campeonato) {
+    setTableLoading("carrerasList", 5);
     try {
         const data  = await getCarrerasByCampeonato(id_campeonato);
         const tbody = document.getElementById("carrerasList");
@@ -576,8 +580,6 @@ async function loadCarrerasByCamp(id_campeonato) {
     }
 }
 
-// ── Modal Carreras ─────────────────────────────────────────────
-
 document.getElementById("btnNewCarrera").onclick         = () => openCarreraModal();
 document.getElementById("btnCloseCarreraModal").onclick  = closeCarreraModal;
 document.getElementById("btnCancelCarreraModal").onclick = closeCarreraModal;
@@ -605,7 +607,6 @@ async function openCarreraModal(id = null) {
     }
     document.getElementById("carreraModal").classList.remove("hidden");
 }
-window.openCarreraModal = openCarreraModal;
 
 function closeCarreraModal() {
     document.getElementById("carreraModal").classList.add("hidden");
@@ -650,12 +651,10 @@ async function handleDeleteCarrera(id) {
         alert("Error al eliminar: " + err.message);
     }
 }
-window.handleDeleteCarrera = handleDeleteCarrera;
 
 
 // ════════════════════════════════════════════════════════════════
 //  RESULTADOS
-//  Campos: res_posicion, res_puntos, res_tiempo_seg, res_vueltas
 // ════════════════════════════════════════════════════════════════
 
 async function loadResultadosSection() {
@@ -664,7 +663,7 @@ async function loadResultadosSection() {
         const selCamp = document.getElementById("resultadosCampeonato");
         selCamp.innerHTML = campeonatos.length
             ? campeonatos.map(c =>
-                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + c.camp_descripcion : ""}</option>`
+                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + escAttr(c.camp_descripcion) : ""}</option>`
               ).join("")
             : `<option value="">Sin campeonatos</option>`;
 
@@ -679,7 +678,7 @@ async function loadCarrerasForResultados(id_campeonato) {
     const selCar   = document.getElementById("resultadosCarrera");
     selCar.innerHTML = carreras.length
         ? carreras.map(c =>
-            `<option value="${c.id_carrera}">${c.nombre}${c.fecha ? " · " + c.fecha : ""}</option>`
+            `<option value="${c.id_carrera}">${escAttr(c.nombre)}${c.fecha ? " · " + c.fecha : ""}</option>`
           ).join("")
         : `<option value="">Sin carreras en este campeonato</option>`;
 
@@ -696,6 +695,7 @@ document.getElementById("resultadosCarrera").addEventListener("change", async fu
 });
 
 async function loadResultadosList(id_carrera) {
+    setTableLoading("resultadosList", 7);
     try {
         const data  = await getResultadosByCarrera(id_carrera);
         const tbody = document.getElementById("resultadosList");
@@ -705,7 +705,6 @@ async function loadResultadosList(id_carrera) {
             return;
         }
 
-        // Calcular vuelta rápida: menor res_tiempo_seg (ignorar nulos y ceros)
         let minTiempo = null, minId = null;
         data.forEach(r => {
             if (!r.res_tiempo_seg) return;
@@ -717,7 +716,7 @@ async function loadResultadosList(id_carrera) {
         });
 
         tbody.innerHTML = data.map(r => {
-            const nombre     = r.piloto ? `${r.piloto.pilo_numero ? "#" + r.piloto.pilo_numero + " " : ""}${r.piloto.pilo_nombre}` : "—";
+            const nombre      = r.piloto ? `${r.piloto.pilo_numero ? "#" + r.piloto.pilo_numero + " " : ""}${r.piloto.pilo_nombre}` : "—";
             const esVueltaRap = minId !== null && r.id_resultado === minId;
             return `
                 <tr>
@@ -747,8 +746,6 @@ async function loadResultadosList(id_carrera) {
     }
 }
 
-// ── Modal Resultados ───────────────────────────────────────────
-
 document.getElementById("btnNewResultado").onclick         = () => openResultadoModal();
 document.getElementById("btnCloseResultadoModal").onclick  = closeResultadoModal;
 document.getElementById("btnCancelResultadoModal").onclick = closeResultadoModal;
@@ -756,11 +753,10 @@ document.getElementById("resultadoModal").addEventListener("click", e => {
     if (e.target === document.getElementById("resultadoModal")) closeResultadoModal();
 });
 
-// Carga posiciones libres en el select; en edición deja libre la posición actual
 async function cargarPosicionesDisponibles(id_carrera, posicionActual = null) {
     const sel = document.getElementById("resultadoPosicion");
     try {
-        const data    = await getResultadosByCarrera(id_carrera);
+        const data     = await getResultadosByCarrera(id_carrera);
         const ocupadas = new Set(data.map(r => r.res_posicion));
         if (posicionActual) ocupadas.delete(posicionActual);
 
@@ -797,20 +793,18 @@ async function openResultadoModal(id = null) {
     document.getElementById("resultadoTiempo").value  = "";
     document.getElementById("resultadoModalTitle").textContent = id ? "Editar Resultado" : "Agregar Resultado";
 
-    // Cargar pilotos
     try {
         const pilotos = await getPilotosActivosAdmin();
         document.getElementById("resultadoPiloto").innerHTML =
             `<option value="">Seleccionar piloto...</option>` +
             pilotos.map(p =>
-                `<option value="${p.id_piloto}">${p.pilo_numero ? "#" + p.pilo_numero + " " : ""}${p.pilo_nombre}</option>`
+                `<option value="${p.id_piloto}">${p.pilo_numero ? "#" + p.pilo_numero + " " : ""}${escAttr(p.pilo_nombre)}</option>`
             ).join("");
     } catch (e) {
         document.getElementById("resultadoPiloto").innerHTML = `<option value="">Error cargando pilotos</option>`;
     }
 
     if (id) {
-        // Modo edición: prefill
         try {
             const data = await getResultadosByCarrera(id_carrera);
             const r    = data.find(x => x.id_resultado === id);
@@ -823,7 +817,6 @@ async function openResultadoModal(id = null) {
             }
         } catch (e) { console.error(e); }
     } else {
-        // Modo nuevo: verificar que haya posiciones libres
         const hayDisponibles = await cargarPosicionesDisponibles(id_carrera);
         if (!hayDisponibles) {
             showMsg("saveMsgResultados", "⚠️ Esta carrera ya tiene los 12 resultados registrados");
@@ -833,9 +826,7 @@ async function openResultadoModal(id = null) {
 
     document.getElementById("resultadoModal").classList.remove("hidden");
 }
-window.openResultadoModal = openResultadoModal;
 
-// Auto-asignar puntos al seleccionar posición
 document.getElementById("resultadoPosicion").addEventListener("change", async function () {
     const pos = parseInt(this.value);
     if (!pos) return;
@@ -904,12 +895,10 @@ async function handleDeleteResultado(id) {
         alert("Error al eliminar: " + err.message);
     }
 }
-window.handleDeleteResultado = handleDeleteResultado;
 
 
 // ════════════════════════════════════════════════════════════════
 //  TABLA DE PUNTOS
-//  id_tablapuntosbase = posición (1–12) | tpb_puntos = puntos
 // ════════════════════════════════════════════════════════════════
 
 async function loadPuntosSection() {
@@ -947,7 +936,6 @@ function renderPuntosTable(data) {
     }).join("");
 }
 
-// Edición inline de una fila
 function editPuntosFila(pos, valorActual) {
     const cell = document.getElementById(`puntos-val-${pos}`);
     cell.innerHTML = `
@@ -966,7 +954,6 @@ function editPuntosFila(pos, valorActual) {
         </div>`;
     document.getElementById(`puntosInput-${pos}`).focus();
 }
-window.editPuntosFila = editPuntosFila;
 
 async function savePuntosFila(pos) {
     const input  = document.getElementById(`puntosInput-${pos}`);
@@ -986,12 +973,10 @@ async function savePuntosFila(pos) {
         console.error(err);
     }
 }
-window.savePuntosFila = savePuntosFila;
 
 
 // ════════════════════════════════════════════════════════════════
 //  RANKING
-//  Campos: ran_puntos, ran_carreras, ran_victorias, ran_podios
 // ════════════════════════════════════════════════════════════════
 
 async function loadRankingSection() {
@@ -1000,7 +985,7 @@ async function loadRankingSection() {
         const sel = document.getElementById("rankingCampeonato");
         sel.innerHTML = campeonatos.length
             ? campeonatos.map(c =>
-                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + c.camp_descripcion : ""}</option>`
+                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + escAttr(c.camp_descripcion) : ""}</option>`
               ).join("")
             : `<option value="">Sin campeonatos activos</option>`;
 
@@ -1031,7 +1016,7 @@ async function loadRankingList(id_campeonato) {
             const pos    = i + 1;
             const cls    = pos === 1 ? "rank-card-1" : pos === 2 ? "rank-card-2" : pos === 3 ? "rank-card-3" : "rank-card-n";
             const color  = pos === 1 ? "var(--gold)" : pos === 2 ? "var(--silver)" : pos === 3 ? "var(--bronze)" : "var(--gray-500)";
-            const nombre = r.piloto?.pilo_nombre ?? "—";
+            const nombre = escAttr(r.piloto?.pilo_nombre ?? "—");
             const numero = r.piloto?.pilo_numero ?? "";
             return `
                 <div class="rank-card ${cls}">
@@ -1048,7 +1033,7 @@ async function loadRankingList(id_campeonato) {
                         <div class="rank-pts-num">${r.ran_puntos}</div>
                         <div class="rank-pts-label">pts</div>
                     </div>
-                    <button class="rank-edit-btn" onclick="openRankingModal(${r.id_ranking}, ${r.piloto?.id_piloto}, '${escAttr(nombre)}', ${r.ran_puntos}, ${r.ran_carreras}, ${r.ran_victorias}, ${r.ran_podios})" title="Editar">
+                    <button class="rank-edit-btn" onclick="openRankingModal(${r.id_ranking}, ${r.piloto?.id_piloto}, '${escAttr(r.piloto?.pilo_nombre ?? "")}', ${r.ran_puntos}, ${r.ran_carreras}, ${r.ran_victorias}, ${r.ran_podios})" title="Editar">
                         ${iconEdit}
                     </button>
                     <button class="del-btn" onclick="handleDeleteRanking(${r.id_ranking})" title="Eliminar">✕</button>
@@ -1059,8 +1044,6 @@ async function loadRankingList(id_campeonato) {
         console.error(err);
     }
 }
-
-// ── Modal Ranking ──────────────────────────────────────────────
 
 document.getElementById("btnAddRanking").onclick  = () => openRankingModal();
 document.getElementById("btnCloseModal").onclick  = closeRankingModal;
@@ -1081,7 +1064,7 @@ async function openRankingModal(id = null, id_piloto = null, nombre = "", puntos
         const pilotos = await getPilotosActivosAdmin();
         document.getElementById("rankingPiloto").innerHTML = pilotos.map(p =>
             `<option value="${p.id_piloto}" ${p.id_piloto === id_piloto ? "selected" : ""}>
-                ${p.pilo_numero ? "#" + p.pilo_numero + " " : ""}${p.pilo_nombre}
+                ${p.pilo_numero ? "#" + p.pilo_numero + " " : ""}${escAttr(p.pilo_nombre)}
             </option>`
         ).join("");
     } catch (err) {
@@ -1089,7 +1072,6 @@ async function openRankingModal(id = null, id_piloto = null, nombre = "", puntos
     }
     document.getElementById("rankingModal").classList.remove("hidden");
 }
-window.openRankingModal = openRankingModal;
 
 function closeRankingModal() {
     document.getElementById("rankingModal").classList.add("hidden");
@@ -1139,7 +1121,27 @@ async function handleDeleteRanking(id) {
         alert("Error al eliminar: " + err.message);
     }
 }
-window.handleDeleteRanking = handleDeleteRanking;
+
+
+// ════════════════════════════════════════════════════════════════
+//  EXPONER FUNCIONES AL SCOPE GLOBAL (onclick en HTML)
+// ════════════════════════════════════════════════════════════════
+
+// ✅ FIX: una sola asignación limpia en lugar de window.x = x repetido
+Object.assign(window, {
+    openChampModal,
+    handleDeleteChamp,
+    openDriverModal,
+    handleDeleteDriver,
+    openCarreraModal,
+    handleDeleteCarrera,
+    openResultadoModal,
+    handleDeleteResultado,
+    editPuntosFila,
+    savePuntosFila,
+    openRankingModal,
+    handleDeleteRanking
+});
 
 
 // ════════════════════════════════════════════════════════════════
