@@ -1,9 +1,9 @@
 /* ============================================================
-   FKARTING — FRONTEND · styles.css
+   FKARTING — FRONTEND · styles.css  v1.0.0
    Estilo oscuro racing, coherente con admin-panel.css
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap');
+/* ✅ @import de Google Fonts eliminado — se carga en el <head> de cada HTML */
 
 /* ── VARIABLES ── */
 :root {
@@ -52,7 +52,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Animación flash en el fondo */
+/* ✅ Animación flash-pulse sin scale() — mucho más eficiente en GPU */
 body::before {
   content: '';
   position: fixed;
@@ -64,14 +64,8 @@ body::before {
 }
 
 @keyframes flash-pulse {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.8; }
 }
 
 a { text-decoration: none; }
@@ -377,13 +371,13 @@ ul { list-style: none; }
   justify-content: center;
   gap: 16px;
   min-height: 380px;
-  width: 100%;        /* ocupa todo el container padre */
+  width: 100%;
 }
 
 .ranking-col {
-  flex: 1 1 0;        /* las 3 columnas se reparten igual */
-  min-width: 0;       /* evita overflow */
-  max-width: 300px;   /* tope razonable */
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -546,22 +540,6 @@ ul { list-style: none; }
   font-weight: 600;
 }
 
-/* ── Línea base ── */
-.ranking-baseline {
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, transparent, var(--border), transparent);
-  margin-top: 0;
-}
-
-/* ── Responsive ── */
-@media (max-width: 600px) {
-  .ranking-list { gap: 8px; min-height: 280px; }
-  .ranking-bar-pts { font-size: 2rem; }
-  .ranking-col-name { font-size: 0.9rem; }
-}
-
-
 
 /* ============================================================
    MEJOR TIEMPO
@@ -594,7 +572,7 @@ ul { list-style: none; }
 }
 
 .tiempo-pos {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 900;
   color: rgba(255,255,255,0.25);
@@ -604,7 +582,7 @@ ul { list-style: none; }
 .tiempo-nombre {
   flex: 1;
   padding: 0 16px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: .5px;
@@ -625,7 +603,7 @@ ul { list-style: none; }
 }
 
 .tiempo-valor {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 900;
   color: #fff;
@@ -642,7 +620,6 @@ ul { list-style: none; }
   gap: 8px;
 }
 
-/* Populated by JS — each result item should have class "result-item" */
 .result-item {
   display: flex;
   align-items: center;
@@ -705,9 +682,7 @@ ul { list-style: none; }
   letter-spacing: 0.03em;
 }
 
-.carrera-meta-icon {
-  font-size: 1rem;
-}
+.carrera-meta-icon { font-size: 1rem; }
 
 .empty-msg {
   color: var(--gray-600);
@@ -773,7 +748,6 @@ ul { list-style: none; }
   margin-bottom: 12px;
 }
 
-/* Stats row: Campeonatos | Podios */
 .driver-stats {
   display: flex;
   align-items: center;
@@ -993,8 +967,7 @@ ul { list-style: none; }
 
   .section { padding: 56px 0; }
 
-  #rankingTable thead th,
-  #rankingTable tbody td { padding: 11px 12px; }
+  /* ✅ Eliminado selector #rankingTable que no existía en el HTML */
 
   .drivers-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
 
