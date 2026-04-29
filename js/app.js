@@ -272,7 +272,7 @@ async function loadPilotos() {
             <div class="driver-stats">
                 <div class="driver-stat">
                     <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
-                    <span class="driver-stat-label">Campeonatos</span>
+                    <span class="driver-stat-label">Tempo</span>
                 </div>
                 <div class="driver-stat-divider"></div>
                 <div class="driver-stat">
