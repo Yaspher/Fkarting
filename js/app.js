@@ -251,7 +251,7 @@ async function loadUltimaCarrera() {
 
 
 // ════════════════════════════════════════════════════════════════
-//  PILOTOS DESTACADOS
+//  PILOTOS
 // ════════════════════════════════════════════════════════════════
 
 async function loadPilotos() {
@@ -264,29 +264,45 @@ async function loadPilotos() {
             return;
         }
 
-        grid.innerHTML = data.map(d => `
-            <div class="driver-card">
-                <div class="driver-num">#${d.Numero ?? "—"}</div>
-                <div class="driver-name">${d.Nombre}</div>
-                <div class="driver-stats">
-                    <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
-                        <span class="driver-stat-label">Campeonatos</span>
-                    </div>
-                    <div class="driver-stat-divider"></div>
-                    <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Victorias ?? 0}</span>
-                        <span class="driver-stat-label">Victorias</span>
-                    </div>
-                    <div class="driver-stat-divider"></div>
-                    <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Podios ?? 0}</span>
-                        <span class="driver-stat-label">Podios</span>
-                    </div>
+    grid.innerHTML = data.map(d => `
+        <div class="driver-card" data-id="${d.IdPiloto}">
+            <div class="driver-num">#${d.Numero ?? "—"}</div>
+            <div class="driver-name">${formatName(d.Nombre)}</div>
+    
+            <div class="driver-stats">
+                <div class="driver-stat">
+                    <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
+                    <span class="driver-stat-label">Campeonatos</span>
+                </div>
+                <div class="driver-stat-divider"></div>
+                <div class="driver-stat">
+                    <span class="driver-stat-value">${d.Victorias ?? 0}</span>
+                    <span class="driver-stat-label">Victorias</span>
+                </div>
+                <div class="driver-stat-divider"></div>
+                <div class="driver-stat">
+                    <span class="driver-stat-value">${d.Podios ?? 0}</span>
+                    <span class="driver-stat-label">Podios</span>
                 </div>
             </div>
-        `).join("");
+        </div>
+    `).join("");
+    
+    // evento click
+    document.querySelectorAll(".driver-card").forEach(card => {
+        card.addEventListener("click", () => {
+            const id = card.dataset.id;
+            console.log("Ver piloto:", id);
+            // aquí luego puedes abrir modal o redirigir
+        });
+    });
 
+function formatName(name) {
+    return name
+        ?.toLowerCase()
+        .replace(/\b\w/g, l => l.toUpperCase()) || "";
+}
+        
     } catch (err) {
         console.error("Pilotos:", err);
         grid.innerHTML = `<p class="empty-msg">Error al cargar pilotos.</p>`;
