@@ -90,7 +90,7 @@ async function sbDelete(table, id, idField) {
 // ════════════════════════════════════════════════════════════════
 
 export const getRankingVista = () =>
-    sbGet("vista_ranking", "select=Campeonato,Piloto,Puntos,Victorias,Podios");
+    sbGet("vista_ranking", "select=Campeonato,Piloto,Puntos,Vitorias,Podios");
 
 // select=* porque los nombres de columna en estas vistas usan PascalCase
 export const getTiempoVista = () =>
