@@ -8,7 +8,7 @@ import {
     getPilotosVista,
     getTiempoVista,
     getCarreraVista
-} from './conection.js';
+} from './connection.js';
 
 
 // ════════════════════════════════════════════════════════════════
