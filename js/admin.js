@@ -10,7 +10,6 @@ if (sessionStorage.getItem("fk_admin_auth") !== "true") {
 
 import {
     // Dashboard
-    getDashboardPilotos, getDashboardCampeonatos, getDashboardRanking,
     getCampeonatoActivo, getCarrerasByCampeonatoId, getRankingTop3ByCampeonato,
     getUltimaCarreraCompletada, getResultadosTop3, getResultadosCompletos, getPilotosActivosCount,
     // Campeonatos
