@@ -1,6 +1,6 @@
 Proyecto FKarting
 
-v1.0
+v1.1.0 - Corredores y Admin
 
 Usuario: "admin"
 Password: "fkarting2026"
