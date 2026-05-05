@@ -1,6 +1,6 @@
 // ══════════════════════════════════════════════
-//  FKarting — admin.js  v1.0
-//  Solo lógica UI · Todas las queries en connection.js
+//  FKarting — admin.js  v1.2.0
+//  Solo lógica UI · Todas las queries en Connection.js
 // ══════════════════════════════════════════════
 
 // ✅ AUTH GUARD — redirige si no está autenticado
@@ -13,18 +13,22 @@ import {
     getCampeonatoActivo, getCarrerasByCampeonatoId, getRankingTop3ByCampeonato,
     getUltimaCarreraCompletada, getResultadosTop3, getResultadosCompletos, getPilotosActivosCount,
     // Campeonatos
-    getCampeonatos, createCampeonato, updateCampeonato, deleteCampeonato,
+    getCampeonatos, getCampeonatosActivos, createCampeonato, updateCampeonato, deleteCampeonato,
     // Pilotos
     getPilotos, getPilotoById, getPilotosActivosAdmin, createPiloto, updatePiloto, deletePiloto,
     // Carreras
-    getCampeonatosAdmin, getCarrerasByCampeonato, getCarreraById, createCarrera, updateCarrera, deleteCarrera,
+    getCarrerasByCampeonato, getCarrerasByCampeonatoId, getCarreraById,
+    createCarrera, updateCarrera, deleteCarrera,
     // Resultados
     getResultadosByCarrera, createResultado, updateResultado, deleteResultado,
     // Ranking
-    getCampeonatosActivos, getRankingByCampeonato, createRanking, updateRanking, deleteRanking,
+    getRankingByCampeonato, createRanking, updateRanking, deleteRanking,
     // Puntos
     getTablaPuntos, upsertPuntosPosicion, initPuntosFila
-} from './connection.js';
+} from './Connection.js';
+
+// ── Alias para compatibilidad con secciones que usan getCampeonatosAdmin
+const getCampeonatosAdmin = getCampeonatosActivos;
 
 
 // ════════════════════════════════════════════════════════════════
@@ -88,7 +92,6 @@ function showMsg(id, text, ms = 4000) {
     el._t = setTimeout(() => el.textContent = "", ms);
 }
 
-// ✅ FIX: escAttr completo — previene XSS en innerHTML
 function escAttr(s) {
     return String(s)
         .replace(/&/g, "&amp;")
@@ -98,7 +101,6 @@ function escAttr(s) {
         .replace(/'/g, "&#39;");
 }
 
-// Estado de carga genérico para tablas
 function setTableLoading(tbodyId, cols) {
     document.getElementById(tbodyId).innerHTML =
         `<tr><td colspan="${cols}" class="table-empty" style="opacity:.5">Cargando...</td></tr>`;
@@ -128,7 +130,6 @@ document.querySelectorAll(".sidebar-item[data-section]").forEach(item => {
     });
 });
 
-// ✅ FIX: Logout limpia sessionStorage antes de redirigir
 document.getElementById("logout").onclick = (e) => {
     e.preventDefault();
     sessionStorage.removeItem("fk_admin_auth");
@@ -719,18 +720,12 @@ async function loadResultadosList(id_carrera) {
             const esVueltaRap = minId !== null && r.id_resultado === minId;
             return `
                 <tr>
-                    <td>
-                        <span class="pos-badge pos-${r.res_posicion <= 3 ? r.res_posicion : "n"}">${r.res_posicion}</span>
-                    </td>
+                    <td><span class="pos-badge pos-${r.res_posicion <= 3 ? r.res_posicion : "n"}">${r.res_posicion}</span></td>
                     <td><span class="pilot-name">${escAttr(nombre)}</span></td>
                     <td><span class="stat-pill stat-win">${r.res_puntos} pts</span></td>
                     <td><span style="color:var(--gray-400);font-size:0.875rem">${r.res_vueltas ?? "—"}</span></td>
                     <td><span class="tiempo-val">${r.res_tiempo_seg ? formatInterval(r.res_tiempo_seg) : "—"}</span></td>
-                    <td>
-                        ${esVueltaRap
-                            ? `<span class="vuelta-rap-badge">🏁 Rápida</span>`
-                            : `<span style="color:var(--gray-700);font-size:0.8rem">—</span>`}
-                    </td>
+                    <td>${esVueltaRap ? `<span class="vuelta-rap-badge">🏁 Rápida</span>` : `<span style="color:var(--gray-700);font-size:0.8rem">—</span>`}</td>
                     <td>
                         <div class="td-actions">
                             <button class="action-btn" onclick="openResultadoModal(${r.id_resultado})" title="Editar">${iconEdit}</button>
@@ -912,13 +907,13 @@ async function loadPuntosSection() {
 
 function renderPuntosTable(data) {
     const tbody = document.getElementById("puntosList");
-    const mapaExistente = {};
-    data.forEach(r => { mapaExistente[r.id_tablapuntosbase] = r.tpb_puntos ?? 0; });
+    const mapa  = {};
+    data.forEach(r => { mapa[r.id_tablapuntosbase] = r.tpb_puntos ?? 0; });
 
     tbody.innerHTML = Array.from({ length: 12 }, (_, i) => {
         const pos    = i + 1;
-        const puntos = mapaExistente[pos] ?? "—";
-        const existe = Object.prototype.hasOwnProperty.call(mapaExistente, pos);
+        const puntos = mapa[pos] ?? "—";
+        const existe = Object.prototype.hasOwnProperty.call(mapa, pos);
         return `
             <tr id="puntos-row-${pos}">
                 <td><span class="pos-badge pos-${pos <= 3 ? pos : "n"}">${pos}</span></td>
@@ -928,7 +923,7 @@ function renderPuntosTable(data) {
                 </td>
                 <td>
                     <div class="td-actions">
-                        <button class="action-btn" onclick="editPuntosFila(${pos}, ${existe ? mapaExistente[pos] : 0})" title="Editar">${iconEdit}</button>
+                        <button class="action-btn" onclick="editPuntosFila(${pos}, ${existe ? mapa[pos] : 0})" title="Editar">${iconEdit}</button>
                     </div>
                 </td>
             </tr>`;
@@ -939,15 +934,9 @@ function editPuntosFila(pos, valorActual) {
     const cell = document.getElementById(`puntos-val-${pos}`);
     cell.innerHTML = `
         <div style="display:flex;gap:8px;align-items:center">
-            <input
-                type="number"
-                id="puntosInput-${pos}"
-                class="form-input"
-                value="${valorActual}"
-                min="0"
-                style="width:80px;padding:5px 8px"
-                onkeydown="if(event.key==='Enter') savePuntosFila(${pos}); if(event.key==='Escape') loadPuntosSection();"
-            >
+            <input type="number" id="puntosInput-${pos}" class="form-input"
+                value="${valorActual}" min="0" style="width:80px;padding:5px 8px"
+                onkeydown="if(event.key==='Enter') savePuntosFila(${pos}); if(event.key==='Escape') loadPuntosSection();">
             <button class="btn-primary" style="padding:5px 12px;font-size:0.75rem" onclick="savePuntosFila(${pos})">✓</button>
             <button class="btn-ghost"   style="padding:5px 10px;font-size:0.75rem" onclick="loadPuntosSection()">✕</button>
         </div>`;
@@ -990,7 +979,7 @@ async function loadRankingSection() {
 
         if (campeonatos.length) await loadRankingList(campeonatos[0].id_campeonato);
         else document.getElementById("rankingList").innerHTML =
-            `<div class="rank-empty">No hay campeonatos activos. Crea uno en la sección Campeonatos.</div>`;
+            `<div class="rank-empty">No hay campeonatos activos.</div>`;
     } catch (err) {
         showMsg("saveMsgRanking", "❌ Error cargando ranquin");
         console.error(err);
@@ -1007,7 +996,7 @@ async function loadRankingList(id_campeonato) {
         const list = document.getElementById("rankingList");
 
         if (!data.length) {
-            list.innerHTML = `<div class="rank-empty">No hay pilotos en este ranquin todavía.<br>Usa el botón "Agregar Piloto al Ranquin" para comenzar.</div>`;
+            list.innerHTML = `<div class="rank-empty">No hay pilotos en este ranquin todavía.</div>`;
             return;
         }
 
@@ -1126,20 +1115,13 @@ async function handleDeleteRanking(id) {
 //  EXPONER FUNCIONES AL SCOPE GLOBAL (onclick en HTML)
 // ════════════════════════════════════════════════════════════════
 
-// ✅ FIX: una sola asignación limpia en lugar de window.x = x repetido
 Object.assign(window, {
-    openChampModal,
-    handleDeleteChamp,
-    openDriverModal,
-    handleDeleteDriver,
-    openCarreraModal,
-    handleDeleteCarrera,
-    openResultadoModal,
-    handleDeleteResultado,
-    editPuntosFila,
-    savePuntosFila,
-    openRankingModal,
-    handleDeleteRanking
+    openChampModal,      handleDeleteChamp,
+    openDriverModal,     handleDeleteDriver,
+    openCarreraModal,    handleDeleteCarrera,
+    openResultadoModal,  handleDeleteResultado,
+    editPuntosFila,      savePuntosFila,
+    openRankingModal,    handleDeleteRanking
 });
 
 
