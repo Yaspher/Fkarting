@@ -24,7 +24,7 @@ import {
     getCampeonatosActivos, getRankingByCampeonato, createRanking, updateRanking, deleteRanking,
     // Puntos
     getTablaPuntos, upsertPuntosPosicion, initPuntosFila
-} from './conection.js';
+} from './connection.js';
 
 
 // ════════════════════════════════════════════════════════════════
