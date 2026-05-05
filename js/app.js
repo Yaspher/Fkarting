@@ -265,7 +265,7 @@ async function loadPilotos() {
         }
 
     grid.innerHTML = data.map(d => `
-        <div class="driver-card" data-id="${d.IdPiloto}">
+        <div class="driver-card" data-id="${d.Id}">
             <div class="driver-num">#${d.Numero ?? "—"}</div>
             <div class="driver-name">${formatName(d.Nombre)}</div>
     
