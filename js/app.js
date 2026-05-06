@@ -1,6 +1,6 @@
 // ══════════════════════════════════════════════
-//  FKarting — app.js
-//  Solo lógica UI · Todas las queries en connection.js
+//  FKarting — app.js  v1.2.0
+//  Solo lógica UI · Todas las queries en Connection.js
 // ══════════════════════════════════════════════
 
 import {
@@ -8,7 +8,7 @@ import {
     getPilotosVista,
     getTiempoVista,
     getCarreraVista
-} from './conection.js';
+} from './connection.js';
 
 
 // ════════════════════════════════════════════════════════════════
@@ -47,7 +47,7 @@ function posClass(pos) {
     return "px";
 }
 
-// ✅ Lee un campo probando múltiples variantes de nombre (PascalCase, lowercase, snake_case)
+// Lee un campo probando múltiples variantes de nombre
 function field(row, ...keys) {
     for (const k of keys) {
         if (row[k] !== undefined && row[k] !== null) return row[k];
@@ -55,6 +55,11 @@ function field(row, ...keys) {
         if (row[lower] !== undefined && row[lower] !== null) return row[lower];
     }
     return null;
+}
+
+// Capitaliza cada palabra
+function formatName(name) {
+    return name?.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) || "";
 }
 
 
@@ -111,7 +116,7 @@ async function loadRanking() {
                 </div>
                 <div class="ranking-col-base">
                     <div class="ranking-col-stat">
-                        <span class="col-stat-val">${d.Vitorias ?? 0}</span>
+                        <span class="col-stat-val">${d.Victorias ?? 0}</span>
                         <span class="col-stat-lbl">Victorias</span>
                     </div>
                     <div class="ranking-col-stat">
@@ -143,17 +148,12 @@ async function loadMejorTiempo() {
             return;
         }
 
-        // Debug: confirma los nombres de columna reales que devuelve Supabase
-        console.log("[MejorTiempo] columnas:", Object.keys(data[0]));
-
-        // ✅ FIX: ordenar por segundos, no por string
         const sorted = [...data].sort((a, b) =>
             intervalToSec(field(a, "Tiempos", "tiempos"))
           - intervalToSec(field(b, "Tiempos", "tiempos"))
         );
 
         container.innerHTML = sorted.map((d, i) => {
-            // ✅ FIX: leer campos con fallback a minúsculas
             const tiempos      = field(d, "Tiempos",      "tiempos");
             const nombrePiloto = field(d, "NombrePiloto", "nombrepiloto", "nombre_piloto");
             const vueltaRapida = field(d, "VueltaRapida", "vueltarapida", "vuelta_rapida");
@@ -169,8 +169,7 @@ async function loadMejorTiempo() {
         }).join("");
 
     } catch (err) {
-        console.error("Mejor Tiempo error:", err);
-        // ✅ Muestra el mensaje real de Supabase para facilitar diagnóstico
+        console.error("Mejor Tiempo:", err);
         container.innerHTML = `<p class="empty-msg">Error al cargar tiempos.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
     }
 }
@@ -190,10 +189,7 @@ async function loadUltimaCarrera() {
             return;
         }
 
-        // Debug: confirma los nombres de columna reales que devuelve Supabase
-        console.log("[UltimaCarrera] columnas:", Object.keys(data[0]));
-
-        // ✅ FIX: ordenar en JS para evitar problemas de mayúsculas en order= de PostgREST
+        // Ordenar en JS — evita problemas de case-sensitivity en order= de PostgREST
         data.sort((a, b) => {
             const fa = field(a, "Fecha", "fecha") ?? "";
             const fb = field(b, "Fecha", "fecha") ?? "";
@@ -204,8 +200,6 @@ async function loadUltimaCarrera() {
         });
 
         const ultimaId   = data[0].id_carrera;
-
-        // ✅ FIX: == flexible para no fallar por discrepancia string/number
         const resultados = data.filter(r => r.id_carrera == ultimaId);
 
         if (!resultados.length) {
@@ -213,10 +207,9 @@ async function loadUltimaCarrera() {
             return;
         }
 
-        // ✅ FIX: leer campos con fallback a minúsculas
         const nombre   = field(resultados[0], "nombre",   "Nombre");
         const circuito = field(resultados[0], "circuito", "Circuito");
-        const fecha    = field(resultados[0], "fecha",    "Fecha");
+        const fecha    = field(resultados[0], "Fecha",    "fecha");
 
         const fechaStr = fecha
             ? new Date(fecha).toLocaleDateString("es-DO", {
@@ -230,9 +223,9 @@ async function loadUltimaCarrera() {
                 <span>${nombre ?? ""}${circuito ? " · " + circuito : ""}${fechaStr ? " · " + fechaStr : ""}</span>
             </div>
             ${resultados.map(r => {
-                const posicion   = field(r, "posicion",    "Posicion");
-                const piloNombre = field(r, "pilo_nombre", "pilonombre", "pilo_Nombre", "NombrePiloto");
-                const puntos     = field(r, "puntos",      "Puntos");
+                const posicion   = field(r, "posicion",     "Posicion");
+                const piloNombre = field(r, "NombrePiloto", "pilo_nombre", "pilonombre");
+                const puntos     = field(r, "puntos",       "Puntos");
                 return `
                 <div class="result-item">
                     <div class="result-pos ${posClass(posicion)}">${posicion ?? "—"}</div>
@@ -243,8 +236,7 @@ async function loadUltimaCarrera() {
         `;
 
     } catch (err) {
-        console.error("Última carrera error:", err);
-        // ✅ Muestra el mensaje real de Supabase para facilitar diagnóstico
+        console.error("Última carrera:", err);
         container.innerHTML = `<p class="empty-msg">Error al cargar resultados.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
     }
 }
@@ -265,27 +257,33 @@ async function loadPilotos() {
         }
 
         grid.innerHTML = data.map(d => `
-            <div class="driver-card">
+            <div class="driver-card" data-id="${d.Id}">
                 <div class="driver-num">#${d.Numero ?? "—"}</div>
-                <div class="driver-name">${d.Nombre}</div>
+                <div class="driver-name">${formatName(d.Nombre)}</div>
                 <div class="driver-stats">
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
-                        <span class="driver-stat-label">Campeonatos</span>
+                        <span class="driver-stat-label">WDC</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Victorias ?? 0}</span>
-                        <span class="driver-stat-label">Victorias</span>
+                        <span class="driver-stat-label">WIN</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Podios ?? 0}</span>
-                        <span class="driver-stat-label">Podios</span>
+                        <span class="driver-stat-label">POLES</span>
                     </div>
                 </div>
             </div>
         `).join("");
+
+        document.querySelectorAll(".driver-card").forEach(card => {
+            card.addEventListener("click", () => {
+                console.log("Ver piloto:", card.dataset.id);
+            });
+        });
 
     } catch (err) {
         console.error("Pilotos:", err);
