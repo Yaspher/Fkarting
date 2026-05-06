@@ -1,7 +1,7 @@
 Proyecto FKarting
 
-v0.6.0
+v1.2.0 
 
-User: admin
 
-CC: fkarting2026
+Usuario: "admin"
+Password: "fkarting2026"

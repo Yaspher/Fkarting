@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Admin - FKarting</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ✅ No indexar esta página -->
+<meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="css/admin.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,64 +30,67 @@
 
     <nav class="sidebar-nav">
       <span class="sidebar-nav-label">Secciones</span>
+      <!-- ✅ FIX: ul > li estructura válida -->
+      <ul class="sidebar-nav-list">
+        <li class="sidebar-item active" data-section="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          Dashboard
+        </li>
 
-      <li class="sidebar-item active" data-section="dashboard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-        </svg>
-        Dashboard
-      </li>
+        <li class="sidebar-item" data-section="championships">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <path d="M8 21h8m-4-4v4m-7-9h.01M19 12h.01M3 7h18v5a9 9 0 01-18 0V7z"/>
+          </svg>
+          Campeonatos
+        </li>
 
-      <li class="sidebar-item" data-section="championships">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <path d="M8 21h8m-4-4v4m-7-9h.01M19 12h.01M3 7h18v5a9 9 0 01-18 0V7z"/>
-        </svg>
-        Campeonatos
-      </li>
+        <li class="sidebar-item" data-section="drivers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          Pilotos
+        </li>
 
-      <li class="sidebar-item" data-section="drivers">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-        Pilotos
-      </li>
+        <li class="sidebar-item" data-section="puntos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <circle cx="12" cy="8" r="6"/>
+            <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+          </svg>
+          Puntos
+        </li>
 
-      <li class="sidebar-item" data-section="puntos">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <circle cx="12" cy="8" r="6"/>
-          <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
-        </svg>
-        Puntos
-      </li>
+        <li class="sidebar-item" data-section="carreras">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+            <line x1="4" y1="22" x2="4" y2="15"/>
+          </svg>
+          Carreras
+        </li>
 
-      <li class="sidebar-item" data-section="carreras">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-          <line x1="4" y1="22" x2="4" y2="15"/>
-        </svg>
-        Carreras
-      </li>
+        <li class="sidebar-item" data-section="resultados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+          Resultados
+        </li>
 
-      <li class="sidebar-item" data-section="resultados">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <path d="M9 11l3 3L22 4"/>
-          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-        </svg>
-        Resultados
-      </li>
-
-      <li class="sidebar-item" data-section="ranking">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-        </svg>
-        Ranquin
-      </li>
+        <li class="sidebar-item" data-section="ranking">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          Ranquin
+        </li>
+      </ul>
     </nav>
 
     <div class="sidebar-back">
-      <a id="logout" href="index.html">
+      <!-- ✅ FIX: logout ahora limpia sessionStorage via admin.js -->
+      <a id="logout" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
@@ -113,7 +118,6 @@
       <!-- ── DASHBOARD ── -->
       <section id="dashboard" class="section">
 
-        <!-- Fila 1: Tarjeta pilotos activos -->
         <div class="stats" style="margin-bottom:24px">
           <div class="stat-card">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
@@ -126,10 +130,8 @@
           </div>
         </div>
 
-        <!-- Fila 2: Campeonato activo + Top 3 -->
         <div class="dash-row" style="margin-bottom:24px">
 
-          <!-- Campeonato activo -->
           <div class="dash-card" id="dashCampeonato">
             <p class="dash-card-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
@@ -142,7 +144,6 @@
             </div>
           </div>
 
-          <!-- Top 3 ranking -->
           <div class="dash-card" id="dashTop3">
             <p class="dash-card-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
@@ -157,7 +158,6 @@
 
         </div>
 
-        <!-- Fila 3: Última carrera -->
         <div class="dash-card dash-card-full" id="dashUltimaCarrera">
           <p class="dash-card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
@@ -172,10 +172,8 @@
           </div>
         </div>
 
-        <!-- Fila 3: Tiempo más rápido + Más vueltas -->
         <div class="dash-row" style="margin-top:16px">
 
-          <!-- Tiempo más rápido -->
           <div class="dash-card" id="dashMasRapido">
             <p class="dash-card-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
@@ -189,7 +187,6 @@
             </div>
           </div>
 
-          <!-- Más vueltas -->
           <div class="dash-card" id="dashMasVueltas">
             <p class="dash-card-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
@@ -455,6 +452,18 @@
             <option value="false">Inactivo</option>
           </select>
         </div>
+        <div class="modal-field">
+          <label class="form-label">🏆 WDC <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Campeonatos</span></label>
+          <input type="number" id="driverWDC" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">🥇 WIN <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Victorias</span></label>
+          <input type="number" id="driverWIN" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">⚡ POLES <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Podios</span></label>
+          <input type="number" id="driverPOLES" class="form-input" placeholder="0" min="0">
+        </div>
       </div>
       <div class="modal-footer">
         <button id="btnCancelDriverModal" class="btn-ghost">Cancelar</button>
@@ -551,6 +560,7 @@
     </div>
   </div>
 </div>
+
 <!-- ── MODAL RANQUIN ──────────────────────────────────── -->
 <div id="rankingModal" class="modal-overlay hidden">
   <div class="modal-box">

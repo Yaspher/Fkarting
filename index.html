@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>FKarting - Campeonato Nacional</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ✅ SEO y redes sociales -->
+    <meta name="description" content="Campeonato Nacional de Karting 2026 — Resultados, Ranking y Pilotos">
+    <meta property="og:title" content="FKarting — Campeonato 2026">
+    <meta property="og:description" content="Velocidad. Precisión. Competencia.">
+    <meta property="og:type" content="website">
+    <!-- ✅ Evita petición 404 de favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2'><path d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/><line x1='4' y1='22' x2='4' y2='15'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
@@ -56,10 +63,9 @@
                 Próxima Carrera
             </button>
             <a href="#ranking" class="btn-ghost">Ver Ranking</a>
-            <a href="ayuda.html" class="btn-ghost" >Ayuda</a>
+            <a href="ayuda.html" class="btn-ghost">Ayuda</a>
         </div>
     </div>
-    <!-- decorative stripe -->
     <div class="hero-stripe"></div>
 </section>
 
@@ -101,7 +107,7 @@
     <div class="container">
         <div class="section-head">
             <div class="section-head-line"></div>
-            <h2>Pilotos Destacados</h2>
+            <h2>Pilotos</h2>
         </div>
         <div class="drivers-grid" id="driversGrid"></div>
     </div>
@@ -119,12 +125,14 @@
             </div>
             <span class="logo-text">FKARTING</span>
         </div>
-        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v0.4.0</p>
-        <a href="admin.html" class="footer-admin">Administración</a>
+        <!-- ✅ Versión actualizada a v1.2.0 -->
+        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.2.0</p>
+        <!-- ✅ Enlaza al login, no directo al admin -->
+        <a href="login.html" class="footer-admin">Administración</a>
     </div>
 </footer>
 
-<!-- ── MODAL ── -->
+<!-- ── MODAL PRÓXIMA CARRERA ── -->
 <div id="raceModal" class="modal">
     <div class="modal-box">
         <button class="modal-close" id="closeModal">
@@ -141,7 +149,10 @@
         <h2 class="modal-title">Próxima Carrera</h2>
         <div class="modal-fields">
             <div class="modal-field">
-                <span class="modal-field-label">Por Confirmar</span>
+                <span class="modal-field-label">Estado</span>
+                <span class="modal-field-value">Por Confirmar</span>
+            </div>
+            <div class="modal-field">
                 <span class="modal-field-label">Fecha</span>
                 <span class="modal-field-value">17 Abril 2026</span>
             </div>

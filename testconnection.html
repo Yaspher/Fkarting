@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>FKarting — Test de Conexión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        :root {
+            --bg:       #080808;
+            --card:     #0e0e0e;
+            --border:   rgba(127,29,29,0.30);
+            --red:      #dc2626;
+            --red-dark: #7f1d1d;
+            --green:    #16a34a;
+            --yellow:   #ca8a04;
+            --white:    #ffffff;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --font:     'Courier New', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--gray-400);
+            font-family: var(--font);
+            font-size: 13px;
+            padding: 32px 24px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .title {
+            color: var(--white);
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .title span { color: var(--red); }
+
+        .btn-run {
+            background: var(--red);
+            color: var(--white);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background 0.15s;
+        }
+
+        .btn-run:hover { background: #b91c1c; }
+        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .summary {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .summary-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .pill-ok     { background: rgba(22,163,74,0.15);  color: #4ade80; border: 1px solid #16a34a; }
+        .pill-err    { background: rgba(220,38,38,0.15);  color: #f87171; border: 1px solid var(--red); }
+        .pill-total  { background: rgba(255,255,255,0.05); color: var(--gray-400); border: 1px solid var(--gray-600); }
+
+        .group-title {
+            color: var(--gray-600);
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 24px 0 10px;
+        }
+
+        .test-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .test-card.ok  { border-color: rgba(22,163,74,0.4); }
+        .test-card.err { border-color: rgba(220,38,38,0.5); }
+
+        .test-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .test-header:hover { background: rgba(255,255,255,0.02); }
+
+        .status-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+
+        .test-name {
+            color: var(--white);
+            font-weight: bold;
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .test-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .badge-rows {
+            background: rgba(255,255,255,0.06);
+            color: var(--gray-400);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .badge-time {
+            color: var(--gray-600);
+            font-size: 11px;
+            min-width: 52px;
+            text-align: right;
+        }
+
+        .chevron {
+            color: var(--gray-600);
+            font-size: 11px;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .test-card.open .chevron { transform: rotate(180deg); }
+
+        .test-detail {
+            display: none;
+            padding: 0 16px 14px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .test-card.open .test-detail { display: block; }
+
+        .detail-section {
+            margin-top: 10px;
+        }
+
+        .detail-label {
+            color: var(--gray-600);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .columns-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .col-pill {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #93c5fd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .error-box {
+            background: rgba(127,29,29,0.2);
+            border: 1px solid var(--red-dark);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #fca5a5;
+            font-size: 12px;
+            line-height: 1.5;
+            word-break: break-word;
+            margin-top: 8px;
+        }
+
+        .sample-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .sample-table th {
+            color: var(--gray-600);
+            text-align: left;
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            white-space: nowrap;
+        }
+
+        .sample-table td {
+            color: var(--gray-400);
+            padding: 4px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sample-table tr:last-child td { border-bottom: none; }
+
+        .pending { color: var(--gray-600); font-style: italic; }
+
+        .spinner {
+            display: inline-block;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        a.back {
+            display: inline-block;
+            margin-top: 32px;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 12px;
+            border: 1px solid rgba(127,29,29,0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        a.back:hover { color: var(--white); border-color: rgba(127,29,29,0.5); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="title">🔌 <span>FK</span>arting — Test de Conexión v1.2.0</div>
+    <button class="btn-run" id="btnRun">▶ Ejecutar Tests</button>
+</header>
+
+<div class="summary" id="summary" style="display:none">
+    <span class="summary-pill pill-total" id="pillTotal">— endpoints</span>
+    <span class="summary-pill pill-ok"    id="pillOk">— OK</span>
+    <span class="summary-pill pill-err"   id="pillErr">— Errores</span>
+</div>
+
+<div id="output"></div>
+
+<a href="index.html" class="back">← Volver al inicio</a>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────
+const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
+
+const HEADERS = {
+    "Content-Type":  "application/json",
+    "apikey":        SUPABASE_KEY,
+    "Authorization": `Bearer ${SUPABASE_KEY}`
+};
+
+// ── Endpoints a testear ─────────────────────────────────────────
+const GROUPS = [
+    {
+        title: "VISTAS (solo lectura)",
+        tests: [
+            { name: "vista_ranking",  url: "vista_ranking?select=*&limit=3" },
+            { name: "vista_tiempos",  url: "vista_tiempos?select=*&limit=3" },
+            { name: "vista_piloto",   url: "vista_piloto?select=*&limit=3"  },
+            { name: "vista_carrera",  url: "vista_carrera?select=*&limit=3" },
+        ]
+    },
+    {
+        title: "TABLAS PRINCIPALES",
+        tests: [
+            { name: "campeonato",      url: "campeonato?select=*&limit=3"      },
+            { name: "piloto",          url: "piloto?select=*&limit=3"          },
+            { name: "carrera",         url: "carrera?select=*&limit=3"         },
+            { name: "resultado",       url: "resultado?select=*&limit=3"       },
+            { name: "ranking",         url: "ranking?select=*&limit=3"         },
+            { name: "tablapuntosbase", url: "tablapuntosbase?select=*&limit=3" },
+        ]
+    }
+];
+
+// ── Test runner ─────────────────────────────────────────────────
+async function runTest(endpoint) {
+    const t0 = performance.now();
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint.url}`, { headers: HEADERS });
+        const ms  = Math.round(performance.now() - t0);
+        if (!res.ok) {
+            const errText = await res.text();
+            let errMsg = errText;
+            try { errMsg = JSON.parse(errText).message ?? errText; } catch {}
+            return { ok: false, ms, error: errMsg, rows: 0, columns: [] };
+        }
+        const data = await res.json();
+        const columns = data.length ? Object.keys(data[0]) : [];
+        return { ok: true, ms, rows: data.length, columns, sample: data };
+    } catch (err) {
+        const ms = Math.round(performance.now() - t0);
+        return { ok: false, ms, error: err.message, rows: 0, columns: [] };
+    }
+}
+
+// ── Render ──────────────────────────────────────────────────────
+function renderCard(test, result, id) {
+    const icon   = result === null ? `<span class="spinner">⟳</span>` : result.ok ? "✅" : "❌";
+    const status = result === null ? "" : result.ok ? "ok" : "err";
+    const rows   = result === null ? "" : `<span class="badge-rows">${result.rows} fila${result.rows !== 1 ? "s" : ""}</span>`;
+    const time   = result === null ? "" : `<span class="badge-time">${result.ms}ms</span>`;
+
+    let detail = "";
+    if (result !== null) {
+        if (result.ok) {
+            const cols = result.columns.map(c => `<span class="col-pill">${c}</span>`).join("");
+            const sampleRows = (result.sample ?? []).slice(0, 2).map(row => {
+                const cells = result.columns.map(c => {
+                    const val = row[c];
+                    const display = val === null ? '<span style="color:var(--gray-600)">null</span>'
+                                  : String(val).length > 30 ? String(val).slice(0, 30) + "…"
+                                  : String(val);
+                    return `<td>${display}</td>`;
+                }).join("");
+                return `<tr>${cells}</tr>`;
+            }).join("");
+
+            const headers = result.columns.map(c => `<th>${c}</th>`).join("");
+
+            detail = `
+                <div class="detail-section">
+                    <div class="detail-label">Columnas (${result.columns.length})</div>
+                    <div class="columns-list">${cols}</div>
+                </div>
+                ${result.sample?.length ? `
+                <div class="detail-section" style="margin-top:12px">
+                    <div class="detail-label">Muestra (${Math.min(2, result.sample.length)} fila${result.sample.length !== 1 ? "s" : ""})</div>
+                    <div style="overflow-x:auto">
+                        <table class="sample-table">
+                            <thead><tr>${headers}</tr></thead>
+                            <tbody>${sampleRows}</tbody>
+                        </table>
+                    </div>
+                </div>` : ""}`;
+        } else {
+            detail = `<div class="error-box">⚠️ ${result.error}</div>`;
+        }
+    }
+
+    return `
+        <div class="test-card ${status}" id="card-${id}">
+            <div class="test-header" onclick="toggleCard('${id}')">
+                <span class="status-icon">${icon}</span>
+                <span class="test-name">${test.name}</span>
+                <div class="test-meta">
+                    ${rows}
+                    ${time}
+                    <span class="chevron">▼</span>
+                </div>
+            </div>
+            <div class="test-detail">${detail}</div>
+        </div>`;
+}
+
+function toggleCard(id) {
+    document.getElementById(`card-${id}`).classList.toggle("open");
+}
+
+// ── Main ────────────────────────────────────────────────────────
+document.getElementById("btnRun").addEventListener("click", async () => {
+    const btn = document.getElementById("btnRun");
+    btn.disabled = true;
+    btn.textContent = "⟳ Ejecutando...";
+
+    const output  = document.getElementById("output");
+    const summary = document.getElementById("summary");
+    output.innerHTML = "";
+    summary.style.display = "none";
+
+    let totalOk  = 0;
+    let totalErr = 0;
+    let cardId   = 0;
+
+    for (const group of GROUPS) {
+        const groupEl = document.createElement("div");
+        groupEl.innerHTML = `<div class="group-title">${group.title}</div>`;
+
+        // Render placeholders
+        const cardEls = {};
+        for (const test of group.tests) {
+            const id = `c${cardId++}`;
+            const placeholder = document.createElement("div");
+            placeholder.id = `wrapper-${id}`;
+            placeholder.innerHTML = renderCard(test, null, id);
+            groupEl.appendChild(placeholder);
+            cardEls[test.name] = { id, test };
+        }
+
+        output.appendChild(groupEl);
+
+        // Run tests for this group
+        for (const test of group.tests) {
+            const { id } = cardEls[test.name];
+            const result = await runTest(test);
+            if (result.ok) totalOk++; else totalErr++;
+
+            const wrapper = document.getElementById(`wrapper-${id}`);
+            wrapper.innerHTML = renderCard(test, result, id);
+        }
+    }
+
+    // Summary
+    const total = totalOk + totalErr;
+    document.getElementById("pillTotal").textContent = `${total} endpoints`;
+    document.getElementById("pillOk").textContent    = `${totalOk} OK`;
+    document.getElementById("pillErr").textContent   = `${totalErr} Error${totalErr !== 1 ? "es" : ""}`;
+    summary.style.display = "flex";
+
+    btn.disabled    = false;
+    btn.textContent = "↺ Repetir Tests";
+});
+</script>
+
+</body>
+</html>
