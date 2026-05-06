@@ -3,11 +3,6 @@
 //  Solo lógica UI · Todas las queries en Connection.js
 // ══════════════════════════════════════════════
 
-// ✅ AUTH GUARD — redirige si no está autenticado
-if (sessionStorage.getItem("fk_admin_auth") !== "true") {
-    window.location.replace("login.html");
-}
-
 import {
     // Dashboard
     getCampeonatoActivo, getCarrerasByCampeonatoId, getRankingTop3ByCampeonato,
@@ -16,8 +11,8 @@ import {
     getCampeonatos, getCampeonatosActivos, createCampeonato, updateCampeonato, deleteCampeonato,
     // Pilotos
     getPilotos, getPilotoById, getPilotosActivosAdmin, createPiloto, updatePiloto, deletePiloto,
-    // Carreras
-    getCarrerasByCampeonato, getCarrerasByCampeonatoId, getCarreraById,
+    // Carreras — getCarrerasByCampeonatoId ya importada en Dashboard
+    getCarrerasByCampeonato, getCarreraById,
     createCarrera, updateCarrera, deleteCarrera,
     // Resultados
     getResultadosByCarrera, createResultado, updateResultado, deleteResultado,
@@ -26,6 +21,11 @@ import {
     // Puntos
     getTablaPuntos, upsertPuntosPosicion, initPuntosFila
 } from './Connection.js';
+
+// ✅ AUTH GUARD — debe ir después de los imports en ES modules
+if (sessionStorage.getItem("fk_admin_auth") !== "true") {
+    window.location.replace("login.html");
+}
 
 // ── Alias para compatibilidad con secciones que usan getCampeonatosAdmin
 const getCampeonatosAdmin = getCampeonatosActivos;
@@ -459,6 +459,9 @@ async function openDriverModal(id = null) {
     document.getElementById("driverName").value    = "";
     document.getElementById("driverNumber").value  = "";
     document.getElementById("driverEstado").value  = "true";
+    document.getElementById("driverWDC").value     = "0";
+    document.getElementById("driverWIN").value     = "0";
+    document.getElementById("driverPOLES").value   = "0";
     document.getElementById("driverModalTitle").textContent = id ? "Editar Piloto" : "Nuevo Piloto";
 
     if (id) {
@@ -468,6 +471,9 @@ async function openDriverModal(id = null) {
             document.getElementById("driverName").value   = d.pilo_nombre;
             document.getElementById("driverNumber").value = d.pilo_numero ?? "";
             document.getElementById("driverEstado").value = String(d.pilo_activo !== false);
+            document.getElementById("driverWDC").value    = d.pilo_cantidadcampeonatos ?? 0;
+            document.getElementById("driverWIN").value    = d.pilo_cantidadvictoria    ?? 0;
+            document.getElementById("driverPOLES").value  = d.pilo_cantidadpodios      ?? 0;
         }
     }
     document.getElementById("driverModal").classList.remove("hidden");
@@ -482,10 +488,13 @@ document.getElementById("btnSaveDriver").onclick = async () => {
     const nombre = document.getElementById("driverName").value.trim();
     const numero = parseInt(document.getElementById("driverNumber").value);
     const activo = document.getElementById("driverEstado").value === "true";
+    const wdc    = parseInt(document.getElementById("driverWDC").value)   || 0;
+    const win    = parseInt(document.getElementById("driverWIN").value)   || 0;
+    const poles  = parseInt(document.getElementById("driverPOLES").value) || 0;
 
     if (!nombre) return showMsg("saveMsgDrivers", "⚠️ El nombre es obligatorio");
 
-    const payload = { nombre, numero: isNaN(numero) ? null : numero, activo };
+    const payload = { nombre, numero: isNaN(numero) ? null : numero, activo, wdc, win, poles };
 
     try {
         if (editId) {

@@ -97,7 +97,7 @@ async function sbDelete(table, id, idField) {
 //           El orden se maneja en app.js / admin.js.
 // ════════════════════════════════════════════════════════════════
 
-// Columnas conocidas: Campeonato, Piloto, Puntos, Vitorias, Podios
+// Columnas conocidas: Campeonato, Piloto, Puntos, Victorias, Podios
 export const getRankingVista = () =>
     sbGet("vista_ranking", "select=*");
 
@@ -158,9 +158,12 @@ export const createPiloto = (body) => sbPost("piloto", {
 });
 
 export const updatePiloto = (id, body) => sbPatch("piloto", id, "id_piloto", {
-    ...(body.nombre !== undefined && { pilo_nombre: body.nombre }),
-    ...(body.numero !== undefined && { pilo_numero: body.numero }),
-    ...(body.activo !== undefined && { pilo_activo: body.activo })
+    ...(body.nombre !== undefined && { pilo_nombre:               body.nombre }),
+    ...(body.numero !== undefined && { pilo_numero:               body.numero }),
+    ...(body.activo !== undefined && { pilo_activo:               body.activo }),
+    ...(body.wdc    !== undefined && { pilo_cantidadcampeonatos:  body.wdc   }),
+    ...(body.win    !== undefined && { pilo_cantidadvictoria:     body.win   }),
+    ...(body.poles  !== undefined && { pilo_cantidadpodios:       body.poles })
 });
 
 export const deletePiloto = (id) => sbDelete("piloto", id, "id_piloto");

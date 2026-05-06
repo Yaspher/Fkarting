@@ -90,7 +90,7 @@
 
     <div class="sidebar-back">
       <!-- ✅ FIX: logout ahora limpia sessionStorage via admin.js -->
-      <a id="logout" href="index.html">
+      <a id="logout" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
@@ -451,6 +451,18 @@
             <option value="true">Activo</option>
             <option value="false">Inactivo</option>
           </select>
+        </div>
+        <div class="modal-field">
+          <label class="form-label">🏆 WDC <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Campeonatos</span></label>
+          <input type="number" id="driverWDC" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">🥇 WIN <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Victorias</span></label>
+          <input type="number" id="driverWIN" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">⚡ POLES <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Podios</span></label>
+          <input type="number" id="driverPOLES" class="form-input" placeholder="0" min="0">
         </div>
       </div>
       <div class="modal-footer">
