@@ -44,7 +44,21 @@
             </svg>
             Admin
         </a>
+        <!-- ── Hamburger (solo móvil) ── -->
+        <button class="hamburger" id="hamburger" aria-label="Menú">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
+    <!-- ── Menú móvil desplegable (dentro del header para heredar sticky) ── -->
+    <nav class="nav-mobile" id="navMobile">
+        <a href="index.html">Inicio</a>
+        <a href="#ranking">Ranking</a>
+        <a href="#resultados">Resultados</a>
+        <a href="#pilotos">Pilotos</a>
+        <a href="login.html">Admin</a>
+    </nav>
 </header>
 
 <!-- ── HERO ── -->
@@ -107,7 +121,7 @@
     <div class="container">
         <div class="section-head">
             <div class="section-head-line"></div>
-            <h2>Pilotos</h2>
+            <h2>Pilotos Destacados</h2>
         </div>
         <div class="drivers-grid" id="driversGrid"></div>
     </div>
@@ -125,8 +139,8 @@
             </div>
             <span class="logo-text">FKARTING</span>
         </div>
-        <!-- ✅ Versión actualizada a v1.2.0 -->
-        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.2.0</p>
+        <!-- ✅ Versión actualizada a v1.0.0 -->
+        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.0.0</p>
         <!-- ✅ Enlaza al login, no directo al admin -->
         <a href="login.html" class="footer-admin">Administración</a>
     </div>
@@ -169,6 +183,24 @@
     </div>
 </div>
 
+<script>
+    // ── Hamburger menu ──
+    const hamburger  = document.getElementById("hamburger");
+    const navMobile  = document.getElementById("navMobile");
+
+    hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("open");
+        navMobile.classList.toggle("open");
+    });
+
+    // Cerrar al hacer click en cualquier enlace del menú móvil
+    navMobile.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            hamburger.classList.remove("open");
+            navMobile.classList.remove("open");
+        });
+    });
+</script>
 <script type="module" src="js/app.js"></script>
 
 </body>
