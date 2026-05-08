@@ -20,7 +20,7 @@ import {
     getRankingByCampeonato, createRanking, updateRanking, deleteRanking,
     // Puntos
     getTablaPuntos, upsertPuntosPosicion, initPuntosFila
-} from './Connection.js';
+} from './connection.js';
 
 // ✅ AUTH GUARD — debe ir después de los imports en ES modules
 if (sessionStorage.getItem("fk_admin_auth") !== "true") {
