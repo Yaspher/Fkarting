@@ -804,6 +804,31 @@ ul { list-style: none; }
   font-weight: 600;
 }
 
+.driver-stat-label-WDC {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+
+  background: radial-gradient(
+    ellipse at 0% 50%,  
+    #FFF 0%,            
+    #FFD700 25%,        
+    #B8860B 60%,         
+    #B8860B 100%        
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: shine-radial 2s linear infinite;
+}
+
+@keyframes shine-radial {
+  0%   { background-position: -50% 50%; }
+  100% { background-position: 150% 50%; }
+}
 /* ============================================================
    FOOTER
    ============================================================ */

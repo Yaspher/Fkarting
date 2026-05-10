@@ -116,7 +116,7 @@ async function loadRanking() {
                 </div>
                 <div class="ranking-col-base">
                     <div class="ranking-col-stat">
-                        <span class="col-stat-val">${d.Vitorias ?? 0}</span>
+                        <span class="col-stat-val">${d.Victorias ?? 0}</span>
                         <span class="col-stat-lbl">WIN</span>
                     </div>
                     <div class="ranking-col-stat">
@@ -264,17 +264,17 @@ async function loadPilotos() {
                 <div class="driver-stats">
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
-                        <span class="driver-stat-label">Campeonatos</span>
+                        <span class="driver-stat-label-WDC">WDC</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Victorias ?? 0}</span>
-                        <span class="driver-stat-label">Victorias</span>
+                        <span class="driver-stat-label">WIN</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Podios ?? 0}</span>
-                        <span class="driver-stat-label">Podios</span>
+                        <span class="driver-stat-label">POLES</span>
                     </div>
                 </div>
             </div>
