@@ -612,64 +612,77 @@ ul { list-style: none; }
 
 /* ============================================================
    RESULTADOS / ÚLTIMA CARRERA
+   — mismo lenguaje visual que MEJOR TIEMPO
    ============================================================ */
 
 .results-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .result-item {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
   background: var(--bg-card);
-  border: 1px solid var(--border-dim);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 10px;
   padding: 14px 20px;
-  transition: background 0.15s, border-color 0.15s;
+  transition: border-color .2s;
 }
 
 .result-item:hover {
-  background: rgba(127,29,29,0.08);
-  border-color: var(--border-soft);
+  border-color: rgba(255,255,255,0.18);
+}
+
+/* Posición 1 resaltada como la vuelta rápida en MEJOR TIEMPO */
+.result-item.pos-winner {
+  border-color: var(--gold);
+  background: rgba(234,179,8,0.06);
 }
 
 .result-pos {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.5rem;
-  min-width: 48px;
-  text-align: center;
+  font-size: 22px;
+  width: 36px;
+  text-align: left;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .result-pos.p1 { color: var(--gold);   }
 .result-pos.p2 { color: var(--silver); }
 .result-pos.p3 { color: var(--bronze); }
-.result-pos.px { color: var(--gray-600); }
+.result-pos.px { color: rgba(255,255,255,0.25); }
 
 .result-name {
   flex: 1;
+  padding: 0 16px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
   color: var(--white);
-  font-weight: 600;
-  font-size: 0.95rem;
 }
 
 .result-pts {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.25rem;
+  font-size: 22px;
   color: var(--red-500);
+  letter-spacing: 1px;
 }
 
 .result-pts-label {
-  font-size: 0.65rem;
+  font-size: 11px;
   color: var(--gray-600);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-left: 2px;
+  letter-spacing: 1px;
+  margin-left: 3px;
 }
 
 .carrera-meta {
@@ -696,19 +709,19 @@ ul { list-style: none; }
 
 .drivers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* antes 220px */
-  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
 }
 
 .driver-card {
   background: var(--bg-card);
   border: 1px solid var(--border-dim);
-  border-radius: 16px;
-  padding: 36px 24px 24px;
+  border-radius: 12px;
+  padding: 28px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   text-align: center;
   transition: border-color 0.2s, transform 0.2s, background 0.2s;
   position: relative;
@@ -725,41 +738,27 @@ ul { list-style: none; }
   transition: opacity 0.2s;
 }
 
-/* =================================================================================== */
-
-/*  Version Vieja 
 .driver-card:hover {
   border-color: var(--border);
   transform: translateY(-3px);
   background: rgba(14,14,14,0.98);
-} */
-
-/*  Version Nueva */
-.driver-card:hover {
-  border-color: var(--red);
-  transform: translateY(-6px) scale(1.02);
-  background: rgba(14,14,14,1);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-}  /**/
-
-/* =================================================================================== */
-
+}
 
 .driver-card:hover::before { opacity: 1; }
 
 .driver-num {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 3.5rem;
+  font-size: 2.8rem;
   color: var(--red);
   line-height: 1;
 }
 
 .driver-name {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--white);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .driver-stats {
@@ -770,7 +769,7 @@ ul { list-style: none; }
   border: 1px solid var(--border-dim);
   border-radius: 8px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-top: 4px;
 }
 
 .driver-stat {
@@ -778,7 +777,7 @@ ul { list-style: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 14px 10px;
+  padding: 10px 8px;
   gap: 2px;
 }
 
@@ -792,23 +791,44 @@ ul { list-style: none; }
 .driver-stat-value {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: var(--red-500);
   line-height: 1;
 }
 
 .driver-stat-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--gray-600);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 600;
 }
 
-.driver-stats {
-  background: rgba(0,0,0,0.4);
+.driver-stat-label-WDC {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+
+  background: radial-gradient(
+    ellipse at 0% 50%,  
+    #FFF 0%,            
+    #FFD700 25%,        
+    #B8860B 60%,         
+    #B8860B 100%        
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: shine-radial 2s linear infinite;
 }
 
+@keyframes shine-radial {
+  0%   { background-position: -50% 50%; }
+  100% { background-position: 150% 50%; }
+}
 /* ============================================================
    FOOTER
    ============================================================ */
@@ -972,32 +992,184 @@ ul { list-style: none; }
 
 
 /* ============================================================
+   HAMBURGER MENU — index.html
+   ============================================================ */
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.hamburger:hover { border-color: var(--red-900); }
+
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--gray-400);
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  transform-origin: center;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Menú desplegable móvil */
+.nav-mobile {
+  display: none;
+  flex-direction: column;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0 12px;
+}
+
+.nav-mobile.open { display: flex; }
+
+.nav-mobile a {
+  color: var(--gray-400);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-dim);
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+
+.nav-mobile a:last-child { border-bottom: none; }
+
+.nav-mobile a:hover {
+  color: var(--white);
+  background: rgba(127,29,29,0.10);
+}
+
+/* ============================================================
+   SIDEBAR MÓVIL — admin.html
+   ============================================================ */
+
+.admin-hamburger {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.admin-hamburger .ham-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-hamburger .ham-lines span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  transform-origin: center;
+}
+
+.admin-hamburger.open .ham-lines span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.admin-hamburger.open .ham-lines span:nth-child(2) {
+  opacity: 0;
+}
+.admin-hamburger.open .ham-lines span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Overlay que cierra el sidebar al tocar fuera */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 49;
+}
+
+.sidebar-overlay.open { display: block; }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 
 @media (max-width: 768px) {
-  .navbar-inner { gap: 16px; }
-  .navbar nav a  { padding: 8px 10px; font-size: 0.8rem; }
-  .navbar-admin  { display: none; }
+  /* ── Index navbar ── */
+  .navbar-inner { gap: 12px; }
+  .navbar nav   { display: none; }
+  .navbar-admin { display: none; }
+  .hamburger    { display: flex; }
 
   .hero { padding: 90px 0 70px; }
   .hero-title { font-size: clamp(2.8rem, 14vw, 5rem); }
 
   .section { padding: 56px 0; }
 
-  /* ✅ Eliminado selector #rankingTable que no existía en el HTML */
-
   .drivers-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
 
   .footer-inner { flex-direction: column; align-items: center; text-align: center; }
+
+  /* ── Admin sidebar ── */
+  .admin-hamburger { display: flex; }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100vh;
+    z-index: 50;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+
+  .sidebar.open { left: 0; }
+
+  .content { margin-left: 0 !important; }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 16px;
+  }
+
+  .admin-header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-  .navbar nav { display: none; }
-
   .hero-actions { flex-direction: column; align-items: center; }
-
   .drivers-grid { grid-template-columns: 1fr; }
-
-  .modal-box { padding: 28px 20px 22px; }
+  .modal-box    { padding: 28px 20px 22px; }
 }

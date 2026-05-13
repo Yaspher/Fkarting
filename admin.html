@@ -103,9 +103,19 @@
   <main class="content">
 
     <header class="admin-header">
-      <div>
-        <h1 class="admin-header-title" id="headerTitle">Panel Administrativo</h1>
-        <p class="admin-header-sub">Panel de Administración · FKarting</p>
+      <div class="admin-header-top">
+        <!-- ── Hamburger visible solo en móvil ── -->
+        <button class="admin-hamburger" id="adminHamburger" aria-label="Menú">
+          <div class="ham-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+        <div>
+          <h1 class="admin-header-title" id="headerTitle">Panel Administrativo</h1>
+          <p class="admin-header-sub">Panel de Administración · FKarting</p>
+        </div>
       </div>
       <div class="status-pill">
         <span class="status-dot"></span>
@@ -606,6 +616,198 @@
   </div>
 </div>
 
+<!-- ── Overlay para cerrar sidebar en móvil ── -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script>
+    // ── Admin sidebar hamburger ──
+    const adminHamburger  = document.getElementById("adminHamburger");
+    const sidebar         = document.querySelector(".sidebar");
+    const sidebarOverlay  = document.getElementById("sidebarOverlay");
+
+    function openSidebar() {
+        sidebar.classList.add("open");
+        sidebarOverlay.classList.add("open");
+        adminHamburger.classList.add("open");
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove("open");
+        sidebarOverlay.classList.remove("open");
+        adminHamburger.classList.remove("open");
+    }
+
+    adminHamburger.addEventListener("click", () => {
+        sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
+    });
+
+    sidebarOverlay.addEventListener("click", closeSidebar);
+
+    // Cerrar sidebar al seleccionar sección en móvil
+    document.querySelectorAll(".sidebar-item").forEach(item => {
+        item.addEventListener("click", () => {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
+</script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   HAMBURGER + SIDEBAR MÓVIL
+   Overrides sobre admin.css para reemplazar el sidebar
+   horizontal con un menú deslizante + hamburger
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Botón hamburger ── */
+.admin-hamburger {
+  display: none;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+  flex-shrink: 0;
+}
+
+.admin-hamburger .ham-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-hamburger .ham-lines span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  transform-origin: center;
+}
+
+.admin-hamburger.open .ham-lines span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.admin-hamburger.open .ham-lines span:nth-child(2) { opacity: 0; }
+.admin-hamburger.open .ham-lines span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Overlay oscuro ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 49;
+}
+.sidebar-overlay.open { display: block; }
+
+/* ── Wrapper del título + hamburger en el header ── */
+.admin-header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Responsive: tablet (768px) ── */
+@media (max-width: 768px) {
+  .admin-hamburger { display: flex; }
+
+  /* Override admin.css que pone el layout en columna */
+  .admin-layout {
+    flex-direction: row !important;
+    height: 100vh !important;
+    position: relative;
+  }
+
+  /* Override admin.css sidebar horizontal */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -260px !important;
+    width: 240px !important;
+    height: 100vh !important;
+    flex-direction: column !important;
+    z-index: 50;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+    overflow-y: auto;
+  }
+
+  .sidebar.open { left: 0 !important; }
+
+  /* Override: sidebar-nav vuelve a ser vertical */
+  .sidebar-nav {
+    flex-direction: column !important;
+    overflow-x: visible !important;
+    padding: 16px 8px !important;
+  }
+
+  .sidebar-nav-label { display: block !important; }
+
+  .sidebar-item {
+    white-space: normal !important;
+    border-left: 3px solid transparent !important;
+    border-bottom: none !important;
+    border-radius: 8px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .sidebar-item.active {
+    border-left-color: var(--red) !important;
+    border-bottom-color: transparent !important;
+  }
+
+  .sidebar-back { display: flex !important; }
+
+  /* Content ocupa todo el ancho */
+  .content {
+    overflow: hidden !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .content-inner { padding: 20px 16px !important; }
+
+  .admin-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 20px !important;
+  }
+}
+
+/* ── Responsive: móvil pequeño (600px) ── */
+@media (max-width: 600px) {
+  /* Override COMPLETO del bloque de admin.css en 600px */
+  .admin-layout {
+    flex-direction: row !important;
+    height: 100vh !important;
+  }
+
+  .sidebar {
+    width: 240px !important;
+    position: fixed !important;
+    flex-direction: column !important;
+  }
+
+  .sidebar-nav {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    overflow-x: visible !important;
+    gap: 0 !important;
+  }
+
+  .content {
+    overflow: hidden !important;
+    flex: 1 !important;
+  }
+
+  .content-inner { padding: 16px !important; }
+
+  .form-row { flex-direction: column; }
+  .form-group, .form-group-wide { width: 100%; min-width: unset; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-field.full { grid-column: 1; }
+  .rank-card { flex-wrap: wrap; }
+}
+</style>
 <script type="module" src="js/admin.js"></script>
 </body>
 </html>

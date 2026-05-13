@@ -33,6 +33,7 @@
             <ul>
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="#ranking">Ranking</a></li>
+                <li><a href="#mejor-tiempo">Mejor Tiempo</a></li>
                 <li><a href="#resultados">Resultados</a></li>
                 <li><a href="#pilotos">Pilotos</a></li>
             </ul>
@@ -44,7 +45,22 @@
             </svg>
             Admin
         </a>
+        <!-- ── Hamburger (solo móvil) ── -->
+        <button class="hamburger" id="hamburger" aria-label="Menú">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
+    <!-- ── Menú móvil desplegable (dentro del header para heredar sticky) ── -->
+    <nav class="nav-mobile" id="navMobile">
+        <a href="index.html">Inicio</a>
+        <a href="#ranking">Ranking</a>
+        <a href="#mejor-tiempo">Mejor Tiempo</a>
+        <a href="#resultados">Resultados</a>
+        <a href="#pilotos">Pilotos</a>
+        <a href="login.html">Admin</a>
+    </nav>
 </header>
 
 <!-- ── HERO ── -->
@@ -52,7 +68,7 @@
     <div class="hero-overlay"></div>
     <div class="container hero-inner">
         <p class="hero-eyebrow">Temporada Oficial</p>
-        <h1 class="hero-title">Campeonato<br><span>2026</span></h1>
+        <h1 class="hero-title">Campeonato<br><span>FKarting</span></h1>
         <p class="hero-sub">Velocidad. Precisión. Competencia.</p>
         <div class="hero-actions">
             <button id="btnNextRace" class="btn-primary">
@@ -81,7 +97,7 @@
 </section>
 
 <!-- ── MEJOR TIEMPO ── -->
-<section class="section">
+<section id="mejor-tiempo" class="section">
   <div class="container">
     <div class="section-head">
       <div class="section-head-line"></div>
@@ -107,7 +123,7 @@
     <div class="container">
         <div class="section-head">
             <div class="section-head-line"></div>
-            <h2>Pilotos</h2>
+            <h2>Pilotos Destacados</h2>
         </div>
         <div class="drivers-grid" id="driversGrid"></div>
     </div>
@@ -125,8 +141,8 @@
             </div>
             <span class="logo-text">FKARTING</span>
         </div>
-        <!-- ✅ Versión actualizada a v1.2.0 -->
-        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.2.0</p>
+        <!-- ✅ Versión actualizada a v1.0.0 -->
+        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.2.5</p>
         <!-- ✅ Enlaza al login, no directo al admin -->
         <a href="login.html" class="footer-admin">Administración</a>
     </div>
@@ -153,22 +169,40 @@
                 <span class="modal-field-value">Por Confirmar</span>
             </div>
             <div class="modal-field">
-                <span class="modal-field-label">Fecha</span>
-                <span class="modal-field-value">17 Abril 2026</span>
+                <span class="modal-field-label">Fecha Posible</span>
+                <span class="modal-field-value">12 Junio 2026</span>
             </div>
             <div class="modal-field">
                 <span class="modal-field-label">Lugar</span>
-                <span class="modal-field-value">Autódromo Nacional</span>
+                <span class="modal-field-value">Autódromo Malecon</span>
             </div>
             <div class="modal-field">
                 <span class="modal-field-label">Hora</span>
-                <span class="modal-field-value">8:00 AM</span>
+                <span class="modal-field-value">8:00 PM</span>
             </div>
         </div>
         <button class="btn-primary btn-full" id="closeModalBtn">Cerrar</button>
     </div>
 </div>
 
+<script>
+    // ── Hamburger menu ──
+    const hamburger  = document.getElementById("hamburger");
+    const navMobile  = document.getElementById("navMobile");
+
+    hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("open");
+        navMobile.classList.toggle("open");
+    });
+
+    // Cerrar al hacer click en cualquier enlace del menú móvil
+    navMobile.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            hamburger.classList.remove("open");
+            navMobile.classList.remove("open");
+        });
+    });
+</script>
 <script type="module" src="js/app.js"></script>
 
 </body>

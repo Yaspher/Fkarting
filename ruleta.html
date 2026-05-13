@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>FKARTING - Ruleta Racing</title>
+
+
+
+</head>
+
+<body>
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<nav class="navbar">
+    <div class="logo">
+        F<span>K</span>ARTING
+    </div>
+</nav>
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main">
+
+    <!-- RULETA -->
+    <section class="card roulette-section">
+
+        <h1 class="title">
+            RULETA <span>RACING</span>
+        </h1>
+
+        <div class="wheel-wrapper">
+
+            <div class="pointer"></div>
+
+            <canvas id="wheel" width="650" height="650"></canvas>
+
+        </div>
+
+        <button class="spin-btn" id="spinBtn">
+            GIRAR RULETA
+        </button>
+
+        <div class="winner" id="winner">
+            Esperando resultado...
+        </div>
+
+    </section>
+
+    <!-- HISTORIAL -->
+    <aside class="card sidebar">
+
+        <h2 class="sidebar-title">
+            Historial
+        </h2>
+
+        <div class="history" id="history">
+
+        </div>
+
+    </aside>
+
+</main>
+
+<script>
+
+/* =========================================================
+   PARTICIPANTES (SIMULANDO DB)
+========================================================= */
+
+const participants = [
+    { number: 7,  name: 'Carlos', prob: 10 },
+    { number: 12, name: 'Juan', prob: 20 },
+    { number: 21, name: 'Pedro', prob: 15 },
+    { number: 99, name: 'Luis', prob: 5  },
+    { number: 44, name: 'Miguel', prob: 25 },
+    { number: 1,  name: 'Diego', prob: 25 }
+];
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius  = 290;
+
+let rotation = 0;
+let spinning = false;
+
+/* =========================================================
+   DRAW WHEEL
+========================================================= */
+
+function drawWheel(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    const slice = (Math.PI * 2) / participants.length;
+
+    participants.forEach((p, i)=>{
+
+        const angle = (i * slice) + rotation;
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+
+        ctx.arc(
+            centerX,
+            centerY,
+            radius,
+            angle,
+            angle + slice
+        );
+
+        ctx.closePath();
+
+        ctx.fillStyle = i % 2 === 0
+            ? '#dc2626'
+            : '#111111';
+
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255,255,255,.08)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        /* TEXT */
+
+        ctx.save();
+
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + slice / 2);
+
+        ctx.textAlign = 'right';
+
+        ctx.fillStyle = '#fff';
+
+        ctx.font = 'bold 22px Barlow';
+
+        ctx.fillText(
+            `#${p.number}`,
+            radius - 40,
+            -10
+        );
+
+        ctx.font = '18px Barlow';
+
+        ctx.fillText(
+            p.name,
+            radius - 40,
+            20
+        );
+
+        ctx.restore();
+
+    });
+
+    /* CENTRO */
+
+    ctx.beginPath();
+
+    ctx.arc(centerX, centerY, 70, 0, Math.PI * 2);
+
+    ctx.fillStyle = '#0e0e0e';
+    ctx.fill();
+
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#7f1d1d';
+    ctx.stroke();
+
+}
+
+/* =========================================================
+   WEIGHTED RANDOM
+========================================================= */
+
+function weightedRandom(){
+
+    const total = participants.reduce((a,b)=> a + b.prob, 0);
+
+    let rand = Math.random() * total;
+
+    for(let p of participants){
+
+        if(rand < p.prob){
+            return p;
+        }
+
+        rand -= p.prob;
+    }
+}
+
+/* =========================================================
+   SPIN
+========================================================= */
+
+function spin(){
+
+    if(spinning) return;
+
+    spinning = true;
+
+    const winner = weightedRandom();
+
+    const index = participants.indexOf(winner);
+
+    const slice = (Math.PI * 2) / participants.length;
+
+    const target =
+        (Math.PI * 2 * 6) +
+        ((Math.PI * 2) - (index * slice) - (slice / 2));
+
+    const start = rotation;
+    const duration = 5000;
+
+    let startTime = null;
+
+    function animate(time){
+
+        if(!startTime) startTime = time;
+
+        const progress = time - startTime;
+
+        const percent = Math.min(progress / duration, 1);
+
+        const ease =
+            1 - Math.pow(1 - percent, 4);
+
+        rotation =
+            start +
+            ((target - start) * ease);
+
+        drawWheel();
+
+        if(percent < 1){
+
+            requestAnimationFrame(animate);
+
+        }else{
+
+            spinning = false;
+
+            showWinner(winner);
+
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+/* =========================================================
+   WINNER
+========================================================= */
+
+function showWinner(winner){
+
+    document.getElementById('winner').innerHTML =
+        `🏆 Ganador: <strong>#${winner.number} ${winner.name}</strong>`;
+
+    addHistory(winner);
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function addHistory(winner){
+
+    const history = document.getElementById('history');
+
+    const item = document.createElement('div');
+    item.className = 'history-item';
+
+    item.innerHTML = `
+        <div class="history-left">
+            <div class="history-number">
+                #${winner.number}
+            </div>
+
+            <div>
+                ${winner.name}
+            </div>
+        </div>
+
+        <button class="delete-btn">
+            ✕
+        </button>
+    `;
+
+    item.querySelector('.delete-btn')
+        .addEventListener('click', ()=>{
+
+            item.remove();
+
+        });
+
+    history.prepend(item);
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+
+drawWheel();
+
+document
+.getElementById('spinBtn')
+.addEventListener('click', spin);
+
+</script>
+
+</body>
+</html>

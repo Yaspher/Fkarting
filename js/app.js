@@ -117,11 +117,11 @@ async function loadRanking() {
                 <div class="ranking-col-base">
                     <div class="ranking-col-stat">
                         <span class="col-stat-val">${d.Victorias ?? 0}</span>
-                        <span class="col-stat-lbl">Victorias</span>
+                        <span class="col-stat-lbl">WIN</span>
                     </div>
                     <div class="ranking-col-stat">
                         <span class="col-stat-val">${d.Podios ?? 0}</span>
-                        <span class="col-stat-lbl">Podios</span>
+                        <span class="col-stat-lbl">POLES</span>
                     </div>
                 </div>
             </div>`;
@@ -226,8 +226,9 @@ async function loadUltimaCarrera() {
                 const posicion   = field(r, "posicion",     "Posicion");
                 const piloNombre = field(r, "NombrePiloto", "pilo_nombre", "pilonombre");
                 const puntos     = field(r, "puntos",       "Puntos");
+                const posNum     = parseInt(posicion);
                 return `
-                <div class="result-item">
+                <div class="result-item${posNum === 1 ? " pos-winner" : ""}">
                     <div class="result-pos ${posClass(posicion)}">${posicion ?? "—"}</div>
                     <div class="result-name">${piloNombre ?? "—"}</div>
                     <div class="result-pts">${puntos ?? 0}<span class="result-pts-label">pts</span></div>
@@ -263,7 +264,7 @@ async function loadPilotos() {
                 <div class="driver-stats">
                     <div class="driver-stat">
                         <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
-                        <span class="driver-stat-label">WDC</span>
+                        <span class="driver-stat-label-WDC">WDC</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
