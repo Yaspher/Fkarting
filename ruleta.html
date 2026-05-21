@@ -67,6 +67,10 @@ body::before {
   50%       { opacity: 0.8; }
 }
 
+@keyframes spin-icon {
+  to { transform: rotate(360deg); }
+}
+
 a { text-decoration: none; }
 ul { list-style: none; }
 
@@ -541,7 +545,7 @@ canvas#wheel {
 /* ── STATS ROW ── */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   width: 100%;
 }
@@ -681,16 +685,12 @@ canvas#wheel {
       <!-- Stats row -->
       <div class="stats-row">
         <div class="stat-chip">
-          <div class="stat-chip-val" id="statPilotos">6</div>
+          <div class="stat-chip-val" id="statPilotos">—</div>
           <div class="stat-chip-lbl">Pilotos</div>
         </div>
         <div class="stat-chip">
-          <div class="stat-chip-val" id="statGiros">0</div>
-          <div class="stat-chip-lbl">Giros</div>
-        </div>
-        <div class="stat-chip">
           <div class="stat-chip-val" id="statUltimo">—</div>
-          <div class="stat-chip-lbl">Último</div>
+          <div class="stat-chip-lbl">Último Ganador</div>
         </div>
       </div>
 
@@ -756,17 +756,31 @@ canvas#wheel {
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   PARTICIPANTES
+   SUPABASE CONFIG
 ═══════════════════════════════════════════════════════ */
 
-const participants = [
-  { number: 7,  name: 'Carlos',  prob: 10 },
-  { number: 12, name: 'Juan',    prob: 20 },
-  { number: 21, name: 'Pedro',   prob: 15 },
-  { number: 99, name: 'Luis',    prob: 5  },
-  { number: 44, name: 'Miguel',  prob: 25 },
-  { number: 1,  name: 'Diego',   prob: 25 }
-];
+const SUPABASE_URL = 'https://kgzqqaxhqcydrvzqnxmk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg';
+
+async function fetchPilotos() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/vista_piloto?select=Nombre,Numero`,
+    {
+      headers: {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+/* ═══════════════════════════════════════════════════════
+   PARTICIPANTS (loaded from DB)
+═══════════════════════════════════════════════════════ */
+
+let participants = [];
 
 /* ═══════════════════════════════════════════════════════
    CANVAS SETUP
@@ -780,7 +794,6 @@ const R       = (canvas.width / 2) - 8;
 
 let rotation  = 0;
 let spinning  = false;
-let totalSpins = 0;
 
 /* Color palette alternating red/dark with subtle variation */
 const SLICE_COLORS = [
@@ -884,17 +897,11 @@ function drawWheel() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   WEIGHTED RANDOM
+   RANDOM — equal probability for all pilots
 ═══════════════════════════════════════════════════════ */
 
-function weightedRandom() {
-  const total = participants.reduce((a, b) => a + b.prob, 0);
-  let   rand  = Math.random() * total;
-  for (const p of participants) {
-    if (rand < p.prob) return p;
-    rand -= p.prob;
-  }
-  return participants[0];
+function pickRandom() {
+  return participants[Math.floor(Math.random() * participants.length)];
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -908,16 +915,35 @@ function spin() {
   const btn = document.getElementById('spinBtn');
   btn.disabled = true;
 
-  const winner = weightedRandom();
+  const winner = pickRandom();
   const index  = participants.indexOf(winner);
   const slice  = (Math.PI * 2) / participants.length;
 
-  /* Target angle: multiple full rotations + land on winner */
+  /* ── Ángulo correcto ──────────────────────────────────
+     El puntero está en la parte superior del canvas,
+     que en coordenadas de canvas = -π/2.
+     Necesitamos que el CENTRO del sector del ganador
+     quede exactamente en -π/2 al frenar.
+
+     Centro del sector i (sin rotación) = i*slice + slice/2
+     Queremos: rotation_final + i*slice + slice/2 = -π/2 (mod 2π)
+     => rotation_final = -π/2 - i*slice - slice/2  (mod 2π)
+  ────────────────────────────────────────────────────── */
   const fullTurns = 7 + Math.floor(Math.random() * 3);
-  const target    =
-    rotation +
-    (Math.PI * 2 * fullTurns) +
-    ((Math.PI * 2) - ((rotation % (Math.PI * 2)) + index * slice + slice / 2));
+  const TAU       = Math.PI * 2;
+
+  /* Ángulo destino normalizado a [0, 2π) */
+  let targetAngle = (-Math.PI / 2) - index * slice - slice / 2;
+  targetAngle     = ((targetAngle % TAU) + TAU) % TAU;
+
+  /* Rotación actual normalizada */
+  const currentNorm = ((rotation % TAU) + TAU) % TAU;
+
+  /* Delta mínimo para girar hacia adelante */
+  let delta = targetAngle - currentNorm;
+  if (delta < 0) delta += TAU;
+
+  const target = rotation + delta + TAU * fullTurns;
 
   const start    = rotation;
   const duration = 5200;
@@ -939,7 +965,6 @@ function spin() {
     } else {
       spinning = false;
       btn.disabled = false;
-      totalSpins++;
       showWinner(winner);
     }
   }
@@ -1013,7 +1038,6 @@ function deleteHistory(idx) {
 ═══════════════════════════════════════════════════════ */
 
 function updateStats(winner) {
-  document.getElementById('statGiros').textContent   = totalSpins;
   document.getElementById('statUltimo').textContent  =
     winner ? `#${winner.number}` : (historyData[0] ? `#${historyData[0].number}` : '—');
   document.getElementById('statPilotos').textContent = participants.length;
@@ -1027,7 +1051,6 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   if (!historyData.length) return;
   if (!confirm('¿Limpiar todo el historial?')) return;
   historyData = [];
-  totalSpins  = 0;
   renderHistory();
   updateStats();
 
@@ -1037,11 +1060,56 @@ document.getElementById('clearBtn').addEventListener('click', () => {
 });
 
 /* ═══════════════════════════════════════════════════════
+   LOADING STATE HELPERS
+═══════════════════════════════════════════════════════ */
+
+function setLoading(on) {
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin-icon .8s linear infinite;width:20px;height:20px"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Cargando...`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg> Girar Ruleta`;
+}
+
+/* ═══════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════ */
 
-drawWheel();
+async function init() {
+  setLoading(true);
+
+  /* Draw empty wheel placeholder while loading */
+  drawWheel();
+
+  try {
+    const data = await fetchPilotos();
+
+    if (!data || !data.length) {
+      document.getElementById('winnerBox').innerHTML =
+        `<span class="winner-idle" style="color:var(--red-500)">No hay pilotos registrados en la base de datos.</span>`;
+      return;
+    }
+
+    /* Map DB rows → participant objects (equal probability) */
+    participants = data.map(p => ({
+      name:   p.Nombre ?? p.nombre ?? 'Piloto',
+      number: p.Numero ?? p.numero ?? '—'
+    }));
+
+    drawWheel();
+    updateStats();
+
+  } catch (err) {
+    console.error('Error cargando pilotos:', err);
+    document.getElementById('winnerBox').innerHTML =
+      `<span class="winner-idle" style="color:var(--red-500)">Error conectando a la base de datos.</span>`;
+  } finally {
+    setLoading(false);
+  }
+}
+
 document.getElementById('spinBtn').addEventListener('click', spin);
+init();
 </script>
 
 </body>
