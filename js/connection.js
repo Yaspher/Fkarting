@@ -17,6 +17,7 @@
 //  case-sensitivity en PostgREST. El ordenamiento se hace en JS.
 // ══════════════════════════════════════════════════════════════
 
+export const VERSION  = 'v1.3.3'; // Actualizar manualmente en app.js e index.html
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 

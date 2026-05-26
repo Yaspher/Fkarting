@@ -7,10 +7,13 @@ import {
     getRankingVista,
     getPilotosVista,
     getTiempoVista,
-    getCarreraVista
+    getCarreraVista,
+    VERSION
 } from './connection.js';
 
-
+document.querySelectorAll('[data-version]')
+  .forEach(el => el.textContent = VERSION);
+  
 // ════════════════════════════════════════════════════════════════
 //  HELPERS
 // ════════════════════════════════════════════════════════════════
