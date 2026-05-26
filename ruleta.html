@@ -610,6 +610,65 @@ canvas#wheel {
   border-color: var(--red-900);
 }
 
+/* ── HAMBURGER ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.hamburger:hover { border-color: var(--red-900); }
+
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--gray-400);
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  transform-origin: center;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── MOBILE NAV ── */
+.nav-mobile {
+  display: none;
+  flex-direction: column;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0 12px;
+}
+
+.nav-mobile.open { display: flex; }
+
+.nav-mobile a {
+  color: var(--gray-400);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border-dim);
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+
+.nav-mobile a:last-child { border-bottom: none; }
+
+.nav-mobile a:hover {
+  color: var(--white);
+  background: rgba(127,29,29,0.10);
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .main-grid { grid-template-columns: 1fr; }
@@ -617,11 +676,15 @@ canvas#wheel {
   .history-list { max-height: 320px; }
 }
 
+@media (max-width: 768px) {
+  .navbar nav   { display: none; }
+  .navbar-admin { display: none; }
+  .hamburger    { display: flex; }
+}
+
 @media (max-width: 600px) {
   .roulette-card { padding: 24px 16px 20px; }
   .spin-btn { font-size: 1rem; padding: 12px 28px; }
-  .navbar nav { display: none; }
-  .navbar-admin { display: none; }
 }
 </style>
 </head>
@@ -656,7 +719,23 @@ canvas#wheel {
       </svg>
       Admin
     </a>
+
+    <!-- Hamburger (solo móvil) -->
+    <button class="hamburger" id="hamburger" aria-label="Menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
+
+  <!-- Menú móvil -->
+  <nav class="nav-mobile" id="navMobile">
+    <a href="index.html">Inicio</a>
+    <a href="index.html#ranking">Ranking</a>
+    <a href="index.html#resultados">Resultados</a>
+    <a href="index.html#pilotos">Pilotos</a>
+    <a href="login.html">Admin</a>
+  </nav>
 </header>
 
 <div class="page-stripe"></div>
@@ -946,7 +1025,7 @@ function spin() {
   const target = rotation + delta + TAU * fullTurns;
 
   const start    = rotation;
-  const duration = 5200;
+  const duration = 7200;
   let   startT   = null;
 
   function animate(ts) {
@@ -1057,6 +1136,25 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   const box = document.getElementById('winnerBox');
   box.classList.remove('has-winner');
   box.innerHTML = `<span class="winner-idle">Esperando resultado...</span>`;
+});
+
+/* ═══════════════════════════════════════════════════════
+   HAMBURGER MENU
+═══════════════════════════════════════════════════════ */
+
+const hamburger = document.getElementById('hamburger');
+const navMobile = document.getElementById('navMobile');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navMobile.classList.toggle('open');
+});
+
+navMobile.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    navMobile.classList.remove('open');
+  });
 });
 
 /* ═══════════════════════════════════════════════════════

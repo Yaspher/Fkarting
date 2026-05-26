@@ -136,6 +136,11 @@ document.getElementById("logout").onclick = (e) => {
     window.location.href = "index.html";
 };
 
+document.getElementById("testConnection").onclick = (e) => {
+    e.preventDefault();
+    window.location.href = "testconnection.html";
+};
+
 
 // ════════════════════════════════════════════════════════════════
 //  DASHBOARD
