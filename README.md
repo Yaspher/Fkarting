@@ -1,6 +1,6 @@
 Proyecto FKarting
 
-v1.3.4
+v1.3.0
 
 
 Usuario: "admin"
