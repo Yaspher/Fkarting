@@ -1173,3 +1173,12 @@ ul { list-style: none; }
   .drivers-grid { grid-template-columns: 1fr; }
   .modal-box    { padding: 28px 20px 22px; }
 }
+
+.logo-wordmark {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+@media (max-width: 768px) {
+  .logo-wordmark { height: 26px; }
+}

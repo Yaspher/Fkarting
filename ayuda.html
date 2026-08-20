@@ -13,7 +13,7 @@
 <!-- ── NAVBAR ── -->
 <header class="navbar">
     <div class="container navbar-inner">
-        <div class="logo">
+        <a href="index.html" class="logo">
             <div class="logo-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
@@ -21,7 +21,7 @@
                 </svg>
             </div>
             <span class="logo-text">FKARTING</span>
-        </div>
+        </a>
         <nav>
             <ul>
                 <li><a href="index.html">Inicio</a></li>
@@ -47,7 +47,7 @@
         <p class="hero-eyebrow">Documentación Oficial</p>
         <h1 class="hero-title">Guía del<br><span>Campeonato</span></h1>
         <p class="hero-sub">Todo lo que necesitas saber sobre puntos, rankings y tiempos.</p>
-        <p class="hero-sub">Version v1</p>
+        <p class="hero-sub">Versión v1</p>
     </div>
     <div class="hero-stripe"></div>
 </section>
@@ -93,7 +93,7 @@
         </div>
 
         <p class="help-intro">
-            FKarting utiliza el sistema de puntos oficial de la Fórmula 1. Los puntos se otorgan a los
+            FKarting utiliza su propio sistema de puntos, otorgando puntos a los
             <strong>10 primeros clasificados</strong> de cada carrera y se acumulan a lo largo del campeonato.
         </p>
 
@@ -104,7 +104,7 @@
             <div class="pts-card pts-p1">
                 <div class="pts-pos-label">Posición</div>
                 <div class="pts-pos">1°</div>
-                <div class="pts-medal">🥇</div>
+                <div class="pts-medal" role="img" aria-label="Medalla de oro">🥇</div>
                 <div class="pts-val">15</div>
                 <div class="pts-val-label">puntos</div>
             </div>
@@ -112,7 +112,7 @@
             <div class="pts-card pts-p2">
                 <div class="pts-pos-label">Posición</div>
                 <div class="pts-pos">2°</div>
-                <div class="pts-medal">🥈</div>
+                <div class="pts-medal" role="img" aria-label="Medalla de plata">🥈</div>
                 <div class="pts-val">13</div>
                 <div class="pts-val-label">puntos</div>
             </div>
@@ -120,7 +120,7 @@
             <div class="pts-card pts-p3">
                 <div class="pts-pos-label">Posición</div>
                 <div class="pts-pos">3°</div>
-                <div class="pts-medal">🥉</div>
+                <div class="pts-medal" role="img" aria-label="Medalla de bronce">🥉</div>
                 <div class="pts-val">11</div>
                 <div class="pts-val-label">puntos</div>
             </div>
@@ -233,7 +233,9 @@
                 <div class="ht-step ht-step-final">
                     <div class="ht-dot ht-dot-gold"></div>
                     <div class="ht-content">
-                        <span class="ht-label" style="color:var(--gold)">🏆 Campeón coronado</span>
+                        <span class="ht-label" style="color:var(--gold)">
+                            <span role="img" aria-label="Trofeo">🏆</span> Campeón coronado
+                        </span>
                         <span class="ht-desc">El piloto con más puntos es el Campeón FKarting de la temporada</span>
                     </div>
                 </div>
@@ -259,7 +261,7 @@
             <div class="vr-explainer">
                 <p class="help-intro">
                     La <strong>Vuelta Rápida</strong> es el tiempo de vuelta más bajo registrado por un piloto
-                    durante una carrera. Se identifica con el badge <span class="vr-inline-badge">⚡ Vuelta Rápida</span>
+                    durante una carrera. Se identifica con el badge <span class="vr-inline-badge" role="img" aria-label="Rayo">⚡ Vuelta Rápida</span>
                     en la sección de mejores tiempos.
                 </p>
 
@@ -302,7 +304,7 @@
                     <div class="vr-mock-row vr-mock-fast">
                         <span class="vr-mock-pos">1</span>
                         <span class="vr-mock-name">YASPHER</span>
-                        <span class="vr-mock-badge">⚡ Vuelta Rápida</span>
+                        <span class="vr-mock-badge" role="img" aria-label="Rayo">⚡ Vuelta Rápida</span>
                         <span class="vr-mock-time">0:59.800</span>
                     </div>
                     <div class="vr-mock-row">

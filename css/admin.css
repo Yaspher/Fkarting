@@ -1192,6 +1192,154 @@ a  { text-decoration: none; }
 }
 
 /* ============================================================
+   BOTÓN CONFIRMAR CARRERA + MODALES DE RESULTADOS (v1.3.0)
+   ============================================================ */
+
+.btn-confirm {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  border: 1px solid #15803d !important;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+  transition: all 0.2s;
+}
+
+.btn-confirm:hover {
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.6);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Resultado row en modal ingreso */
+.resultado-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 150px 90px 34px;
+  gap: 8px;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.resultado-row.completo {
+  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.resultado-row.error {
+  border-color: var(--red-500);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.resultado-row-pos {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--gray-600);
+  text-align: center;
+}
+
+.resultado-row-pos-medal {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.resultado-row-piloto select,
+.resultado-row-tiempo input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-form);
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: var(--white);
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.resultado-row-piloto select:focus,
+.resultado-row-tiempo input:focus {
+  border-color: var(--red);
+}
+
+.resultado-row-tiempo input::placeholder {
+  color: var(--gray-700);
+}
+
+.resultado-row-puntos {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--red-500);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Ícono de vuelta rápida junto a los puntos */
+.resultado-row-vr {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Mensaje de error — ocupa la fila completa del grid (nueva línea implícita) */
+.resultado-row-error-msg {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--red-500);
+  padding: 4px 0 0;
+  margin-top: -2px;
+}
+
+/* Progreso */
+#resultadosProgress { user-select: none; }
+
+/* Vista previa style */
+.vista-previa-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(127,29,29,0.08);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 0.875rem;
+}
+
+.vista-previa-pos {
+  font-family: var(--font-display);
+  font-weight: 700;
+  min-width: 34px;
+}
+
+.vista-previa-piloto {
+  flex: 1;
+  padding-left: 12px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.vista-previa-tiempo {
+  color: var(--gray-500);
+  margin: 0 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.vista-previa-puntos {
+  color: var(--red-500);
+  font-weight: 700;
+  min-width: 50px;
+  text-align: right;
+}
+
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 
@@ -1246,4 +1394,17 @@ a  { text-decoration: none; }
   .modal-grid { grid-template-columns: 1fr; }
   .modal-field.full { grid-column: 1; }
   .rank-card { flex-wrap: wrap; }
+  .section-header > div[style*="display:flex"] { width: 100%; flex-direction: column; }
+  .resultado-row {
+    grid-template-columns: 40px 1fr;
+    grid-template-areas:
+      "pos piloto"
+      "tiempo tiempo"
+      "puntos vr";
+  }
+  .resultado-row-pos     { grid-area: pos; }
+  .resultado-row-piloto  { grid-area: piloto; }
+  .resultado-row-tiempo  { grid-area: tiempo; }
+  .resultado-row-puntos  { grid-area: puntos; text-align: left; }
+  .resultado-row-vr      { grid-area: vr; text-align: right; }
 }

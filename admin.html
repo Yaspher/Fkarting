@@ -83,7 +83,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-md">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
-          Ranquin
+          Ranking
         </li>
 
         <li class="sidebar-item" data-section="testConnection" id="testConnection">
@@ -271,9 +271,10 @@
               <tr>
                 <th class="col-num">#</th>
                 <th class="col-name">Nombre</th>
-                <th class="col-stat">Campeonatos</th>
+                <th class="col-stat">WDC</th>
                 <th class="col-stat">Victorias</th>
                 <th class="col-stat">Podios</th>
+                <th class="col-stat">Fast Laps</th>
                 <th class="col-status">Estado</th>
                 <th class="col-actions"></th>
               </tr>
@@ -313,12 +314,20 @@
             <label class="form-label">Campeonato</label>
             <select id="carrerasCampeonato" class="form-select" style="min-width:200px"></select>
           </div>
-          <button id="btnNewCarrera" class="btn-primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nueva Carrera
-          </button>
+          <div style="display:flex;gap:10px">
+            <button id="btnConfirmarCarrera" class="btn-primary btn-confirm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Confirmar Carrera
+            </button>
+            <button id="btnNewCarrera" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Nueva Carrera
+            </button>
+          </div>
         </div>
         <span class="save-msg" id="saveMsgCarreras"></span>
         <div class="table-wrap">
@@ -484,6 +493,10 @@
           <label class="form-label">⚡ POLES <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Podios</span></label>
           <input type="number" id="driverPOLES" class="form-input" placeholder="0" min="0">
         </div>
+        <div class="modal-field">
+          <label class="form-label">🏁 FASTEST <span style="color:var(--gray-500);font-size:0.65rem;text-transform:none;letter-spacing:0">Vueltas Rapidas</span></label>
+          <input type="number" id="driverFASTEST" class="form-input" placeholder="0" min="0">
+        </div>
       </div>
       <div class="modal-footer">
         <button id="btnCancelDriverModal" class="btn-ghost">Cancelar</button>
@@ -621,6 +634,131 @@
       <div class="modal-footer">
         <button id="btnCancelModal" class="btn-ghost">Cancelar</button>
         <button id="btnSaveRanking" class="btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL CONFIRMAR CARRERA (v1.3.0) ─────────────────────── -->
+<div id="confirmarCarreraModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="confirmarCarreraModalTitle">🏁 Confirmar Carrera</h3>
+      <button class="modal-close" id="btnCloseConfirmarCarrera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div class="modal-field full">
+          <label class="form-label">Campeonato</label>
+          <select id="confirmarCarreraCampeonato" class="form-select">
+            <option value="">Cargando campeonatos...</option>
+          </select>
+        </div>
+
+        <div class="modal-field full">
+          <label class="form-label">Carrera (Pendientes)</label>
+          <select id="confirmarCarreraSelect" class="form-select">
+            <option value="">Seleccionar carrera...</option>
+          </select>
+        </div>
+
+        <div class="modal-field full">
+          <label class="form-label">Información de la Carrera</label>
+          <div id="confirmarCarreraInfo" style="background: rgba(127,29,29,0.08); border: 1px solid rgba(127,29,29,0.2); border-radius: 8px; padding: 12px; color: var(--gray-400); font-size: 0.875rem;">
+            <div style="display: grid; gap: 6px;">
+              <div><strong>Circuito:</strong> <span id="infoCircuito">—</span></div>
+              <div><strong>Fecha:</strong> <span id="infoFecha">—</span></div>
+              <div><strong>Pilotos inscritos:</strong> <span id="infoPilotos">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span class="save-msg" id="saveMsgConfirmarCarrera"></span>
+
+      <div class="modal-footer">
+        <button id="btnCancelConfirmarCarrera" class="btn-ghost">Cancelar</button>
+        <button id="btnContinuarResultados" class="btn-primary">Continuar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL INGRESAR RESULTADOS (v1.3.0) ────────────────────── -->
+<div id="ingresarResultadosModal" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width: 720px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" id="ingresarResultadosTitle">📊 Ingresar Resultados</h3>
+        <p id="ingresarResultadosSubtitle" style="color: var(--gray-500); font-size: 0.875rem; margin-top: 4px;">GP Circuito — Fecha</p>
+      </div>
+      <button class="modal-close" id="btnCloseIngresarResultados">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Progreso -->
+      <div id="resultadosProgress" style="background: rgba(127,29,29,0.1); border-radius: 8px; padding: 12px; margin-bottom: 20px; font-size: 0.875rem; color: var(--gray-400);">
+        <span id="resultadosProgressText">0/12 pilotos ingresados</span>
+        <div style="width: 100%; height: 4px; background: rgba(127,29,29,0.2); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+          <div id="resultadosProgressBar" style="width: 0%; height: 100%; background: var(--red-700); border-radius: 2px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <!-- Tabla de resultados -->
+      <div id="resultadosTable" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Se rellena dinámicamente con JS -->
+      </div>
+
+      <!-- Opciones -->
+      <div style="background: rgba(127,29,29,0.08); border: 1px solid rgba(127,29,29,0.2); border-radius: 8px; padding: 12px; margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem;">
+          <input type="checkbox" id="autoCalcularPuntos" checked>
+          <span>Auto-calcular puntos desde tabla</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem;">
+          <input type="checkbox" id="autoVueltaRapida" checked>
+          <span>Calcular vuelta rápida automáticamente</span>
+        </label>
+      </div>
+
+      <span class="save-msg" id="saveMsgIngresarResultados"></span>
+
+      <div class="modal-footer" style="margin-top: 24px;">
+        <button id="btnCancelIngresarResultados" class="btn-ghost">Cancelar</button>
+        <button id="btnBorrarTodoResultados" class="btn-ghost" style="border-color: var(--red-500); color: var(--red-500);">Borrar Todo</button>
+        <button id="btnVistaPrevia" class="btn-ghost">Vista Previa</button>
+        <button id="btnGuardarResultados" class="btn-primary">✓ Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL VISTA PREVIA (v1.3.0) ───────────────────────────── -->
+<div id="vistaPreviaModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">✓ Vista Previa de Resultados</h3>
+      <button class="modal-close" id="btnCloseVistaPrevia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="vistaPreviaContent" style="color: var(--gray-400); font-size: 0.875rem;">
+        <!-- Se rellena dinámicamente -->
+      </div>
+      <div class="modal-footer">
+        <button id="btnVolverEdicion" class="btn-ghost">← Volver a Edición</button>
+        <button id="btnConfirmarGuardar" class="btn-primary">Confirmar y Guardar</button>
       </div>
     </div>
   </div>

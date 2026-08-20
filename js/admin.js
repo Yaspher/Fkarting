@@ -50,6 +50,29 @@ const sectionTitles = {
     ranking:       "Ranquin"
 };
 
+// ── CONSTANTES v1.3.0 — Confirmación de Carrera ──
+const POSICIONES_PARA_PUNTOS = {
+    1: 15, 2: 13, 3: 11, 4: 9, 5: 7, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1,
+    11: 0, 12: 0
+};
+const MEDALLAS = ["", "🥇", "🥈", "🥉"];
+
+// Estado del flujo de confirmación (v1.3.0)
+let estadoConfirmacion = {
+    carreraId: null,
+    carreraNombre: "",
+    carreraFecha: "",
+    carreraCircuito: "",
+    campeonatoId: null,
+    resultados: Array(12).fill(null).map((_, i) => ({
+        posicion: i + 1,
+        id_piloto: null,
+        res_tiempo_seg: null,
+        res_puntos: 0,
+        es_vuelta_rapida: false
+    }))
+};
+
 
 // ════════════════════════════════════════════════════════════════
 //  HELPERS
@@ -65,16 +88,61 @@ function formatInterval(interval) {
     return `${String(mm).padStart(2, "0")}:${ss.padStart(6, "0")}`;
 }
 
+/**
+ * Parser flexible de tiempo de vuelta.
+ * Acepta separadores mixtos entre minutos/segundos/milisegundos
+ * (":", ".", ",", ";" — cualquier combinación) y también dígitos
+ * puros sin separador, ej: "123456" → 1:23.456
+ *
+ * Devuelve { ok, value, error } donde value es el interval Postgres
+ * "00:MM:SS.mmm" listo para guardar.
+ */
+function parseTiempoFlexible(str) {
+    str = String(str ?? "").trim();
+    if (!str) return { ok: true, value: null };
+
+    // Separa en grupos de dígitos, sin importar qué símbolo se usó de separador
+    const parts = str.split(/[^\d]+/).filter(p => p.length > 0);
+
+    let mm, ss, ms;
+
+    if (parts.length >= 3) {
+        // mm : ss . mmm  (con cualquier separador)
+        [mm, ss, ms] = parts;
+    } else if (parts.length === 1) {
+        // Dígitos puros, ej: "123456" → mm=1, ss=23, ms=456
+        const digits = parts[0];
+        if (digits.length < 4) {
+            return { ok: false, error: "⚠️ Tiempo incompleto. Usa M:SS.mmm (ej: 1:23.456)" };
+        }
+        ms = digits.slice(-3);
+        let rest = digits.slice(0, -3);
+        ss = rest.length >= 2 ? rest.slice(-2) : rest.padStart(2, "0");
+        mm = rest.length > 2 ? rest.slice(0, -2) : "0";
+    } else {
+        return { ok: false, error: "⚠️ Formato incompleto. Usa M:SS.mmm (ej: 1:23.456)" };
+    }
+
+    if (!/^\d+$/.test(mm) || !/^\d+$/.test(ss) || !/^\d+$/.test(ms)) {
+        return { ok: false, error: "⚠️ Formato inválido. Usa M:SS.mmm (ej: 1:23.456)" };
+    }
+
+    mm = parseInt(mm, 10);
+    ss = parseInt(ss, 10);
+    ms = ms.length > 3 ? ms.slice(0, 3) : ms.padEnd(3, "0");
+
+    if (ss > 59) return { ok: false, error: "⚠️ Los segundos no pueden ser mayores a 59" };
+    if (mm > 99) return { ok: false, error: "⚠️ Los minutos no pueden ser mayores a 99" };
+
+    const value = `00:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}.${ms}`;
+    return { ok: true, value };
+}
+
 function toInterval(str) {
-    str = str.trim();
-    const match = str.match(/^(\d{1,2}):(\d{2})\.(\d{1,3})$/);
-    if (!match) throw new Error("Formato inválido. Usa MM:SS.mmm (ej: 01:12.450)");
-    const mm = parseInt(match[1]);
-    const ss = parseInt(match[2]);
-    const ms = match[3].padEnd(3, "0");
-    if (ss > 59) throw new Error("Los segundos no pueden ser mayores a 59");
-    if (mm > 99) throw new Error("Los minutos no pueden ser mayores a 99");
-    return `00:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}.${ms}`;
+    const result = parseTiempoFlexible(str);
+    if (!result.ok) throw new Error(result.error.replace(/^⚠️\s*/, ""));
+    if (result.value === null) throw new Error("Formato inválido. Usa MM:SS.mmm (ej: 01:12.450)");
+    return result.value;
 }
 
 function intervalToSeconds(interval) {
@@ -136,10 +204,463 @@ document.getElementById("logout").onclick = (e) => {
     window.location.href = "index.html";
 };
 
-document.getElementById("testConnection").onclick = (e) => {
-    e.preventDefault();
-    window.location.href = "testconnection.html";
-};
+
+// ════════════════════════════════════════════════════════════════
+//  CONFIRMACIÓN DE CARRERA v1.3.0 — FLUJO COMPLETO
+// ════════════════════════════════════════════════════════════════
+
+/**
+ * Abre modal 1: seleccionar carrera
+ */
+async function abrirConfirmarCarrera() {
+    document.getElementById("confirmarCarreraModal").classList.remove("hidden");
+
+    try {
+        const campeonatos = await getCampeonatosActivos();
+        const selCamp = document.getElementById("confirmarCarreraCampeonato");
+        selCamp.innerHTML = campeonatos.length
+            ? campeonatos.map(c =>
+                `<option value="${c.id_campeonato}">${c.camp_ano}${c.camp_descripcion ? " — " + escAttr(c.camp_descripcion) : ""}</option>`
+              ).join("")
+            : `<option value="">Sin campeonatos activos</option>`;
+
+        if (campeonatos.length) {
+            await cargarCarrerasPendientes(campeonatos[0].id_campeonato);
+        }
+    } catch (err) {
+        showMsg("saveMsgConfirmarCarrera", "❌ Error cargando campeonatos");
+        console.error(err);
+    }
+}
+
+/**
+ * Carga carreras pendientes de un campeonato
+ */
+async function cargarCarrerasPendientes(id_campeonato) {
+    try {
+        const carreras   = await getCarrerasByCampeonato(id_campeonato);
+        const pendientes = carreras.filter(c => !c.completada);
+        const selCar     = document.getElementById("confirmarCarreraSelect");
+
+        selCar.innerHTML = pendientes.length
+            ? pendientes.map(c =>
+                `<option value="${c.id_carrera}">${escAttr(c.nombre)}${c.fecha ? " (" + c.fecha + ")" : ""}</option>`
+              ).join("")
+            : `<option value="">Sin carreras pendientes</option>`;
+
+        // Reset info
+        document.getElementById("infoCircuito").textContent = "—";
+        document.getElementById("infoFecha").textContent    = "—";
+        document.getElementById("infoPilotos").textContent  = "—";
+
+        if (pendientes.length) await actualizarInfoCarrera(pendientes[0].id_carrera);
+    } catch (err) {
+        console.error(err);
+        showMsg("saveMsgConfirmarCarrera", "❌ Error cargando carreras");
+    }
+}
+
+/**
+ * Al seleccionar carrera, actualiza info
+ */
+async function actualizarInfoCarrera(id_carrera) {
+    if (!id_carrera) return;
+
+    try {
+        const data    = await getCarreraById(id_carrera);
+        const carrera = data[0];
+
+        document.getElementById("infoCircuito").textContent = carrera.circuito || "—";
+        document.getElementById("infoFecha").textContent = carrera.fecha
+            ? new Date(carrera.fecha + "T00:00:00").toLocaleDateString("es-DO")
+            : "—";
+
+        // Nº de pilotos activos disponibles para asignar (no hay tabla de inscripciones aún)
+        try {
+            const pilotos = await getPilotosActivosAdmin();
+            document.getElementById("infoPilotos").textContent = `${pilotos.length} disponibles`;
+        } catch (err) {
+            document.getElementById("infoPilotos").textContent = "—";
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+/**
+ * Continúa a modal 2 (ingresar resultados)
+ */
+async function continuarAResultados() {
+    const campeonatoId = parseInt(document.getElementById("confirmarCarreraCampeonato").value);
+    const carreraId    = parseInt(document.getElementById("confirmarCarreraSelect").value);
+
+    if (!carreraId || !campeonatoId) {
+        showMsg("saveMsgConfirmarCarrera", "⚠️ Selecciona carrera y campeonato");
+        return;
+    }
+
+    try {
+        const carreras = await getCarreraById(carreraId);
+        const carrera  = carreras[0];
+
+        resetearEstadoConfirmacion();
+        estadoConfirmacion.carreraId       = carreraId;
+        estadoConfirmacion.campeonatoId    = campeonatoId;
+        estadoConfirmacion.carreraNombre   = carrera.nombre;
+        estadoConfirmacion.carreraFecha    = carrera.fecha || "";
+        estadoConfirmacion.carreraCircuito = carrera.circuito || "";
+
+        document.getElementById("confirmarCarreraModal").classList.add("hidden");
+        await abrirIngresarResultados();
+    } catch (err) {
+        showMsg("saveMsgConfirmarCarrera", "❌ Error al continuar");
+        console.error(err);
+    }
+}
+
+/**
+ * Abre modal 2: ingresar resultados
+ */
+async function abrirIngresarResultados() {
+    const modal = document.getElementById("ingresarResultadosModal");
+
+    document.getElementById("ingresarResultadosTitle").textContent = `📊 Ingresar Resultados`;
+    document.getElementById("ingresarResultadosSubtitle").textContent =
+        `${estadoConfirmacion.carreraNombre}${estadoConfirmacion.carreraFecha ? " — " + estadoConfirmacion.carreraFecha : ""}`;
+
+    let pilotos = [];
+    try {
+        pilotos = await getPilotosActivosAdmin();
+    } catch (err) {
+        console.error(err);
+    }
+    // Cachea la lista para vista previa (evita repetir la consulta)
+    estadoConfirmacion._pilotosCache = pilotos;
+
+    const container = document.getElementById("resultadosTable");
+    container.innerHTML = estadoConfirmacion.resultados.map((res, idx) => {
+        const pos     = idx + 1;
+        const medalla = MEDALLAS[pos] || "";
+
+        return `
+      <div class="resultado-row" id="resultado-row-${pos}">
+        <div class="resultado-row-pos">
+          <span class="resultado-row-pos-medal">${medalla}</span>
+          ${medalla ? "" : pos + "°"}
+        </div>
+        <div class="resultado-row-piloto">
+          <select id="piloto-${pos}" class="resultado-piloto-select" data-pos="${pos}">
+            <option value="">— Seleccionar —</option>
+            ${pilotos.map(p =>
+              `<option value="${p.id_piloto}">${p.pilo_numero ? "#" + p.pilo_numero + " " : ""}${escAttr(p.pilo_nombre)}</option>`
+            ).join("")}
+          </select>
+        </div>
+        <div class="resultado-row-tiempo">
+          <input type="text" id="tiempo-${pos}" class="resultado-tiempo-input" placeholder="1:23.456" data-pos="${pos}">
+        </div>
+        <div class="resultado-row-puntos" id="puntos-${pos}">0 pts</div>
+        <div class="resultado-row-vr" id="vr-${pos}"></div>
+        <div class="resultado-row-error-msg" id="error-${pos}"></div>
+      </div>
+    `;
+    }).join("");
+
+    document.querySelectorAll(".resultado-piloto-select").forEach(sel => {
+        sel.addEventListener("change", (e) => actualizarFilaResultado(e.target.dataset.pos));
+    });
+
+    document.querySelectorAll(".resultado-tiempo-input").forEach(inp => {
+        inp.addEventListener("input", (e) => actualizarFilaResultado(e.target.dataset.pos));
+    });
+
+    actualizarProgressResultados();
+    modal.classList.remove("hidden");
+}
+
+/**
+ * Actualiza una fila de resultado (validación + cálculo)
+ */
+function actualizarFilaResultado(posicion) {
+    const pos           = parseInt(posicion);
+    const selectPiloto  = document.getElementById(`piloto-${pos}`);
+    const inputTiempo   = document.getElementById(`tiempo-${pos}`);
+    const divPuntos     = document.getElementById(`puntos-${pos}`);
+    const rowDiv        = document.getElementById(`resultado-row-${pos}`);
+    const errorDiv      = document.getElementById(`error-${pos}`);
+
+    const id_piloto  = parseInt(selectPiloto.value) || null;
+    const tiempoStr  = inputTiempo.value.trim();
+    let errorMsg     = "";
+
+    estadoConfirmacion.resultados[pos - 1].id_piloto = id_piloto;
+
+    // Validación 1: piloto duplicado
+    if (id_piloto) {
+        const duplicado = estadoConfirmacion.resultados.some((r, idx) =>
+            idx !== pos - 1 && r.id_piloto === id_piloto
+        );
+        if (duplicado) {
+            errorMsg = "⚠️ Piloto ya asignado a otra posición";
+        }
+    }
+
+    // Validación 2: tiempo
+    if (!errorMsg && tiempoStr) {
+        const parsed = parseTiempoFlexible(tiempoStr);
+        if (!parsed.ok) {
+            errorMsg = parsed.error;
+        } else {
+            estadoConfirmacion.resultados[pos - 1].res_tiempo_seg = parsed.value;
+        }
+    }
+
+    if (!tiempoStr) {
+        estadoConfirmacion.resultados[pos - 1].res_tiempo_seg = null;
+    }
+
+    rowDiv.classList.toggle("error", !!errorMsg);
+    errorDiv.textContent = errorMsg;
+
+    // Calcula puntos si está habilitado
+    if (document.getElementById("autoCalcularPuntos").checked) {
+        const puntos = POSICIONES_PARA_PUNTOS[pos] || 0;
+        estadoConfirmacion.resultados[pos - 1].res_puntos = puntos;
+        divPuntos.textContent = `${puntos} pts`;
+    } else {
+        divPuntos.textContent = "0 pts";
+        estadoConfirmacion.resultados[pos - 1].res_puntos = 0;
+    }
+
+    rowDiv.classList.toggle("completo", !errorMsg && !!id_piloto);
+
+    actualizarProgressResultados();
+}
+
+/**
+ * Actualiza barra de progreso
+ */
+function actualizarProgressResultados() {
+    const count = estadoConfirmacion.resultados.filter(r => r.id_piloto !== null).length;
+    const pct   = Math.round((count / 12) * 100);
+
+    document.getElementById("resultadosProgressText").textContent = `${count}/12 pilotos ingresados`;
+    document.getElementById("resultadosProgressBar").style.width = pct + "%";
+}
+
+/**
+ * Detecta vuelta rápida automáticamente y marca la fila correspondiente
+ */
+function detectarVueltaRapida() {
+    // Limpia marcas visuales previas
+    document.querySelectorAll(".resultado-row-vr").forEach(el => el.textContent = "");
+    estadoConfirmacion.resultados.forEach(r => r.es_vuelta_rapida = false);
+
+    if (!document.getElementById("autoVueltaRapida").checked) return;
+
+    let minTiempo = null;
+    let minIdx    = null;
+
+    estadoConfirmacion.resultados.forEach((res, idx) => {
+        if (!res.res_tiempo_seg) return;
+        const seg = intervalToSeconds(res.res_tiempo_seg);
+        if (seg > 0 && (minTiempo === null || seg < minTiempo)) {
+            minTiempo = seg;
+            minIdx    = idx;
+        }
+    });
+
+    if (minIdx !== null) {
+        estadoConfirmacion.resultados[minIdx].es_vuelta_rapida = true;
+        const vrEl = document.getElementById(`vr-${minIdx + 1}`);
+        if (vrEl) vrEl.textContent = "⚡";
+    }
+}
+
+/**
+ * Muestra vista previa (con nombres reales de piloto)
+ */
+async function mostrarVistaPrevia() {
+    detectarVueltaRapida();
+
+    // Mapa id_piloto → nombre, usando el caché cargado al abrir el modal de resultados
+    let pilotos = estadoConfirmacion._pilotosCache;
+    if (!pilotos) {
+        try { pilotos = await getPilotosActivosAdmin(); } catch { pilotos = []; }
+    }
+    const nombreMap = Object.fromEntries(pilotos.map(p => [p.id_piloto, p]));
+
+    const content = estadoConfirmacion.resultados
+        .filter(r => r.id_piloto !== null)
+        .map(r => {
+            const medal   = r.posicion <= 3 ? MEDALLAS[r.posicion] : r.posicion + "°";
+            const tiempo  = r.res_tiempo_seg ? formatInterval(r.res_tiempo_seg) : "—";
+            const puntos  = r.res_puntos;
+            const rapida  = r.es_vuelta_rapida ? " ⚡" : "";
+            const piloto  = nombreMap[r.id_piloto];
+            const nombre  = piloto
+                ? `${piloto.pilo_numero ? "#" + piloto.pilo_numero + " " : ""}${escAttr(piloto.pilo_nombre)}`
+                : `Piloto #${r.id_piloto}`;
+
+            return `
+        <div class="vista-previa-item">
+          <span class="vista-previa-pos">${medal}</span>
+          <span class="vista-previa-piloto">${nombre}${rapida}</span>
+          <span class="vista-previa-tiempo">${tiempo}</span>
+          <span class="vista-previa-puntos">${puntos} pts</span>
+        </div>
+      `;
+        }).join("");
+
+    document.getElementById("vistaPreviaContent").innerHTML = content ||
+        `<p style="text-align: center; color: var(--gray-600);">Sin resultados aún</p>`;
+
+    document.getElementById("vistaPreviaModal").classList.remove("hidden");
+}
+
+/**
+ * Valida y guarda resultados
+ */
+async function guardarResultados() {
+    detectarVueltaRapida();
+
+    const conPiloto = estadoConfirmacion.resultados.filter(r => r.id_piloto !== null);
+    if (conPiloto.length === 0) {
+        showMsg("saveMsgIngresarResultados", "⚠️ Mínimo 1 piloto requerido");
+        return;
+    }
+
+    const hayErrores = Array.from(document.querySelectorAll(".resultado-row-error-msg"))
+        .some(e => e.textContent.trim());
+    if (hayErrores) {
+        showMsg("saveMsgIngresarResultados", "⚠️ Corrige los errores antes de guardar");
+        return;
+    }
+
+    const btnGuardar = document.getElementById("btnGuardarResultados");
+    const textOrig   = btnGuardar.textContent;
+
+    try {
+        btnGuardar.disabled  = true;
+        btnGuardar.textContent = "⟳ Guardando...";
+
+        for (const res of estadoConfirmacion.resultados) {
+            if (!res.id_piloto) continue;
+
+            await createResultado({
+                id_carrera:  estadoConfirmacion.carreraId,
+                id_piloto:   res.id_piloto,
+                posicion:    res.posicion,
+                puntos:      res.res_puntos,
+                tiempo_seg:  res.res_tiempo_seg,
+                vueltas:     null
+            });
+        }
+
+        await updateCarrera(estadoConfirmacion.carreraId, { completada: true });
+
+        await actualizarRankingAuto(estadoConfirmacion.campeonatoId, estadoConfirmacion.resultados);
+
+        showMsg("saveMsgIngresarResultados", "✅ Carrera confirmada. Resultados guardados.");
+
+        setTimeout(() => {
+            document.getElementById("ingresarResultadosModal").classList.add("hidden");
+            document.getElementById("vistaPreviaModal").classList.add("hidden");
+            resetearEstadoConfirmacion();
+
+            loadCarrerasSection();
+            loadDashboard();
+
+            btnGuardar.disabled    = false;
+            btnGuardar.textContent = textOrig;
+        }, 1200);
+
+    } catch (err) {
+        showMsg("saveMsgIngresarResultados", "❌ Error al guardar: " + err.message);
+        console.error(err);
+        btnGuardar.disabled    = false;
+        btnGuardar.textContent = textOrig;
+    }
+}
+
+/**
+ * Auto-actualiza ranking después de guardar resultados
+ */
+async function actualizarRankingAuto(id_campeonato, resultados) {
+    try {
+        const ranking    = await getRankingByCampeonato(id_campeonato);
+        const rankingMap = Object.fromEntries(ranking.map(r => [r.piloto.id_piloto, r]));
+
+        for (const res of resultados) {
+            if (!res.id_piloto) continue;
+
+            const rankItem = rankingMap[res.id_piloto];
+            if (rankItem) {
+                await updateRanking(rankItem.id_ranking, {
+                    puntos:    (rankItem.ran_puntos    || 0) + res.res_puntos,
+                    carreras:  (rankItem.ran_carreras  || 0) + 1,
+                    victorias: (rankItem.ran_victorias || 0) + (res.posicion === 1 ? 1 : 0),
+                    podios:    (rankItem.ran_podios    || 0) + (res.posicion <= 3 ? 1 : 0)
+                });
+            } else {
+                await createRanking({
+                    id_campeonato,
+                    id_piloto: res.id_piloto,
+                    puntos:    res.res_puntos,
+                    carreras:  1,
+                    victorias: res.posicion === 1 ? 1 : 0,
+                    podios:    res.posicion <= 3 ? 1 : 0
+                });
+            }
+        }
+    } catch (err) {
+        console.warn("Ranking auto-update falló (no crítico):", err);
+    }
+}
+
+/**
+ * Resetea estado
+ */
+function resetearEstadoConfirmacion() {
+    estadoConfirmacion = {
+        carreraId: null,
+        carreraNombre: "",
+        carreraFecha: "",
+        carreraCircuito: "",
+        campeonatoId: null,
+        resultados: Array(12).fill(null).map((_, i) => ({
+            posicion: i + 1,
+            id_piloto: null,
+            res_tiempo_seg: null,
+            res_puntos: 0,
+            es_vuelta_rapida: false
+        }))
+    };
+}
+
+/**
+ * Borra todos los resultados ingresados (con confirmación)
+ */
+function borrarTodoResultados() {
+    if (!confirm("¿Borrar todos los resultados ingresados?")) return;
+    const carreraId       = estadoConfirmacion.carreraId;
+    const campeonatoId    = estadoConfirmacion.campeonatoId;
+    const carreraNombre   = estadoConfirmacion.carreraNombre;
+    const carreraFecha    = estadoConfirmacion.carreraFecha;
+    const carreraCircuito = estadoConfirmacion.carreraCircuito;
+    const pilotosCache    = estadoConfirmacion._pilotosCache;
+
+    resetearEstadoConfirmacion();
+    // Conserva el contexto de la carrera actual, solo limpia los resultados
+    estadoConfirmacion.carreraId        = carreraId;
+    estadoConfirmacion.campeonatoId     = campeonatoId;
+    estadoConfirmacion.carreraNombre    = carreraNombre;
+    estadoConfirmacion.carreraFecha     = carreraFecha;
+    estadoConfirmacion.carreraCircuito  = carreraCircuito;
+    estadoConfirmacion._pilotosCache    = pilotosCache;
+
+    abrirIngresarResultados();
+}
 
 
 // ════════════════════════════════════════════════════════════════
@@ -1136,6 +1657,64 @@ Object.assign(window, {
     openResultadoModal,  handleDeleteResultado,
     editPuntosFila,      savePuntosFila,
     openRankingModal,    handleDeleteRanking
+});
+
+
+// ════════════════════════════════════════════════════════════════
+//  EVENT LISTENERS v1.3.0 — Confirmación de Carrera
+// ════════════════════════════════════════════════════════════════
+
+document.getElementById("btnConfirmarCarrera").addEventListener("click", abrirConfirmarCarrera);
+document.getElementById("btnCloseConfirmarCarrera").addEventListener("click", () => {
+    document.getElementById("confirmarCarreraModal").classList.add("hidden");
+});
+document.getElementById("btnCancelConfirmarCarrera").addEventListener("click", () => {
+    document.getElementById("confirmarCarreraModal").classList.add("hidden");
+});
+document.getElementById("confirmarCarreraCampeonato").addEventListener("change", (e) => {
+    if (e.target.value) cargarCarrerasPendientes(parseInt(e.target.value));
+});
+document.getElementById("confirmarCarreraSelect").addEventListener("change", (e) => {
+    if (e.target.value) actualizarInfoCarrera(parseInt(e.target.value));
+});
+document.getElementById("btnContinuarResultados").addEventListener("click", continuarAResultados);
+
+document.getElementById("btnCloseIngresarResultados").addEventListener("click", () => {
+    document.getElementById("ingresarResultadosModal").classList.add("hidden");
+    resetearEstadoConfirmacion();
+});
+document.getElementById("btnCancelIngresarResultados").addEventListener("click", () => {
+    document.getElementById("ingresarResultadosModal").classList.add("hidden");
+    resetearEstadoConfirmacion();
+});
+document.getElementById("btnBorrarTodoResultados").addEventListener("click", borrarTodoResultados);
+document.getElementById("btnVistaPrevia").addEventListener("click", mostrarVistaPrevia);
+document.getElementById("btnGuardarResultados").addEventListener("click", guardarResultados);
+
+document.getElementById("btnCloseVistaPrevia").addEventListener("click", () => {
+    document.getElementById("vistaPreviaModal").classList.add("hidden");
+});
+document.getElementById("btnVolverEdicion").addEventListener("click", () => {
+    document.getElementById("vistaPreviaModal").classList.add("hidden");
+});
+document.getElementById("btnConfirmarGuardar").addEventListener("click", async () => {
+    document.getElementById("vistaPreviaModal").classList.add("hidden");
+    await guardarResultados();
+});
+
+document.getElementById("confirmarCarreraModal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("confirmarCarreraModal"))
+        document.getElementById("confirmarCarreraModal").classList.add("hidden");
+});
+document.getElementById("ingresarResultadosModal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("ingresarResultadosModal")) {
+        document.getElementById("ingresarResultadosModal").classList.add("hidden");
+        resetearEstadoConfirmacion();
+    }
+});
+document.getElementById("vistaPreviaModal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("vistaPreviaModal"))
+        document.getElementById("vistaPreviaModal").classList.add("hidden");
 });
 
 
