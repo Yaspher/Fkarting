@@ -296,6 +296,12 @@ ul { list-style: none; }
   display: block;
 }
 
+.hero-logo {
+  width: clamp(280px, 42vw, 620px);
+  height: auto;
+  filter: drop-shadow(0 6px 28px rgba(220,38,38,0.35));
+}
+
 .hero-sub {
   font-size: 1.05rem;
   color: var(--gray-400);
@@ -1128,7 +1134,7 @@ ul { list-style: none; }
   .hamburger    { display: flex; }
 
   .hero { padding: 90px 0 70px; }
-  .hero-title { font-size: clamp(2.8rem, 14vw, 5rem); }
+  .hero-logo { width: clamp(220px, 60vw, 380px); }
 
   .section { padding: 56px 0; }
 
@@ -1177,8 +1183,10 @@ ul { list-style: none; }
 .logo-wordmark {
   height: 30px;
   width: auto;
+  max-width: 200px;
+  object-fit: contain;
   display: block;
 }
 @media (max-width: 768px) {
-  .logo-wordmark { height: 26px; }
+  .logo-wordmark { height: 24px; max-width: 160px; }
 }

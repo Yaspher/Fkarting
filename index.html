@@ -9,8 +9,11 @@
     <meta property="og:title" content="FKarting — Campeonato 2026">
     <meta property="og:description" content="Velocidad. Precisión. Competencia.">
     <meta property="og:type" content="website">
-    <!-- ✅ Evita petición 404 de favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2'><path d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/><line x1='4' y1='22' x2='4' y2='15'/></svg>">
+    <!-- ✅ Favicon FKarting -->
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
@@ -20,18 +23,12 @@
 <!-- ── NAVBAR ── -->
 <header class="navbar">
     <div class="container navbar-inner">
-        <div class="logo">
-            <a href="index.html" class="logo">
-                <img src="img/fkarting_final_transparent.png" alt="FKarting" class="logo-wordmark">
-            </a>
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-                    <line x1="4" y1="22" x2="4" y2="15"/>
-                </svg>
-            </div>
-            <span class="logo-text">FKARTING</span>
-        </div>
+        <a href="index.html" class="logo">
+            <picture>
+                <source srcset="img/fkarting-logo.webp" type="image/webp">
+                <img src="img/fkarting-logo.png" alt="FKarting" class="logo-wordmark">
+            </picture>
+        </a>
         <nav>
             <ul>
                 <li><a href="index.html">Inicio</a></li>
@@ -71,13 +68,10 @@
     <div class="hero-overlay"></div>
     <div class="container hero-inner">
         <p class="hero-eyebrow">Temporada Oficial</p>
-
-        <h1 class="hero-title">Campeonato<br><span>FKarting</span></h1>
-
-        <a href="index.html" class="logo">
-            <img src="img/fkarting_final_transparent.png" alt="FKarting" class="logo-wordmark">
-        </a>
-        
+        <picture>
+            <source srcset="img/fkarting-logo.webp" type="image/webp">
+            <img src="img/fkarting-logo.png" alt="FKarting" class="hero-logo">
+        </picture>
         <p class="hero-sub">Velocidad. Precisión. Competencia.</p>
         <div class="hero-actions">
             <a href="ruleta.html" class="btn-ghost">Ruleta</a>
@@ -143,23 +137,15 @@
 <footer class="footer">
     <div class="container footer-inner">
         <div class="footer-logo">
-            <div class="logo-icon logo-icon-sm">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-                    <line x1="4" y1="22" x2="4" y2="15"/>
-                </svg>
-            </div>
-            <span class="logo-text">FKARTING</span>
+            <picture>
+                <source srcset="img/fkarting-logo.webp" type="image/webp">
+                <img src="img/fkarting-logo.png" alt="FKarting" class="logo-wordmark" style="height:22px">
+            </picture>
         </div>
         <!-- ✅ Versión actualizada a v1.0.0 -->
         <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados — <span data-version></span></p>
         <!-- ✅ Enlaza al login, no directo al admin -->
         <a href="login.html" class="footer-admin">Administración</a>
-
-        <div class="footer-logo">
-            <img src="img/fkarting_final_transparent.png" alt="FKarting" class="logo-wordmark" style="height:22px">
-        </div>
-
     </div>
 </footer>
 
@@ -203,7 +189,7 @@
 <!-- ── MODAL Piloto ── -->
 <div id="pilotoModal" class="modal">
     <div class="modal-box">
-       
+
     </div>
 </div>
 
