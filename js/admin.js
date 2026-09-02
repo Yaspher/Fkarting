@@ -1,7 +1,3 @@
-// ══════════════════════════════════════════════
-//  FKarting — admin.js  v1.2.0
-//  Solo lógica UI · Todas las queries en Connection.js
-// ══════════════════════════════════════════════
 
 import {
     // Dashboard

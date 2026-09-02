@@ -1,23 +1,5 @@
-// ══════════════════════════════════════════════════════════════
-//  FKarting — Connection.js  v1.2.0
-//  Capa de Acceso a Datos (DAL)
-//  Único archivo que habla con Supabase.
-//
-//  SEGURIDAD: La key sb_publishable es pública por diseño en Supabase.
-//  La seguridad real depende de Row Level Security (RLS) activo
-//  en todas las tablas. Verificar en el dashboard de Supabase.
-//
-//  VISTAS DISPONIBLES:
-//    - vista_ranking   → columnas: Campeonato, Piloto, Puntos, Vitorias, Podios
-//    - vista_tiempos   → columnas: SecTiempo, SecCarrera, SecPiloto, Tiempos, VueltaRapida, NombrePiloto
-//    - vista_piloto    → columnas: Id, Nombre, Numero, Campeonato, Victorias, Podios
-//    - vista_carrera   → columnas: id_carrera, nombre, circuito, Fecha, posicion, puntos, NombrePiloto
-//
-//  NOTA: Todas las vistas usan select=* para evitar errores de
-//  case-sensitivity en PostgREST. El ordenamiento se hace en JS.
-// ══════════════════════════════════════════════════════════════
 
-export const VERSION  = 'v1.3.0'; 
+export const VERSION  = 'v1.4.0'; 
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 
