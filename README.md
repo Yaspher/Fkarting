@@ -1,10 +1,6 @@
 Proyecto FKarting
 
-brand 
-
-v1.5.0 - Estilizacion a Ayuda - Listo
-
-v1.6.0 - Modal Pilotos - Listo
+New brand - Actual v1.6.0
 
 v1.7.0 - Cambio Logo y rebranding 
 
