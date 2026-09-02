@@ -9,11 +9,7 @@
     <meta property="og:title" content="FKarting — Campeonato 2026">
     <meta property="og:description" content="Velocidad. Precisión. Competencia.">
     <meta property="og:type" content="website">
-    <!-- ✅ Favicon FKarting -->
-    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
-    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta property="og:url" content="https://www.fkarting.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
@@ -36,6 +32,7 @@
                 <li><a href="#mejor-tiempo">Mejor Tiempo</a></li>
                 <li><a href="#resultados">Resultados</a></li>
                 <li><a href="#pilotos">Pilotos</a></li>
+                <li><a href="ayuda.html">Ayuda</a></li>
             </ul>
         </nav>
         <a href="login.html" class="navbar-admin">
@@ -59,7 +56,8 @@
         <a href="#mejor-tiempo">Mejor Tiempo</a>
         <a href="#resultados">Resultados</a>
         <a href="#pilotos">Pilotos</a>
-        <a href="login.html">Admin</a>
+        <a href="ayuda.html">Ayuda</a>
+        <!-- <a href="login.html">Admin</a> -->
     </nav>
 </header>
 
@@ -74,19 +72,31 @@
         </picture>
         <p class="hero-sub">Velocidad. Precisión. Competencia.</p>
         <div class="hero-actions">
-            <a href="ruleta.html" class="btn-ghost">Ruleta</a>
+            <a href="ayuda.html" class="btn-primary">Guía rápida</a>
             <button id="btnNextRace" class="btn-primary">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <polyline points="12 6 12 12 16 14"/>
                 </svg>
-                Próxima Carrera
+                Próxima carrera
             </button>
-            <a href="#ranking" class="btn-ghost">Ver Ranking</a>
-            <a href="ayuda.html" class="btn-ghost">Ayuda</a>
+            <a href="#ranking" class="btn-ghost">Ver ranking</a>
+            <a href="ruleta.html" class="btn-ghost">Ruleta</a>
         </div>
     </div>
     <div class="hero-stripe"></div>
+</section>
+
+<section class="info-banner">
+    <div class="container info-banner-inner">
+        <div class="info-banner-copy">
+            <span class="info-banner-kicker">¿Necesitas ayuda?</span>
+            <h3>Consulta la guía del campeonato</h3>
+        </div>
+        <div class="info-banner-actions">
+            <a href="ayuda.html" class="btn-primary">Ver ayuda</a>
+        </div>
+    </div>
 </section>
 
 <!-- ── RANKING ── -->
@@ -189,7 +199,18 @@
 <!-- ── MODAL Piloto ── -->
 <div id="pilotoModal" class="modal">
     <div class="modal-box">
-
+        <button class="modal-close" id="closePilotoModal" aria-label="Cerrar modal piloto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M6 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1"/></svg>
+        </div>
+        <h2 class="modal-title" id="pilotoModalTitle">Piloto</h2>
+        <div id="pilotoMeta" class="modal-fields" style="padding:12px 0 18px; border:none"></div>
+        <div id="pilotoHistory" style="width:100%;"></div>
+        <button class="btn-primary btn-full" id="closePilotoModalBtn">Cerrar</button>
     </div>
 </div>
 
