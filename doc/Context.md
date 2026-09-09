@@ -3,7 +3,7 @@
 ## Identidad y estado
 
 - **Nombre:** FKarting.
-- **Versión del proyecto:** v1.8.2.
+- **Versión del proyecto:** v1.8.4.
 - **Tipo:** sitio web estático para un campeonato de karting, con vista
   pública y panel administrativo.
 - **Objetivo:** publicar el campeonato activo, el ranking general, los mejores
