@@ -1,6 +1,6 @@
 Proyecto FKarting
 
-NewBrand - LogoyPilotos - Actual v1.8.0 
+NewBrand - LogoyPilotos - Actual v1.8.1 
 
 v1.9.0 - Mejor Automatizacion.
 
