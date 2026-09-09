@@ -1,5 +1,5 @@
 
-export const VERSION  = 'v1.6.0'; 
+export const VERSION  = 'v1.7.1';
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 

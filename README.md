@@ -1,10 +1,8 @@
 Proyecto FKarting
 
-NewBrand - LogoyPilotos - Actual v1.6.0 -
+NewBrand - LogoyPilotos - Actual v1.7.1 -
 
-v1.7.0 - Nueva Seccion de Pilotos.
-
-v1.8.0 - (Se posiciono el logo antiguo) Cambio Logo y rebranding. 
+v1.8.0 - Nueva Seccion de Pilotos y cambios en la actual:
 
 v1.9.0 - Mejor Automatizacion.
 
