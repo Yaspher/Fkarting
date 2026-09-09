@@ -110,6 +110,13 @@ a  { text-decoration: none; }
   flex-shrink: 0;
 }
 
+.sidebar-logo-image {
+  display: block;
+  width: 110px;
+  height: auto;
+  max-height: 32px;
+}
+
 .sidebar-logo-title {
   font-family: var(--font-display);
   font-weight: 900;

@@ -1,7 +1,3 @@
-// ══════════════════════════════════════════════
-//  FKarting — app.js  v1.2.0
-//  Solo lógica UI · Todas las queries en Connection.js
-// ══════════════════════════════════════════════
 
 import {
     getRankingVista,
@@ -284,8 +280,11 @@ async function loadPilotos() {
         `).join("");
 
         document.querySelectorAll(".driver-card").forEach(card => {
+            const id = card.dataset.id;
+            const pilot = data.find(p => String(p.Id) === String(id));
             card.addEventListener("click", () => {
-                console.log("Ver piloto:", card.dataset.id);
+                if (pilot) openPilotoModal(pilot);
+                else console.log("Ver piloto:", id);
             });
         });
 
@@ -305,6 +304,101 @@ document.getElementById("btnNextRace").onclick   = () => modal.style.display = "
 document.getElementById("closeModal").onclick    = () => modal.style.display = "none";
 document.getElementById("closeModalBtn").onclick = () => modal.style.display = "none";
 window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+
+
+// ════════════════════════════════════════════════════════════════
+//  MODAL PILOTO — apertura, carga de historial y cierre
+// ════════════════════════════════════════════════════════════════
+const pilotoModal = document.getElementById("pilotoModal");
+const pilotoModalTitle = document.getElementById("pilotoModalTitle");
+const pilotoMeta = document.getElementById("pilotoMeta");
+const pilotoHistory = document.getElementById("pilotoHistory");
+const closePilotoModalBtn = document.getElementById("closePilotoModalBtn");
+const closePilotoModalX = document.getElementById("closePilotoModal");
+
+function escapeHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function openPilotoModal(pilot) {
+    if (!pilotoModal) return;
+    pilotoModal.style.display = "flex";
+    pilotoModalTitle.textContent = (pilot.Nombre ? formatName(pilot.Nombre) : 'Piloto') + (pilot.Numero ? ` · #${pilot.Numero}` : '');
+
+    pilotoMeta.innerHTML = `
+      <div class="driver-stats" style="display:flex;gap:12px;width:100%;justify-content:space-between;padding:6px 0">
+        <div class="driver-stat" style="text-align:left">
+          <div class="driver-stat-value">${pilot.Campeonato ?? 0}</div>
+          <div class="driver-stat-label-WDC">WDC</div>
+        </div>
+        <div class="driver-stat" style="text-align:center">
+          <div class="driver-stat-value">${pilot.Victorias ?? 0}</div>
+          <div class="driver-stat-label">Wins</div>
+        </div>
+        <div class="driver-stat" style="text-align:right">
+          <div class="driver-stat-value">${pilot.Podios ?? 0}</div>
+          <div class="driver-stat-label">Podios</div>
+        </div>
+      </div>
+    `;
+
+    pilotoHistory.innerHTML = `<p class="empty-msg" style="opacity:.6">Cargando historial...</p>`;
+
+    try {
+        const data = await getCarreraVista();
+        const matches = (data || []).filter(r => {
+            const nombre = field(r, "NombrePiloto", "nombrepiloto", "nombre_piloto") || '';
+            return String(nombre).trim().toLowerCase() === String(pilot.Nombre ?? '').trim().toLowerCase();
+        });
+
+        if (!matches.length) {
+            pilotoHistory.innerHTML = `<p class="empty-msg">Este piloto aún no tiene historial registrado.</p>`;
+            return;
+        }
+
+        matches.sort((a, b) => {
+            const fa = field(a, "Fecha", "fecha") || '';
+            const fb = field(b, "Fecha", "fecha") || '';
+            if (fb > fa) return 1;
+            if (fb < fa) return -1;
+            return (parseInt(field(a, "posicion", "Posicion")) || 0) - (parseInt(field(b, "posicion", "Posicion")) || 0);
+        });
+
+        pilotoHistory.innerHTML = matches.map(m => {
+            const fecha = field(m, "Fecha", "fecha");
+            const fechaStr = fecha ? new Date(fecha).toLocaleDateString("es-DO", { day: "numeric", month: "short", year: "numeric" }) : '';
+            const carreraNombre = field(m, "nombre", "Nombre") ?? '';
+            const circuito = field(m, "circuito", "Circuito") ?? '';
+            const posicion = field(m, "posicion", "Posicion") ?? '—';
+            const puntos = field(m, "puntos", "Puntos") ?? 0;
+
+            return `
+            <div class="pilot-history-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+                <div style="flex:1;min-width:0;padding-right:12px">
+                    <div class="pilot-history-carrera" style="font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(carreraNombre)}${circuito ? ' · ' + escapeHtml(circuito) : ''}</div>
+                    <div class="pilot-history-fecha" style="font-size:0.85rem;color:var(--gray-600)">${fechaStr}</div>
+                </div>
+                <div style="text-align:right;min-width:84px">
+                    <div class="pilot-history-pos" style="font-weight:900;font-family:var(--font-display);">${posicion}</div>
+                    <div class="pilot-history-pts" style="color:var(--red-500);font-weight:700">${puntos} pts</div>
+                </div>
+            </div>`;
+        }).join('');
+
+    } catch (err) {
+        console.error("Historial piloto:", err);
+        pilotoHistory.innerHTML = `<p class="empty-msg">Error al cargar historial.<br><small style="opacity:.6">${escapeHtml(err.message || String(err))}</small></p>`;
+    }
+}
+
+function closePilotoModal() {
+    if (!pilotoModal) return;
+    pilotoModal.style.display = "none";
+}
+
+closePilotoModalBtn?.addEventListener("click", closePilotoModal);
+closePilotoModalX?.addEventListener("click", closePilotoModal);
+pilotoModal?.addEventListener("click", e => { if (e.target === pilotoModal) closePilotoModal(); });
 
 
 // ════════════════════════════════════════════════════════════════

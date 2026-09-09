@@ -317,6 +317,59 @@ ul { list-style: none; }
   justify-content: center;
 }
 
+.info-banner {
+  background: linear-gradient(90deg, rgba(127,29,29,0.18), rgba(17,17,17,0.9));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.info-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 0;
+}
+
+.info-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-banner-kicker {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--red-500);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.info-banner-copy h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+  letter-spacing: 0.05em;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.info-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .info-banner-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-banner-copy h3 {
+    font-size: 1.7rem;
+  }
+}
+
 /* Bottom stripe */
 .hero-stripe {
   position: absolute;
@@ -1190,3 +1243,38 @@ ul { list-style: none; }
 @media (max-width: 768px) {
   .logo-wordmark { height: 24px; max-width: 160px; }
 }
+
+/* ============================================================
+   PILOTO MODAL — estilos específicos y responsive
+   ============================================================ */
+
+.pilot-history-row { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.pilot-history-carrera { font-weight: 700; color: var(--white); }
+.pilot-history-fecha { font-size: 0.85rem; color: var(--gray-600); }
+.pilot-history-pos { font-weight: 900; font-family: var(--font-display); }
+.pilot-history-pts { color: var(--red-500); font-weight: 700; }
+
+/* Modal mobile: full-screen and internal scroll */
+@media (max-width: 480px) {
+  #pilotoModal .modal-box {
+    width: 100%;
+    height: 100vh;
+    max-width: 100%;
+    border-radius: 0;
+    padding: 18px 16px 16px;
+    justify-content: flex-start;
+  }
+  #pilotoModal .modal-box { align-items: stretch; }
+  #pilotoModal .modal-box > #pilotoHistory {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    padding-right: 6px;
+  }
+  #pilotoModal .modal-close { top: 10px; right: 10px; }
+  #pilotoModal .modal-title { font-size: 1.1rem; }
+  #pilotoModal .btn-primary { padding: 12px 14px; font-size: 1rem; }
+}
+
+/* Ensure touch targets are large enough */
+#pilotoModal .modal-box .pilot-history-row { min-height: 52px; }
+#pilotoModal .modal-box .pilot-history-row div { min-height: 44px; }
