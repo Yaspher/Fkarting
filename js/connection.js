@@ -1,5 +1,5 @@
 
-export const VERSION  = 'v1.6.0'; 
+export const VERSION  = 'v1.8.0';
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 
@@ -91,6 +91,10 @@ export const getTiempoVista = () =>
 // Columnas conocidas: Id, Nombre, Numero, Campeonato, Victorias, Podios
 export const getPilotosVista = () =>
     sbGet("vista_piloto", "select=*");
+
+// Columnas: Id, Nombre, Numero, Campeonato, Victorias, Podios
+export const getPilotosLegendariosVista = () =>
+    sbGet("vista_pilotos_legendarios", "select=*");
 
 // Columnas conocidas: id_carrera, nombre, circuito, Fecha, posicion, puntos, NombrePiloto
 // Sin order= — Fecha tiene mayúscula y PostgREST es case-sensitive en el parámetro order=

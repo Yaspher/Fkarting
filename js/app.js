@@ -2,6 +2,7 @@
 import {
     getRankingVista,
     getPilotosVista,
+    getPilotosLegendariosVista,
     getTiempoVista,
     getCarreraVista,
     VERSION
@@ -246,51 +247,66 @@ async function loadUltimaCarrera() {
 //  PILOTOS DESTACADOS
 // ════════════════════════════════════════════════════════════════
 
-async function loadPilotos() {
-    const grid = document.getElementById("driversGrid");
-    try {
-        const data = await getPilotosVista();
+function pilotStat(value) {
+    return value === null || value === undefined || Number(value) === 0 ? "~" : value;
+}
 
-        if (!data?.length) {
-            grid.innerHTML = `<p class="empty-msg">No hay pilotos registrados.</p>`;
-            return;
-        }
+function renderPilotos(grid, data, emptyMessage) {
+    if (!data?.length) {
+        grid.innerHTML = `<p class="empty-msg">${emptyMessage}</p>`;
+        return;
+    }
 
-        grid.innerHTML = data.map(d => `
+    grid.innerHTML = data.map(d => `
             <div class="driver-card" data-id="${d.Id}">
                 <div class="driver-num">#${d.Numero ?? "—"}</div>
                 <div class="driver-name">${formatName(d.Nombre)}</div>
                 <div class="driver-stats">
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
+                        <span class="driver-stat-value">${pilotStat(d.Campeonato)}</span>
                         <span class="driver-stat-label-WDC">WDC</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Victorias ?? 0}</span>
+                        <span class="driver-stat-value">${pilotStat(d.Victorias)}</span>
                         <span class="driver-stat-label">WIN</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Podios ?? 0}</span>
+                        <span class="driver-stat-value">${pilotStat(d.Podios)}</span>
                         <span class="driver-stat-label">POLES</span>
                     </div>
                 </div>
             </div>
         `).join("");
 
-        document.querySelectorAll(".driver-card").forEach(card => {
+    grid.querySelectorAll(".driver-card").forEach(card => {
             const id = card.dataset.id;
             const pilot = data.find(p => String(p.Id) === String(id));
             card.addEventListener("click", () => {
                 if (pilot) openPilotoModal(pilot);
                 else console.log("Ver piloto:", id);
             });
-        });
+    });
+}
 
+async function loadPilotos() {
+    const grid = document.getElementById("driversGrid");
+    try {
+        renderPilotos(grid, await getPilotosVista(), "No hay pilotos registrados.");
     } catch (err) {
         console.error("Pilotos:", err);
         grid.innerHTML = `<p class="empty-msg">Error al cargar pilotos.</p>`;
+    }
+}
+
+async function loadPilotosLegendarios() {
+    const grid = document.getElementById("legendaryDriversGrid");
+    try {
+        renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.");
+    } catch (err) {
+        console.error("Pilotos legendarios:", err);
+        grid.innerHTML = `<p class="empty-msg">Error al cargar pilotos legendarios.</p>`;
     }
 }
 
@@ -328,15 +344,15 @@ async function openPilotoModal(pilot) {
     pilotoMeta.innerHTML = `
       <div class="driver-stats" style="display:flex;gap:12px;width:100%;justify-content:space-between;padding:6px 0">
         <div class="driver-stat" style="text-align:left">
-          <div class="driver-stat-value">${pilot.Campeonato ?? 0}</div>
+          <div class="driver-stat-value">${pilotStat(pilot.Campeonato)}</div>
           <div class="driver-stat-label-WDC">WDC</div>
         </div>
         <div class="driver-stat" style="text-align:center">
-          <div class="driver-stat-value">${pilot.Victorias ?? 0}</div>
+          <div class="driver-stat-value">${pilotStat(pilot.Victorias)}</div>
           <div class="driver-stat-label">Wins</div>
         </div>
         <div class="driver-stat" style="text-align:right">
-          <div class="driver-stat-value">${pilot.Podios ?? 0}</div>
+          <div class="driver-stat-value">${pilotStat(pilot.Podios)}</div>
           <div class="driver-stat-label">Podios</div>
         </div>
       </div>
@@ -410,7 +426,8 @@ async function init() {
         loadRanking(),
         loadMejorTiempo(),
         loadUltimaCarrera(),
-        loadPilotos()
+        loadPilotos(),
+        loadPilotosLegendarios()
     ]);
 }
 
