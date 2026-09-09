@@ -112,9 +112,9 @@ a  { text-decoration: none; }
 
 .sidebar-logo-image {
   display: block;
-  width: 110px;
-  height: auto;
-  max-height: 32px;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .sidebar-logo-title {
