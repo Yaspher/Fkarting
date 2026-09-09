@@ -3,7 +3,7 @@
 ## Identidad y estado
 
 - **Nombre:** FKarting.
-- **Versión del proyecto:** v1.7.1.
+- **Versión del proyecto:** v1.8.0.
 - **Tipo:** sitio web estático para un campeonato de karting, con vista
   pública y panel administrativo.
 - **Objetivo:** publicar el campeonato activo, el ranking general, los mejores
@@ -94,6 +94,8 @@ Vistas públicas esperadas:
 - `vista_ranking`
 - `vista_tiempos`
 - `vista_piloto`
+- `vista_pilotos_legendarios` (script pendiente de ejecutar cuando Supabase
+  vuelva a estar disponible)
 - `vista_carrera`
 
 Los nombres y las mayúsculas de las columnas de las vistas deben respetarse,
