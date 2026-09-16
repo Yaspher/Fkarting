@@ -3,7 +3,7 @@
 ## Identidad y estado
 
 - **Nombre:** FKarting.
-- **Versión del proyecto:** v1.8.4.
+- **Versión del proyecto:** v2.0.0.
 - **Tipo:** sitio web estático para un campeonato de karting, con vista
   pública y panel administrativo.
 - **Objetivo:** publicar el campeonato activo, el ranking general, los mejores
@@ -26,8 +26,12 @@ se muestra en los elementos con `data-version`.
 - `js/admin.js` protege y opera el panel administrativo.
 - `css/styles.css` contiene los estilos públicos; `css/admin.css` los estilos
   del panel.
-- El despliegue se realiza mediante GitHub Actions en GitHub Pages al hacer
-  push a `main`, usando `.github/workflows/static.yml`.
+- El despliegue se hace con GitHub Pages mediante la workflow
+  `.github/workflows/jekyll-gh-pages.yml`, que publica directamente el sitio
+  estático al hacer push en la rama `main`.
+- La aplicación no incluye un empaquetador ni una suite de pruebas
+  automatizadas; la verificación disponible en este momento es la validación
+  sintáctica de los scripts con Node (`node --check` en `js/*.js`).
 - Supabase debe estar configurado con las tablas y vistas esperadas antes de
   que la aplicación pueda cargar datos.
 
@@ -127,7 +131,18 @@ de consulta.
 - `doc/AUTOMATION.md`: oportunidades de automatización, validaciones,
   índices, constraints, vistas, seed, pruebas e importación/exportación.
 - `doc/refresh_ranking.sql`: automatización SQL del ranking.
+- `doc/sync_pilot_stats.sql`: trigger que mantiene las victorias y podios
+  históricos de `piloto` sincronizados con todos sus registros de `ranking`.
 
-No hay backend de autenticación, migraciones completas, seed formal, suite de
-pruebas automatizadas ni configuración por entorno. Estas son áreas pendientes
-descritas con más detalle en `AUTOMATION.md`.
+Durante esta verificación se confirma que:
+
+- El proyecto sigue siendo un sitio estático sin backend ni empaquetador.
+- La autenticación administrativa sigue siendo un guard de frontend basado en
+  `sessionStorage["fk_admin_auth"]`, no un sistema real de sesión.
+- `main` es la única fuente automática de producción para GitHub Pages.
+  `QA` se mantiene como rama de pruebas y no publica un segundo sitio.
+- No hay una suite de pruebas automatizadas ni configuración por entorno
+  declarada en el repositorio.
+
+Estas permanecen como áreas pendientes de mejora y deben documentarse con más
+detalle en la planificación del producto y la automatización operativa.
