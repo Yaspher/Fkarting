@@ -555,8 +555,6 @@ async function guardarResultados() {
 
         await updateCarrera(estadoConfirmacion.carreraId, { completada: true });
 
-        await actualizarRankingAuto(estadoConfirmacion.campeonatoId, estadoConfirmacion.resultados);
-
         showMsg("saveMsgIngresarResultados", "✅ Carrera confirmada. Resultados guardados.");
 
         setTimeout(() => {
@@ -576,41 +574,6 @@ async function guardarResultados() {
         console.error(err);
         btnGuardar.disabled    = false;
         btnGuardar.textContent = textOrig;
-    }
-}
-
-/**
- * Auto-actualiza ranking después de guardar resultados
- */
-async function actualizarRankingAuto(id_campeonato, resultados) {
-    try {
-        const ranking    = await getRankingByCampeonato(id_campeonato);
-        const rankingMap = Object.fromEntries(ranking.map(r => [r.piloto.id_piloto, r]));
-
-        for (const res of resultados) {
-            if (!res.id_piloto) continue;
-
-            const rankItem = rankingMap[res.id_piloto];
-            if (rankItem) {
-                await updateRanking(rankItem.id_ranking, {
-                    puntos:    (rankItem.ran_puntos    || 0) + res.res_puntos,
-                    carreras:  (rankItem.ran_carreras  || 0) + 1,
-                    victorias: (rankItem.ran_victorias || 0) + (res.posicion === 1 ? 1 : 0),
-                    podios:    (rankItem.ran_podios    || 0) + (res.posicion <= 3 ? 1 : 0)
-                });
-            } else {
-                await createRanking({
-                    id_campeonato,
-                    id_piloto: res.id_piloto,
-                    puntos:    res.res_puntos,
-                    carreras:  1,
-                    victorias: res.posicion === 1 ? 1 : 0,
-                    podios:    res.posicion <= 3 ? 1 : 0
-                });
-            }
-        }
-    } catch (err) {
-        console.warn("Ranking auto-update falló (no crítico):", err);
     }
 }
 

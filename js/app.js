@@ -3,7 +3,8 @@ import {
     getRankingVista,
     getPilotosVista,
     getPilotosLegendariosVista,
-    getTiempoVista,
+    getTop5GlobalVista,
+    getTop5UltimaCarreraVista,
     getCarreraVista,
     VERSION
 } from './connection.js';
@@ -135,42 +136,53 @@ async function loadRanking() {
 
 
 // ════════════════════════════════════════════════════════════════
-//  MEJOR TIEMPO
+//  TOP 5 DE TIEMPOS
 // ════════════════════════════════════════════════════════════════
 
-async function loadMejorTiempo() {
-    const container = document.getElementById("mejorTiempoList");
+function renderTop5(container, data, emptyMessage) {
+    if (!data?.length) {
+        container.innerHTML = `<p class="empty-msg">${emptyMessage}</p>`;
+        return;
+    }
+
+    const sorted = [...data].sort((a, b) =>
+        intervalToSec(field(a, "Tiempos", "tiempos"))
+      - intervalToSec(field(b, "Tiempos", "tiempos"))
+    ).slice(0, 5);
+
+    container.innerHTML = sorted.map((d, i) => {
+        const tiempos      = field(d, "Tiempos", "tiempos");
+        const nombrePiloto = field(d, "NombrePiloto", "nombrepiloto", "nombre_piloto");
+        const vueltaRapida = field(d, "VueltaRapida", "vueltarapida", "vuelta_rapida");
+        const esRapida     = vueltaRapida === true || vueltaRapida === "true";
+
+        return `
+        <div class="tiempo-row top5-row top5-pos-${i + 1}${esRapida ? " vuelta-rapida" : ""}">
+            <div class="tiempo-pos">${i + 1}</div>
+            <div class="tiempo-nombre">${nombrePiloto ?? "—"}</div>
+            ${esRapida ? `<span class="tiempo-badge">⚡ Vuelta Rápida</span>` : ""}
+            <div class="tiempo-valor">${formatTiempo(tiempos)}</div>
+        </div>`;
+    }).join("");
+}
+
+async function loadTop5Global() {
+    const container = document.getElementById("top5GlobalList");
     try {
-        const data = await getTiempoVista();
-
-        if (!data?.length) {
-            container.innerHTML = `<p class="empty-msg">Sin tiempos registrados.</p>`;
-            return;
-        }
-
-        const sorted = [...data].sort((a, b) =>
-            intervalToSec(field(a, "Tiempos", "tiempos"))
-          - intervalToSec(field(b, "Tiempos", "tiempos"))
-        );
-
-        container.innerHTML = sorted.map((d, i) => {
-            const tiempos      = field(d, "Tiempos",      "tiempos");
-            const nombrePiloto = field(d, "NombrePiloto", "nombrepiloto", "nombre_piloto");
-            const vueltaRapida = field(d, "VueltaRapida", "vueltarapida", "vuelta_rapida");
-            const esRapida     = vueltaRapida === true || vueltaRapida === "true";
-
-            return `
-            <div class="tiempo-row ${esRapida ? "vuelta-rapida" : ""}">
-                <div class="tiempo-pos">${i + 1}</div>
-                <div class="tiempo-nombre">${nombrePiloto ?? "—"}</div>
-                ${esRapida ? `<span class="tiempo-badge">⚡ Vuelta Rápida</span>` : ""}
-                <div class="tiempo-valor">${formatTiempo(tiempos)}</div>
-            </div>`;
-        }).join("");
-
+        renderTop5(container, await getTop5GlobalVista(), "Sin tiempos globales registrados.");
     } catch (err) {
-        console.error("Mejor Tiempo:", err);
-        container.innerHTML = `<p class="empty-msg">Error al cargar tiempos.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
+        console.error("Top 5 globales:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar Top 5 globales.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
+    }
+}
+
+async function loadTop5UltimaCarrera() {
+    const container = document.getElementById("top5UltimaCarreraList");
+    try {
+        renderTop5(container, await getTop5UltimaCarreraVista(), "Sin tiempos registrados para la última carrera.");
+    } catch (err) {
+        console.error("Top 5 última carrera:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar Top 5 de la última carrera.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
     }
 }
 
@@ -257,32 +269,41 @@ function renderPilotos(grid, data, emptyMessage) {
         return;
     }
 
-    grid.innerHTML = data.map(d => `
-            <div class="driver-card" data-id="${d.Id}">
-                <div class="driver-num">#${d.Numero ?? "—"}</div>
-                <div class="driver-name">${formatName(d.Nombre)}</div>
+    grid.innerHTML = data.map(d => {
+        const id = field(d, "Id", "id");
+        const nombre = field(d, "Nombre", "nombre");
+        const numero = field(d, "Numero", "numero");
+        const campeonato = field(d, "Campeonato", "campeonato");
+        const victorias = field(d, "Victorias", "victorias");
+        const podios = field(d, "Podios", "podios");
+
+        return `
+            <div class="driver-card" data-id="${id ?? ""}">
+                <div class="driver-num">#${numero ?? "—"}</div>
+                <div class="driver-name">${formatName(nombre)}</div>
                 <div class="driver-stats">
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${pilotStat(d.Campeonato)}</span>
+                        <span class="driver-stat-value">${pilotStat(campeonato)}</span>
                         <span class="driver-stat-label-WDC">WDC</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${pilotStat(d.Victorias)}</span>
+                        <span class="driver-stat-value">${pilotStat(victorias)}</span>
                         <span class="driver-stat-label">WIN</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${pilotStat(d.Podios)}</span>
+                        <span class="driver-stat-value">${pilotStat(podios)}</span>
                         <span class="driver-stat-label">POLES</span>
                     </div>
                 </div>
             </div>
-        `).join("");
+        `;
+    }).join("");
 
     grid.querySelectorAll(".driver-card").forEach(card => {
             const id = card.dataset.id;
-            const pilot = data.find(p => String(p.Id) === String(id));
+            const pilot = data.find(p => String(field(p, "Id", "id")) === String(id));
             card.addEventListener("click", () => {
                 if (pilot) openPilotoModal(pilot);
                 else console.log("Ver piloto:", id);
@@ -306,7 +327,16 @@ async function loadPilotosLegendarios() {
         renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.");
     } catch (err) {
         console.error("Pilotos legendarios:", err);
-        grid.innerHTML = `<p class="empty-msg">Error al cargar pilotos legendarios.</p>`;
+        const message = String(err?.message ?? "");
+        const permissionError = message.toLowerCase().includes("permission denied");
+        grid.innerHTML = `
+            <p class="empty-msg">
+                ${permissionError
+                    ? "La vista de pilotos legendarios no tiene permisos de lectura en Supabase."
+                    : "Error al cargar pilotos legendarios."}
+                <br>
+                <small style="opacity:.6">${escapeHtml(message)}</small>
+            </p>`;
     }
 }
 
@@ -424,7 +454,8 @@ pilotoModal?.addEventListener("click", e => { if (e.target === pilotoModal) clos
 async function init() {
     await Promise.all([
         loadRanking(),
-        loadMejorTiempo(),
+        loadTop5Global(),
+        loadTop5UltimaCarrera(),
         loadUltimaCarrera(),
         loadPilotos(),
         loadPilotosLegendarios()

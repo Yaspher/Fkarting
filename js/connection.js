@@ -1,5 +1,5 @@
 
-export const VERSION  = 'v1.8.4';
+export const VERSION  = 'v2.0.0';
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 
@@ -87,6 +87,12 @@ export const getRankingVista = () =>
 // Columnas conocidas: SecTiempo, SecCarrera, SecPiloto, Tiempos, VueltaRapida, NombrePiloto
 export const getTiempoVista = () =>
     sbGet("vista_tiempos", "select=*");
+
+export const getTop5GlobalVista = () =>
+    sbGet("vista_top5_global", "select=*");
+
+export const getTop5UltimaCarreraVista = () =>
+    sbGet("vista_top5_ultima_carrera", "select=*");
 
 // Columnas conocidas: Id, Nombre, Numero, Campeonato, Victorias, Podios
 export const getPilotosVista = () =>
