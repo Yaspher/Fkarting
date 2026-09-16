@@ -630,6 +630,24 @@ ul { list-style: none; }
   background: rgba(225, 6, 0, 0.07);
 }
 
+.top5-row.top5-pos-1 {
+  border-color: var(--gold);
+  background: rgba(234,179,8,0.06);
+  box-shadow: 0 0 18px rgba(234,179,8,0.08);
+}
+
+.top5-row.top5-pos-2 {
+  border-color: rgba(209,213,219,0.65);
+}
+
+.top5-row.top5-pos-3 {
+  border-color: rgba(217,119,6,0.65);
+}
+
+.top5-row.top5-pos-1 .tiempo-pos { color: var(--gold); }
+.top5-row.top5-pos-2 .tiempo-pos { color: var(--silver); }
+.top5-row.top5-pos-3 .tiempo-pos { color: var(--bronze); }
+
 .tiempo-pos {
   font-family: var(--font-display);
   font-size: 22px;
