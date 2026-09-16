@@ -1,16 +1,17 @@
-// ══════════════════════════════════════════════
-//  FKarting — app.js  v1.2.0
-//  Solo lógica UI · Todas las queries en Connection.js
-// ══════════════════════════════════════════════
 
 import {
     getRankingVista,
     getPilotosVista,
-    getTiempoVista,
-    getCarreraVista
+    getPilotosLegendariosVista,
+    getTop5GlobalVista,
+    getTop5UltimaCarreraVista,
+    getCarreraVista,
+    VERSION
 } from './connection.js';
 
-
+document.querySelectorAll('[data-version]')
+  .forEach(el => el.textContent = VERSION);
+  
 // ════════════════════════════════════════════════════════════════
 //  HELPERS
 // ════════════════════════════════════════════════════════════════
@@ -135,42 +136,53 @@ async function loadRanking() {
 
 
 // ════════════════════════════════════════════════════════════════
-//  MEJOR TIEMPO
+//  TOP 5 DE TIEMPOS
 // ════════════════════════════════════════════════════════════════
 
-async function loadMejorTiempo() {
-    const container = document.getElementById("mejorTiempoList");
+function renderTop5(container, data, emptyMessage) {
+    if (!data?.length) {
+        container.innerHTML = `<p class="empty-msg">${emptyMessage}</p>`;
+        return;
+    }
+
+    const sorted = [...data].sort((a, b) =>
+        intervalToSec(field(a, "Tiempos", "tiempos"))
+      - intervalToSec(field(b, "Tiempos", "tiempos"))
+    ).slice(0, 5);
+
+    container.innerHTML = sorted.map((d, i) => {
+        const tiempos      = field(d, "Tiempos", "tiempos");
+        const nombrePiloto = field(d, "NombrePiloto", "nombrepiloto", "nombre_piloto");
+        const vueltaRapida = field(d, "VueltaRapida", "vueltarapida", "vuelta_rapida");
+        const esRapida     = vueltaRapida === true || vueltaRapida === "true";
+
+        return `
+        <div class="tiempo-row top5-row top5-pos-${i + 1}${esRapida ? " vuelta-rapida" : ""}">
+            <div class="tiempo-pos">${i + 1}</div>
+            <div class="tiempo-nombre">${nombrePiloto ?? "—"}</div>
+            ${esRapida ? `<span class="tiempo-badge">⚡ Vuelta Rápida</span>` : ""}
+            <div class="tiempo-valor">${formatTiempo(tiempos)}</div>
+        </div>`;
+    }).join("");
+}
+
+async function loadTop5Global() {
+    const container = document.getElementById("top5GlobalList");
     try {
-        const data = await getTiempoVista();
-
-        if (!data?.length) {
-            container.innerHTML = `<p class="empty-msg">Sin tiempos registrados.</p>`;
-            return;
-        }
-
-        const sorted = [...data].sort((a, b) =>
-            intervalToSec(field(a, "Tiempos", "tiempos"))
-          - intervalToSec(field(b, "Tiempos", "tiempos"))
-        );
-
-        container.innerHTML = sorted.map((d, i) => {
-            const tiempos      = field(d, "Tiempos",      "tiempos");
-            const nombrePiloto = field(d, "NombrePiloto", "nombrepiloto", "nombre_piloto");
-            const vueltaRapida = field(d, "VueltaRapida", "vueltarapida", "vuelta_rapida");
-            const esRapida     = vueltaRapida === true || vueltaRapida === "true";
-
-            return `
-            <div class="tiempo-row ${esRapida ? "vuelta-rapida" : ""}">
-                <div class="tiempo-pos">${i + 1}</div>
-                <div class="tiempo-nombre">${nombrePiloto ?? "—"}</div>
-                ${esRapida ? `<span class="tiempo-badge">⚡ Vuelta Rápida</span>` : ""}
-                <div class="tiempo-valor">${formatTiempo(tiempos)}</div>
-            </div>`;
-        }).join("");
-
+        renderTop5(container, await getTop5GlobalVista(), "Sin tiempos globales registrados.");
     } catch (err) {
-        console.error("Mejor Tiempo:", err);
-        container.innerHTML = `<p class="empty-msg">Error al cargar tiempos.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
+        console.error("Top 5 globales:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar Top 5 globales.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
+    }
+}
+
+async function loadTop5UltimaCarrera() {
+    const container = document.getElementById("top5UltimaCarreraList");
+    try {
+        renderTop5(container, await getTop5UltimaCarreraVista(), "Sin tiempos registrados para la última carrera.");
+    } catch (err) {
+        console.error("Top 5 última carrera:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar Top 5 de la última carrera.<br><small style="opacity:.5;font-size:.75rem">${err.message}</small></p>`;
     }
 }
 
@@ -247,48 +259,84 @@ async function loadUltimaCarrera() {
 //  PILOTOS DESTACADOS
 // ════════════════════════════════════════════════════════════════
 
-async function loadPilotos() {
-    const grid = document.getElementById("driversGrid");
-    try {
-        const data = await getPilotosVista();
+function pilotStat(value) {
+    return value === null || value === undefined || Number(value) === 0 ? "~" : value;
+}
 
-        if (!data?.length) {
-            grid.innerHTML = `<p class="empty-msg">No hay pilotos registrados.</p>`;
-            return;
-        }
+function renderPilotos(grid, data, emptyMessage) {
+    if (!data?.length) {
+        grid.innerHTML = `<p class="empty-msg">${emptyMessage}</p>`;
+        return;
+    }
 
-        grid.innerHTML = data.map(d => `
-            <div class="driver-card" data-id="${d.Id}">
-                <div class="driver-num">#${d.Numero ?? "—"}</div>
-                <div class="driver-name">${formatName(d.Nombre)}</div>
+    grid.innerHTML = data.map(d => {
+        const id = field(d, "Id", "id");
+        const nombre = field(d, "Nombre", "nombre");
+        const numero = field(d, "Numero", "numero");
+        const campeonato = field(d, "Campeonato", "campeonato");
+        const victorias = field(d, "Victorias", "victorias");
+        const podios = field(d, "Podios", "podios");
+
+        return `
+            <div class="driver-card" data-id="${id ?? ""}">
+                <div class="driver-num">#${numero ?? "—"}</div>
+                <div class="driver-name">${formatName(nombre)}</div>
                 <div class="driver-stats">
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Campeonato ?? 0}</span>
+                        <span class="driver-stat-value">${pilotStat(campeonato)}</span>
                         <span class="driver-stat-label-WDC">WDC</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Victorias ?? 0}</span>
+                        <span class="driver-stat-value">${pilotStat(victorias)}</span>
                         <span class="driver-stat-label">WIN</span>
                     </div>
                     <div class="driver-stat-divider"></div>
                     <div class="driver-stat">
-                        <span class="driver-stat-value">${d.Podios ?? 0}</span>
+                        <span class="driver-stat-value">${pilotStat(podios)}</span>
                         <span class="driver-stat-label">POLES</span>
                     </div>
                 </div>
             </div>
-        `).join("");
+        `;
+    }).join("");
 
-        document.querySelectorAll(".driver-card").forEach(card => {
+    grid.querySelectorAll(".driver-card").forEach(card => {
+            const id = card.dataset.id;
+            const pilot = data.find(p => String(field(p, "Id", "id")) === String(id));
             card.addEventListener("click", () => {
-                console.log("Ver piloto:", card.dataset.id);
+                if (pilot) openPilotoModal(pilot);
+                else console.log("Ver piloto:", id);
             });
-        });
+    });
+}
 
+async function loadPilotos() {
+    const grid = document.getElementById("driversGrid");
+    try {
+        renderPilotos(grid, await getPilotosVista(), "No hay pilotos registrados.");
     } catch (err) {
         console.error("Pilotos:", err);
         grid.innerHTML = `<p class="empty-msg">Error al cargar pilotos.</p>`;
+    }
+}
+
+async function loadPilotosLegendarios() {
+    const grid = document.getElementById("legendaryDriversGrid");
+    try {
+        renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.");
+    } catch (err) {
+        console.error("Pilotos legendarios:", err);
+        const message = String(err?.message ?? "");
+        const permissionError = message.toLowerCase().includes("permission denied");
+        grid.innerHTML = `
+            <p class="empty-msg">
+                ${permissionError
+                    ? "La vista de pilotos legendarios no tiene permisos de lectura en Supabase."
+                    : "Error al cargar pilotos legendarios."}
+                <br>
+                <small style="opacity:.6">${escapeHtml(message)}</small>
+            </p>`;
     }
 }
 
@@ -305,15 +353,112 @@ window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 
 
 // ════════════════════════════════════════════════════════════════
+//  MODAL PILOTO — apertura, carga de historial y cierre
+// ════════════════════════════════════════════════════════════════
+const pilotoModal = document.getElementById("pilotoModal");
+const pilotoModalTitle = document.getElementById("pilotoModalTitle");
+const pilotoMeta = document.getElementById("pilotoMeta");
+const pilotoHistory = document.getElementById("pilotoHistory");
+const closePilotoModalBtn = document.getElementById("closePilotoModalBtn");
+const closePilotoModalX = document.getElementById("closePilotoModal");
+
+function escapeHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function openPilotoModal(pilot) {
+    if (!pilotoModal) return;
+    pilotoModal.style.display = "flex";
+    pilotoModalTitle.textContent = (pilot.Nombre ? formatName(pilot.Nombre) : 'Piloto') + (pilot.Numero ? ` · #${pilot.Numero}` : '');
+
+    pilotoMeta.innerHTML = `
+      <div class="driver-stats" style="display:flex;gap:12px;width:100%;justify-content:space-between;padding:6px 0">
+        <div class="driver-stat" style="text-align:left">
+          <div class="driver-stat-value">${pilotStat(pilot.Campeonato)}</div>
+          <div class="driver-stat-label-WDC">WDC</div>
+        </div>
+        <div class="driver-stat" style="text-align:center">
+          <div class="driver-stat-value">${pilotStat(pilot.Victorias)}</div>
+          <div class="driver-stat-label">Wins</div>
+        </div>
+        <div class="driver-stat" style="text-align:right">
+          <div class="driver-stat-value">${pilotStat(pilot.Podios)}</div>
+          <div class="driver-stat-label">Podios</div>
+        </div>
+      </div>
+    `;
+
+    pilotoHistory.innerHTML = `<p class="empty-msg" style="opacity:.6">Cargando historial...</p>`;
+
+    try {
+        const data = await getCarreraVista();
+        const matches = (data || []).filter(r => {
+            const nombre = field(r, "NombrePiloto", "nombrepiloto", "nombre_piloto") || '';
+            return String(nombre).trim().toLowerCase() === String(pilot.Nombre ?? '').trim().toLowerCase();
+        });
+
+        if (!matches.length) {
+            pilotoHistory.innerHTML = `<p class="empty-msg">Este piloto aún no tiene historial registrado.</p>`;
+            return;
+        }
+
+        matches.sort((a, b) => {
+            const fa = field(a, "Fecha", "fecha") || '';
+            const fb = field(b, "Fecha", "fecha") || '';
+            if (fb > fa) return 1;
+            if (fb < fa) return -1;
+            return (parseInt(field(a, "posicion", "Posicion")) || 0) - (parseInt(field(b, "posicion", "Posicion")) || 0);
+        });
+
+        pilotoHistory.innerHTML = matches.map(m => {
+            const fecha = field(m, "Fecha", "fecha");
+            const fechaStr = fecha ? new Date(fecha).toLocaleDateString("es-DO", { day: "numeric", month: "short", year: "numeric" }) : '';
+            const carreraNombre = field(m, "nombre", "Nombre") ?? '';
+            const circuito = field(m, "circuito", "Circuito") ?? '';
+            const posicion = field(m, "posicion", "Posicion") ?? '—';
+            const puntos = field(m, "puntos", "Puntos") ?? 0;
+
+            return `
+            <div class="pilot-history-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+                <div style="flex:1;min-width:0;padding-right:12px">
+                    <div class="pilot-history-carrera" style="font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(carreraNombre)}${circuito ? ' · ' + escapeHtml(circuito) : ''}</div>
+                    <div class="pilot-history-fecha" style="font-size:0.85rem;color:var(--gray-600)">${fechaStr}</div>
+                </div>
+                <div style="text-align:right;min-width:84px">
+                    <div class="pilot-history-pos" style="font-weight:900;font-family:var(--font-display);">${posicion}</div>
+                    <div class="pilot-history-pts" style="color:var(--red-500);font-weight:700">${puntos} pts</div>
+                </div>
+            </div>`;
+        }).join('');
+
+    } catch (err) {
+        console.error("Historial piloto:", err);
+        pilotoHistory.innerHTML = `<p class="empty-msg">Error al cargar historial.<br><small style="opacity:.6">${escapeHtml(err.message || String(err))}</small></p>`;
+    }
+}
+
+function closePilotoModal() {
+    if (!pilotoModal) return;
+    pilotoModal.style.display = "none";
+}
+
+closePilotoModalBtn?.addEventListener("click", closePilotoModal);
+closePilotoModalX?.addEventListener("click", closePilotoModal);
+pilotoModal?.addEventListener("click", e => { if (e.target === pilotoModal) closePilotoModal(); });
+
+
+// ════════════════════════════════════════════════════════════════
 //  ARRANCAR
 // ════════════════════════════════════════════════════════════════
 
 async function init() {
     await Promise.all([
         loadRanking(),
-        loadMejorTiempo(),
+        loadTop5Global(),
+        loadTop5UltimaCarrera(),
         loadUltimaCarrera(),
-        loadPilotos()
+        loadPilotos(),
+        loadPilotosLegendarios()
     ]);
 }
 

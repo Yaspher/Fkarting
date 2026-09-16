@@ -9,8 +9,11 @@
     <meta property="og:title" content="FKarting — Campeonato 2026">
     <meta property="og:description" content="Velocidad. Precisión. Competencia.">
     <meta property="og:type" content="website">
-    <!-- ✅ Evita petición 404 de favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2'><path d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/><line x1='4' y1='22' x2='4' y2='15'/></svg>">
+    <meta property="og:url" content="https://www.fkarting.com">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
@@ -20,22 +23,22 @@
 <!-- ── NAVBAR ── -->
 <header class="navbar">
     <div class="container navbar-inner">
-        <div class="logo">
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-                    <line x1="4" y1="22" x2="4" y2="15"/>
-                </svg>
-            </div>
-            <span class="logo-text">FKARTING</span>
-        </div>
+        <a href="index.html" class="logo">
+            <picture>
+                <source srcset="img/fkarting-logo-principal.webp" type="image/webp">
+                <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+            </picture>
+        </a>
         <nav>
             <ul>
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="#ranking">Ranking</a></li>
-                <li><a href="#mejor-tiempo">Mejor Tiempo</a></li>
-                <li><a href="#resultados">Resultados</a></li>
+                <li><a href="#top5-global">Top 5 Globales</a></li>
+                <li><a href="#top5-ultima-carrera">Top 5 - Última Carrera</a></li>
+                <li><a href="#resultados">Puntos última carrera</a></li>
+                <li><a href="#pilotoslegendarios">Pilotos Legendarios</a></li>
                 <li><a href="#pilotos">Pilotos</a></li>
+                <li><a href="ayuda.html">Ayuda</a></li>
             </ul>
         </nav>
         <a href="login.html" class="navbar-admin">
@@ -56,10 +59,13 @@
     <nav class="nav-mobile" id="navMobile">
         <a href="index.html">Inicio</a>
         <a href="#ranking">Ranking</a>
-        <a href="#mejor-tiempo">Mejor Tiempo</a>
-        <a href="#resultados">Resultados</a>
+        <a href="#top5-global">Top 5 Globales</a>
+        <a href="#top5-ultima-carrera">Top 5 - Última Carrera</a>
+        <a href="#resultados">Puntos última carrera</a>
+        <a href="#pilotoslegendarios">Pilotos Legendarios</a>
         <a href="#pilotos">Pilotos</a>
-        <a href="login.html">Admin</a>
+        <a href="ayuda.html">Ayuda</a>
+        <!-- <a href="login.html">Admin</a> -->
     </nav>
 </header>
 
@@ -68,21 +74,37 @@
     <div class="hero-overlay"></div>
     <div class="container hero-inner">
         <p class="hero-eyebrow">Temporada Oficial</p>
-        <h1 class="hero-title">Campeonato<br><span>FKarting</span></h1>
+        <picture>
+            <source srcset="img/fkarting-logo-principal.webp" type="image/webp">
+            <img src="img/fkarting-logo-principal.png" alt="FKarting" class="hero-logo">
+        </picture>
         <p class="hero-sub">Velocidad. Precisión. Competencia.</p>
         <div class="hero-actions">
+            <a href="ayuda.html" class="btn-primary">Guía rápida</a>
             <button id="btnNextRace" class="btn-primary">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <polyline points="12 6 12 12 16 14"/>
                 </svg>
-                Próxima Carrera
+                Próxima carrera
             </button>
-            <a href="#ranking" class="btn-ghost">Ver Ranking</a>
-            <a href="ayuda.html" class="btn-ghost">Ayuda</a>
+            <a href="#ranking" class="btn-ghost">Ver ranking</a>
+            <a href="ruleta.html" class="btn-ghost">Ruleta</a>
         </div>
     </div>
     <div class="hero-stripe"></div>
+</section>
+
+<section class="info-banner">
+    <div class="container info-banner-inner">
+        <div class="info-banner-copy">
+            <span class="info-banner-kicker">¿Necesitas ayuda?</span>
+            <h3>Consulta la guía del campeonato</h3>
+        </div>
+        <div class="info-banner-actions">
+            <a href="ayuda.html" class="btn-primary">Ver ayuda</a>
+        </div>
+    </div>
 </section>
 
 <!-- ── RANKING ── -->
@@ -96,34 +118,57 @@
     </div>
 </section>
 
-<!-- ── MEJOR TIEMPO ── -->
-<section id="mejor-tiempo" class="section">
+<!-- ── TOP 5 GLOBALES ── -->
+<section id="top5-global" class="section">
   <div class="container">
     <div class="section-head">
       <div class="section-head-line"></div>
-      <h2>Mejor Tiempo</h2>
+      <h2>Top 5 Globales</h2>
     </div>
-    <div id="mejorTiempoList" class="tiempos-list"></div>
+    <div id="top5GlobalList" class="tiempos-list top5-list"></div>
   </div>
 </section>
 
-<!-- ── ÚLTIMA CARRERA ── -->
+<!-- ── TOP 5 ÚLTIMA CARRERA ── -->
+<section id="top5-ultima-carrera" class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head-line"></div>
+      <h2>Top 5 - Última Carrera</h2>
+    </div>
+    <div id="top5UltimaCarreraList" class="tiempos-list top5-list"></div>
+  </div>
+</section>
+
+<!-- ── PUNTOS DE LA ÚLTIMA CARRERA ── -->
 <section id="resultados" class="section section-dark">
     <div class="container">
         <div class="section-head">
             <div class="section-head-line"></div>
-            <h2>Última Carrera</h2>
+            <h2>Puntos de la última carrera</h2>
         </div>
         <div id="resultsList" class="results-list"></div>
     </div>
 </section>
+
+<!-- ── PILOTOS LEGENDARIOS ── -->
+<section id="pilotoslegendarios" class="section">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Pilotos Legendarios</h2>
+        </div>
+        <div class="drivers-grid" id="legendaryDriversGrid"></div>
+    </div>
+</section>
+
 
 <!-- ── PILOTOS ── -->
 <section id="pilotos" class="section">
     <div class="container">
         <div class="section-head">
             <div class="section-head-line"></div>
-            <h2>Pilotos Destacados</h2>
+            <h2>Pilotos</h2>
         </div>
         <div class="drivers-grid" id="driversGrid"></div>
     </div>
@@ -133,16 +178,9 @@
 <footer class="footer">
     <div class="container footer-inner">
         <div class="footer-logo">
-            <div class="logo-icon logo-icon-sm">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
-                    <line x1="4" y1="22" x2="4" y2="15"/>
-                </svg>
-            </div>
-            <span class="logo-text">FKARTING</span>
+            <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark" style="height:22px">
         </div>
-        <!-- ✅ Versión actualizada a v1.0.0 -->
-        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.2.5</p>
+        <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados — <span data-version></span></p>
         <!-- ✅ Enlaza al login, no directo al admin -->
         <a href="login.html" class="footer-admin">Administración</a>
     </div>
@@ -182,6 +220,24 @@
             </div>
         </div>
         <button class="btn-primary btn-full" id="closeModalBtn">Cerrar</button>
+    </div>
+</div>
+
+<!-- ── MODAL Piloto ── -->
+<div id="pilotoModal" class="modal">
+    <div class="modal-box">
+        <button class="modal-close" id="closePilotoModal" aria-label="Cerrar modal piloto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M6 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1"/></svg>
+        </div>
+        <h2 class="modal-title" id="pilotoModalTitle">Piloto</h2>
+        <div id="pilotoMeta" class="modal-fields" style="padding:12px 0 18px; border:none"></div>
+        <div id="pilotoHistory" style="width:100%;"></div>
+        <button class="btn-primary btn-full" id="closePilotoModalBtn">Cerrar</button>
     </div>
 </div>
 

@@ -296,6 +296,12 @@ ul { list-style: none; }
   display: block;
 }
 
+.hero-logo {
+  width: clamp(280px, 42vw, 620px);
+  height: auto;
+  filter: drop-shadow(0 6px 28px rgba(220,38,38,0.35));
+}
+
 .hero-sub {
   font-size: 1.05rem;
   color: var(--gray-400);
@@ -309,6 +315,59 @@ ul { list-style: none; }
   margin-top: 16px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.info-banner {
+  background: linear-gradient(90deg, rgba(127,29,29,0.18), rgba(17,17,17,0.9));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.info-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 0;
+}
+
+.info-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-banner-kicker {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--red-500);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.info-banner-copy h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+  letter-spacing: 0.05em;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.info-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .info-banner-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-banner-copy h3 {
+    font-size: 1.7rem;
+  }
 }
 
 /* Bottom stripe */
@@ -570,6 +629,24 @@ ul { list-style: none; }
   border-color: #e10600;
   background: rgba(225, 6, 0, 0.07);
 }
+
+.top5-row.top5-pos-1 {
+  border-color: var(--gold);
+  background: rgba(234,179,8,0.06);
+  box-shadow: 0 0 18px rgba(234,179,8,0.08);
+}
+
+.top5-row.top5-pos-2 {
+  border-color: rgba(209,213,219,0.65);
+}
+
+.top5-row.top5-pos-3 {
+  border-color: rgba(217,119,6,0.65);
+}
+
+.top5-row.top5-pos-1 .tiempo-pos { color: var(--gold); }
+.top5-row.top5-pos-2 .tiempo-pos { color: var(--silver); }
+.top5-row.top5-pos-3 .tiempo-pos { color: var(--bronze); }
 
 .tiempo-pos {
   font-family: var(--font-display);
@@ -1128,7 +1205,7 @@ ul { list-style: none; }
   .hamburger    { display: flex; }
 
   .hero { padding: 90px 0 70px; }
-  .hero-title { font-size: clamp(2.8rem, 14vw, 5rem); }
+  .hero-logo { width: clamp(220px, 60vw, 380px); }
 
   .section { padding: 56px 0; }
 
@@ -1173,3 +1250,49 @@ ul { list-style: none; }
   .drivers-grid { grid-template-columns: 1fr; }
   .modal-box    { padding: 28px 20px 22px; }
 }
+
+.logo-wordmark {
+  height: 30px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  display: block;
+}
+@media (max-width: 768px) {
+  .logo-wordmark { height: 24px; max-width: 160px; }
+}
+
+/* ============================================================
+   PILOTO MODAL — estilos específicos y responsive
+   ============================================================ */
+
+.pilot-history-row { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.pilot-history-carrera { font-weight: 700; color: var(--white); }
+.pilot-history-fecha { font-size: 0.85rem; color: var(--gray-600); }
+.pilot-history-pos { font-weight: 900; font-family: var(--font-display); }
+.pilot-history-pts { color: var(--red-500); font-weight: 700; }
+
+/* Modal mobile: full-screen and internal scroll */
+@media (max-width: 480px) {
+  #pilotoModal .modal-box {
+    width: 100%;
+    height: 100vh;
+    max-width: 100%;
+    border-radius: 0;
+    padding: 18px 16px 16px;
+    justify-content: flex-start;
+  }
+  #pilotoModal .modal-box { align-items: stretch; }
+  #pilotoModal .modal-box > #pilotoHistory {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    padding-right: 6px;
+  }
+  #pilotoModal .modal-close { top: 10px; right: 10px; }
+  #pilotoModal .modal-title { font-size: 1.1rem; }
+  #pilotoModal .btn-primary { padding: 12px 14px; font-size: 1rem; }
+}
+
+/* Ensure touch targets are large enough */
+#pilotoModal .modal-box .pilot-history-row { min-height: 52px; }
+#pilotoModal .modal-box .pilot-history-row div { min-height: 44px; }

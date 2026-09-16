@@ -1,22 +1,5 @@
-// ══════════════════════════════════════════════════════════════
-//  FKarting — Connection.js  v1.2.0
-//  Capa de Acceso a Datos (DAL)
-//  Único archivo que habla con Supabase.
-//
-//  SEGURIDAD: La key sb_publishable es pública por diseño en Supabase.
-//  La seguridad real depende de Row Level Security (RLS) activo
-//  en todas las tablas. Verificar en el dashboard de Supabase.
-//
-//  VISTAS DISPONIBLES:
-//    - vista_ranking   → columnas: Campeonato, Piloto, Puntos, Vitorias, Podios
-//    - vista_tiempos   → columnas: SecTiempo, SecCarrera, SecPiloto, Tiempos, VueltaRapida, NombrePiloto
-//    - vista_piloto    → columnas: Id, Nombre, Numero, Campeonato, Victorias, Podios
-//    - vista_carrera   → columnas: id_carrera, nombre, circuito, Fecha, posicion, puntos, NombrePiloto
-//
-//  NOTA: Todas las vistas usan select=* para evitar errores de
-//  case-sensitivity en PostgREST. El ordenamiento se hace en JS.
-// ══════════════════════════════════════════════════════════════
 
+export const VERSION  = 'v2.0.0';
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 
@@ -105,9 +88,19 @@ export const getRankingVista = () =>
 export const getTiempoVista = () =>
     sbGet("vista_tiempos", "select=*");
 
+export const getTop5GlobalVista = () =>
+    sbGet("vista_top5_global", "select=*");
+
+export const getTop5UltimaCarreraVista = () =>
+    sbGet("vista_top5_ultima_carrera", "select=*");
+
 // Columnas conocidas: Id, Nombre, Numero, Campeonato, Victorias, Podios
 export const getPilotosVista = () =>
     sbGet("vista_piloto", "select=*");
+
+// Columnas: Id, Nombre, Numero, Campeonato, Victorias, Podios
+export const getPilotosLegendariosVista = () =>
+    sbGet("vista_pilotos_legendarios", "select=*");
 
 // Columnas conocidas: id_carrera, nombre, circuito, Fecha, posicion, puntos, NombrePiloto
 // Sin order= — Fecha tiene mayúscula y PostgREST es case-sensitive en el parámetro order=

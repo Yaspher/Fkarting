@@ -1,6 +1,6 @@
-Proyecto FKarting
+# Proyecto FKarting
 
-v1.2.5
+NewBrand - LogoyPilotos - Actual v2.0.0
 
 
 Usuario: "admin"
