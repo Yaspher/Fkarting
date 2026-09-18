@@ -1,5 +1,11 @@
 
+
+// ════════════════════════════════════════════════════════════════
+//  Version del proyecto y conexión a Supabase
+// ════════════════════════════════════════════════════════════════
+
 export const VERSION  = 'v2.0.0';
+
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 

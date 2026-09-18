@@ -1033,10 +1033,14 @@ canvas#wheel {
 
     <nav>
       <ul>
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="index.html#ranking">Ranking</a></li>
-        <li><a href="index.html#resultados">Resultados</a></li>
-        <li><a href="index.html#pilotos">Pilotos</a></li>
+            <!-- <li><a href="index.html">Inicio</a></li> -->
+            <li><a href="#ranking">Ranking</a></li>
+            <li><a href="#top5-global">Top 5</a></li>
+            <!-- <li><a href="#top5-ultima-carrera">Top 5 - Última Carrera</a></li> -->
+            <!-- <li><a href="#resultados">Puntos última carrera</a></li> -->
+            <li><a href="#pilotoslegendarios">Pilotos Legendarios</a></li>
+            <!-- <li><a href="#pilotos">Pilotos</a></li> -->
+            <li><a href="ayuda.html">Ayuda</a></li>
       </ul>
     </nav>
 
@@ -1056,11 +1060,14 @@ canvas#wheel {
   </div>
 
   <nav class="nav-mobile" id="navMobile">
-    <a href="index.html">Inicio</a>
-    <a href="index.html#ranking">Ranking</a>
-    <a href="index.html#resultados">Resultados</a>
-    <a href="index.html#pilotos">Pilotos</a>
-    <a href="login.html">Admin</a>
+                <!-- <a href="index.html">Inicio</a> -->
+                <a href="#ranking">Ranking</a>
+                <a href="#top5-global">Top 5</a>
+                <!-- <a href="#top5-ultima-carrera">Top 5 - Última Carrera</a> -->
+                <!-- <a href="#resultados">Puntos última carrera</a> -->
+                <a href="#pilotoslegendarios">Pilotos Legendarios</a>
+                <!-- <a href="#pilotos">Pilotos</a> -->
+                <a href="ayuda.html">Ayuda</a>
   </nav>
 </header>
 
@@ -1161,7 +1168,7 @@ canvas#wheel {
     <div class="logo">
       <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark" style="height:22px;width:auto;display:block;">
     </div>
-    <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados v1.2.5</p>
+    <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados — <span data-version></span></p>
     <a href="login.html" class="footer-admin">Administración</a>
   </div>
 </footer>
@@ -1217,6 +1224,7 @@ canvas#wheel {
   </div>
 </div>
 
+<script type="module" src="js/app.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════
