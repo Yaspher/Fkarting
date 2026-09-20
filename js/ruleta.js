@@ -320,14 +320,18 @@ const hamburger = document.getElementById('hamburger');
 const navMobile = document.getElementById('navMobile');
 
 hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('open');
-  navMobile.classList.toggle('open');
+  const isOpen = hamburger.classList.toggle('open');
+  navMobile.classList.toggle('open', isOpen);
+  hamburger.setAttribute('aria-expanded', String(isOpen));
+  hamburger.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
 });
 
 navMobile.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     hamburger.classList.remove('open');
     navMobile.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'Abrir menú');
   });
 });
 

@@ -5,12 +5,8 @@ import {
     getPilotosLegendariosVista,
     getTop5GlobalVista,
     getTop5UltimaCarreraVista,
-    getCarreraVista,
-    VERSION
+    getCarreraVista
 } from './connection.js';
-
-document.querySelectorAll('[data-version]')
-  .forEach(el => el.textContent = VERSION);
   
 // ════════════════════════════════════════════════════════════════
 //  HELPERS

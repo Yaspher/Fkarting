@@ -19,16 +19,12 @@
         <a href="index.html" class="logo">
             <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark" style="height:28px;width:auto;display:block;">
         </a>
-        <nav>
+        <nav aria-label="Navegación principal">
             <ul>
-                <!-- <li><a href="index.html">Inicio</a></li> -->
-                <li><a href="#ranking">Ranking</a></li>
-                <li><a href="#top5-global">Top 5</a></li>
-                <!-- <li><a href="#top5-ultima-carrera">Top 5 - Última Carrera</a></li> -->
-                <!-- <li><a href="#resultados">Puntos última carrera</a></li> -->
-                <li><a href="#pilotoslegendarios">Pilotos Legendarios</a></li>
-                <!-- <li><a href="#pilotos">Pilotos</a></li> -->
-                <li><a href="ayuda.html">Ayuda</a></li>
+                <li><a href="index.html#ranking">Ranking</a></li>
+                <li><a href="index.html#top5-global">Top 5</a></li>
+                <li><a href="index.html#pilotoslegendarios">Pilotos Legendarios</a></li>
+                <!-- <li><a href="ayuda.html">Ayuda</a></li>    -->
             </ul>
         </nav>
         <a href="login.html" class="navbar-admin">
@@ -38,19 +34,19 @@
             </svg>
             Admin
         </a>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMobile">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 
     <!-- ── Menú móvil desplegable (dentro del header para heredar sticky) ── -->
-    <nav class="nav-mobile" id="navMobile">
-        <!-- <a href="index.html">Inicio</a> -->
-        <a href="#ranking">Ranking</a>
-        <a href="#top5-global">Top 5</a>
-        <!-- <a href="#top5-ultima-carrera">Top 5 - Última Carrera</a> -->
-        <!-- <a href="#resultados">Puntos última carrera</a> -->
-        <a href="#pilotoslegendarios">Pilotos Legendarios</a>
-        <!-- <a href="#pilotos">Pilotos</a> -->
-        <a href="ayuda.html">Ayuda</a>
-        <!-- <a href="login.html">Admin</a> -->
+    <nav class="nav-mobile" id="navMobile" aria-label="Navegación móvil">
+        <a href="index.html#ranking">Ranking</a>
+        <a href="index.html#top5-global">Top 5</a>
+        <a href="index.html#pilotoslegendarios">Pilotos Legendarios</a>
+        <!-- <a href="ayuda.html">Ayuda</a> -->
     </nav>
 
 </header>
@@ -391,6 +387,27 @@
 </footer>
 
 <script type="module" src="js/app.js"></script>
+<script type="module" src="js/gameversion.js"></script>
+<script>
+    const hamburger = document.getElementById("hamburger");
+    const navMobile = document.getElementById("navMobile");
+
+    hamburger.addEventListener("click", () => {
+        const isOpen = hamburger.classList.toggle("open");
+        navMobile.classList.toggle("open", isOpen);
+        hamburger.setAttribute("aria-expanded", String(isOpen));
+        hamburger.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+    });
+
+    navMobile.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            hamburger.classList.remove("open");
+            navMobile.classList.remove("open");
+            hamburger.setAttribute("aria-expanded", "false");
+            hamburger.setAttribute("aria-label", "Abrir menú");
+        });
+    });
+</script>
 
 </body>
 </html>
