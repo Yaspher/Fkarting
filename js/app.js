@@ -5,7 +5,9 @@ import {
     getPilotosLegendariosVista,
     getTop5GlobalVista,
     getTop5UltimaCarreraVista,
-    getCarreraVista
+    getCarreraVista,
+    getCampeonatoActivo,
+    getProximasCarreras
 } from './connection.js';
   
 // ════════════════════════════════════════════════════════════════
@@ -57,6 +59,19 @@ function field(row, ...keys) {
 // Capitaliza cada palabra
 function formatName(name) {
     return name?.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) || "";
+}
+
+function formatFecha(fecha, options = { day: "2-digit", month: "short", year: "numeric" }) {
+    if (!fecha) return "Por definir";
+    return new Date(`${fecha}T00:00:00`).toLocaleDateString("es-DO", options);
+}
+
+function formatHora(hora) {
+    if (!hora) return "Por definir";
+    const [hours, minutes] = hora.split(":");
+    if (hours === undefined || minutes === undefined) return hora;
+    return new Date(2000, 0, 1, Number(hours), Number(minutes))
+        .toLocaleTimeString("es-DO", { hour: "numeric", minute: "2-digit" });
 }
 
 
@@ -336,6 +351,78 @@ async function loadPilotosLegendarios() {
     }
 }
 
+// ════════════════════════════════════════════════════════════════
+//  PRÓXIMAS CARRERAS
+// ════════════════════════════════════════════════════════════════
+
+function renderProximasCarreras(container, carreras) {
+    if (!carreras.length) {
+        container.innerHTML = `<p class="empty-msg">No hay carreras pendientes programadas.</p>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="upcoming-races-scroll">
+            <table class="upcoming-races-table">
+                <caption class="sr-only">Carreras pendientes del campeonato activo</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Ronda</th>
+                        <th scope="col">Carrera</th>
+                        <th scope="col">Circuito</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${carreras.map((carrera, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${escapeHtml(carrera.nombre ?? "Sin nombre")}</td>
+                            <td>${escapeHtml(carrera.circuito ?? "Por definir")}${carrera.carrera_hora ? `<span class="upcoming-race-time">${escapeHtml(formatHora(carrera.carrera_hora))}</span>` : ""}</td>
+                            <td>${escapeHtml(formatFecha(carrera.fecha))}</td>
+                            <td><span class="upcoming-race-status ${index === 0 ? "is-next" : ""}">${index === 0 ? "🏁 Próxima" : "Pendiente"}</span></td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+function setModalRace(carrera) {
+    const values = {
+        nextRaceStatus: carrera ? "Pendiente" : "Sin próxima carrera",
+        nextRaceName: carrera?.nombre ?? "No hay carrera pendiente",
+        nextRaceCircuit: carrera?.circuito ?? "Por definir",
+        nextRaceDate: formatFecha(carrera?.fecha, { day: "2-digit", month: "long", year: "numeric" }),
+        nextRaceTime: formatHora(carrera?.carrera_hora)
+    };
+
+    Object.entries(values).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    });
+}
+
+async function loadProximasCarreras() {
+    const container = document.getElementById("upcomingRacesTable");
+    if (!container) return [];
+
+    try {
+        const campeonatos = await getCampeonatoActivo();
+        const camp = campeonatos[0];
+        const carreras = camp ? await getProximasCarreras(camp.id_campeonato) : [];
+        renderProximasCarreras(container, carreras);
+        setModalRace(carreras[0] ?? null);
+        return carreras;
+    } catch (err) {
+        console.error("Próximas carreras:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar próximas carreras.</p>`;
+        setModalRace(null);
+        return [];
+    }
+}
+
 
 // ════════════════════════════════════════════════════════════════
 //  MODAL PRÓXIMA CARRERA
@@ -454,7 +541,8 @@ async function init() {
         loadTop5UltimaCarrera(),
         loadUltimaCarrera(),
         loadPilotos(),
-        loadPilotosLegendarios()
+        loadPilotosLegendarios(),
+        loadProximasCarreras()
     ]);
 }
 

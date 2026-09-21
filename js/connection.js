@@ -174,11 +174,41 @@ export const deletePiloto = (id) => sbDelete("piloto", id, "id_piloto");
 
 export const getCarrerasByCampeonato   = (id) => sbGet("carrera", `id_campeonato=eq.${id}&order=fecha.asc`);
 export const getCarrerasByCampeonatoId = (id) => sbGet("carrera", `id_campeonato=eq.${id}&order=fecha.asc&select=id_carrera,nombre,circuito,fecha,completada`);
+export const getProximasCarreras       = async (id) => {
+    const params = `id_campeonato=eq.${id}&completada=eq.false&order=fecha.asc.nullslast&select=id_carrera,id_campeonato,nombre,circuito,fecha,carrera_hora,completada`;
+    try {
+        return await sbGet("carrera", params);
+    } catch (err) {
+        // Older databases do not have the optional time column yet.
+        if (!String(err?.message ?? "").includes("carrera.carrera_hora does not exist")) throw err;
+        return sbGet("carrera", `id_campeonato=eq.${id}&completada=eq.false&order=fecha.asc.nullslast&select=id_carrera,id_campeonato,nombre,circuito,fecha,completada`);
+    }
+};
 export const getUltimaCarreraCompletada = (id) => sbGet("carrera", `id_campeonato=eq.${id}&completada=eq.true&order=fecha.desc&limit=1`);
 export const getCarreraById            = (id) => sbGet("carrera", `id_carrera=eq.${id}`);
 
-export const createCarrera = (body) => sbPost("carrera", body);
-export const updateCarrera = (id, body) => sbPatch("carrera", id, "id_carrera", body);
+const carreraHoraMissing = err =>
+    String(err?.message ?? "").includes("carrera.carrera_hora does not exist");
+
+export const createCarrera = async (body) => {
+    try {
+        return await sbPost("carrera", body);
+    } catch (err) {
+        if (!carreraHoraMissing(err)) throw err;
+        const { carrera_hora, ...legacyBody } = body;
+        return sbPost("carrera", legacyBody);
+    }
+};
+
+export const updateCarrera = async (id, body) => {
+    try {
+        return await sbPatch("carrera", id, "id_carrera", body);
+    } catch (err) {
+        if (!carreraHoraMissing(err)) throw err;
+        const { carrera_hora, ...legacyBody } = body;
+        return sbPatch("carrera", id, "id_carrera", legacyBody);
+    }
+};
 export const deleteCarrera = (id) => sbDelete("carrera", id, "id_carrera");
 
 

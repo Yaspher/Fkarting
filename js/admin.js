@@ -8,7 +8,7 @@ import {
     // Pilotos
     getPilotos, getPilotoById, getPilotosActivosAdmin, createPiloto, updatePiloto, deletePiloto,
     // Carreras — getCarrerasByCampeonatoId ya importada en Dashboard
-    getCarrerasByCampeonato, getCarreraById,
+    getCarrerasByCampeonato, getProximasCarreras, getCarreraById,
     createCarrera, updateCarrera, deleteCarrera,
     // Resultados
     getResultadosByCarrera, createResultado, updateResultado, deleteResultado,
@@ -637,7 +637,7 @@ async function loadDashboard() {
         const sinCamp = `<p class="dash-empty">No hay campeonato activo. Crea uno en la sección Campeonatos.</p>`;
 
         if (!camp) {
-            ["dashCampeonatoBody", "dashTop3Body", "dashUltimaCarreraBody", "dashMasRapidoBody", "dashMasVueltasBody"]
+            ["dashCampeonatoBody", "dashTop3Body", "dashUltimaCarreraBody", "dashProximasCarrerasBody", "dashMasRapidoBody", "dashMasVueltasBody"]
                 .forEach(id => document.getElementById(id).innerHTML = sinCamp);
             return;
         }
@@ -645,6 +645,7 @@ async function loadDashboard() {
         const carreras    = await getCarrerasByCampeonatoId(camp.id_campeonato);
         const completadas = carreras.filter(c => c.completada).length;
         const pct         = carreras.length ? Math.round((completadas / carreras.length) * 100) : 0;
+        await loadDashProximasCarreras(camp.id_campeonato);
 
         document.getElementById("dashCampeonatoBody").innerHTML = `
             <div class="dash-champ-name">${escAttr(String(camp.camp_ano))}</div>
@@ -770,6 +771,47 @@ async function loadDashboard() {
 
     } catch (err) {
         console.error("Dashboard:", err);
+    }
+}
+
+async function loadDashProximasCarreras(id_campeonato) {
+    const container = document.getElementById("dashProximasCarrerasBody");
+    try {
+        const carreras = await getProximasCarreras(id_campeonato);
+        if (!carreras.length) {
+            container.innerHTML = `<p class="dash-empty">No hay carreras pendientes.</p>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="dash-upcoming-list">
+                ${carreras.map((carrera, index) => {
+                    const fecha = carrera.fecha
+                        ? new Date(`${carrera.fecha}T00:00:00`).toLocaleDateString("es-DO", { day: "2-digit", month: "short", year: "numeric" })
+                        : "Por definir";
+                    const hora = carrera.carrera_hora ? ` · ${escAttr(carrera.carrera_hora.slice(0, 5))}` : "";
+                    return `
+                        <div class="dash-upcoming-item">
+                            <div class="dash-upcoming-round">${index + 1}</div>
+                            <div class="dash-upcoming-info">
+                                <strong>${escAttr(carrera.nombre ?? "Sin nombre")}</strong>
+                                <span>${escAttr(carrera.circuito ?? "Circuito por definir")} · ${escAttr(fecha)}${hora}</span>
+                            </div>
+                            ${index === 0 ? '<span class="dash-upcoming-badge">🏁 Próxima</span>' : ""}
+                            <button type="button" class="action-btn dash-upcoming-edit" data-carrera-id="${carrera.id_carrera}" data-campeonato-id="${id_campeonato}" title="Editar carrera">${iconEdit}</button>
+                        </div>`;
+                }).join("")}
+            </div>`;
+
+        container.querySelectorAll(".dash-upcoming-edit").forEach(button => {
+            button.addEventListener("click", () => {
+                document.getElementById("carrerasCampeonato").value = button.dataset.campeonatoId;
+                openCarreraModal(Number(button.dataset.carreraId));
+            });
+        });
+    } catch (err) {
+        container.innerHTML = `<p class="dash-empty">Error al cargar carreras pendientes.</p>`;
+        console.error("Dashboard próximas carreras:", err);
     }
 }
 
@@ -1086,6 +1128,7 @@ async function openCarreraModal(id = null) {
     document.getElementById("carreraNombre").value     = "";
     document.getElementById("carreraCircuito").value   = "";
     document.getElementById("carreraFecha").value      = "";
+    document.getElementById("carreraHora").value       = "";
     document.getElementById("carreraCompletada").value = "false";
     document.getElementById("carreraModalTitle").textContent = id ? "Editar Carrera" : "Nueva Carrera";
 
@@ -1096,6 +1139,7 @@ async function openCarreraModal(id = null) {
             document.getElementById("carreraNombre").value     = c.nombre;
             document.getElementById("carreraCircuito").value   = c.circuito ?? "";
             document.getElementById("carreraFecha").value      = c.fecha ?? "";
+            document.getElementById("carreraHora").value       = c.carrera_hora?.slice(0, 5) ?? "";
             document.getElementById("carreraCompletada").value = String(c.completada);
         }
     }
@@ -1111,12 +1155,13 @@ document.getElementById("btnSaveCarrera").onclick = async () => {
     const nombre        = document.getElementById("carreraNombre").value.trim();
     const circuito      = document.getElementById("carreraCircuito").value.trim();
     const fecha         = document.getElementById("carreraFecha").value;
+    const carrera_hora  = document.getElementById("carreraHora").value || null;
     const completada    = document.getElementById("carreraCompletada").value === "true";
     const id_campeonato = parseInt(document.getElementById("carrerasCampeonato").value);
 
     if (!nombre) return showMsg("saveMsgCarreras", "⚠️ El nombre es obligatorio");
 
-    const payload = { nombre, circuito: circuito || null, fecha: fecha || null, completada, id_campeonato };
+    const payload = { nombre, circuito: circuito || null, fecha: fecha || null, carrera_hora, completada, id_campeonato };
 
     try {
         if (editId) {
@@ -1128,6 +1173,7 @@ document.getElementById("btnSaveCarrera").onclick = async () => {
         }
         closeCarreraModal();
         await loadCarrerasByCamp(id_campeonato);
+        await loadDashboard();
     } catch (err) {
         showMsg("saveMsgCarreras", "❌ Error al guardar carrera");
         console.error(err);
@@ -1140,6 +1186,7 @@ async function handleDeleteCarrera(id) {
         await deleteCarrera(id);
         const id_campeonato = parseInt(document.getElementById("carrerasCampeonato").value);
         await loadCarrerasByCamp(id_campeonato);
+        await loadDashboard();
         showMsg("saveMsgCarreras", "✅ Carrera eliminada");
     } catch (err) {
         alert("Error al eliminar: " + err.message);

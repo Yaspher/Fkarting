@@ -1172,6 +1172,68 @@ a  { text-decoration: none; }
   padding: 12px 0;
 }
 
+.dash-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.dash-upcoming-item:last-child {
+  border-bottom: none;
+}
+
+.dash-upcoming-round {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--gray-400);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.dash-upcoming-info {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-upcoming-info strong {
+  color: var(--white);
+  font-size: 0.9rem;
+}
+
+.dash-upcoming-info span {
+  overflow: hidden;
+  color: var(--gray-500);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dash-upcoming-badge {
+  color: var(--gold);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.dash-upcoming-edit {
+  flex-shrink: 0;
+}
+
 /* Hero stat — Rápido / Vueltas */
 .dash-stat-hero { display: flex; flex-direction: column; gap: 4px; }
 

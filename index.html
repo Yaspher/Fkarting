@@ -32,6 +32,7 @@
         <nav aria-label="Navegación principal">
             <ul>
                 <li><a href="#ranking">Ranking</a></li>
+                <li><a href="#proximas-carreras">Próximas</a></li>
                 <li><a href="#top5-global">Top 5</a></li>
                 <li><a href="#pilotoslegendarios">Pilotos Legendarios</a></li>
                 <li><a href="ayuda.html">Ayuda</a></li>
@@ -54,10 +55,11 @@
     <!-- ── Menú móvil desplegable (dentro del header para heredar sticky) ── -->
     <nav class="nav-mobile" id="navMobile" aria-label="Navegación móvil">
         <a href="#ranking">Ranking</a>
+        <a href="#proximas-carreras">Próximas</a>
         <a href="#top5-global">Top 5</a>
         <a href="#pilotoslegendarios">Pilotos Legendarios</a>
         <a href="ayuda.html">Ayuda</a>
-        </nav>
+    </nav>
 </header>
 
 <!-- ── HERO ── -->
@@ -72,7 +74,7 @@
         <p class="hero-sub">Velocidad. Precisión. Competencia.</p>
         <div class="hero-actions">
             <a href="ayuda.html" class="btn-primary">Guía rápida</a>
-            <button id="btnNextRace" class="btn-primary">
+            <button id="btnNextRace" class="btn-golden">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <polyline points="12 6 12 12 16 14"/>
@@ -81,6 +83,7 @@
             </button>
             <a href="#ranking" class="btn-ghost">Ver ranking</a>
             <a href="ruleta.html" class="btn-ghost">Ruleta</a>
+            <a href="EnConstruccion.html" class="btn-ghost">Reacción</a>
         </div>
     </div>
     <div class="hero-stripe"></div>
@@ -109,36 +112,38 @@
     </div>
 </section>
 
-<!-- ── TOP 5 GLOBALES ── -->
-<section id="top5-global" class="section">
+<!-- ── MEJOR TIEMPO ── -->
+<section id="mejor-tiempo" class="section">
   <div class="container">
     <div class="section-head">
       <div class="section-head-line"></div>
-      <h2>Top 5 Globales</h2>
+      <h2>Mejor Tiempo</h2>
     </div>
-    <div id="top5GlobalList" class="tiempos-list top5-list"></div>
+    <div id="mejorTiempoList" class="tiempos-list"></div>
   </div>
 </section>
 
-<!-- ── TOP 5 ÚLTIMA CARRERA ── -->
-<section id="top5-ultima-carrera" class="section">
-  <div class="container">
-    <div class="section-head">
-      <div class="section-head-line"></div>
-      <h2>Top 5 - Última Carrera</h2>
-    </div>
-    <div id="top5UltimaCarreraList" class="tiempos-list top5-list"></div>
-  </div>
-</section>
-
-<!-- ── PUNTOS DE LA ÚLTIMA CARRERA ── -->
+<!-- ── ÚLTIMA CARRERA ── -->
 <section id="resultados" class="section section-dark">
     <div class="container">
         <div class="section-head">
             <div class="section-head-line"></div>
-            <h2>Puntos de la última carrera</h2>
+            <h2>Última Carrera</h2>
         </div>
         <div id="resultsList" class="results-list"></div>
+    </div>
+</section>
+
+<!-- ── PRÓXIMAS CARRERAS ── -->
+<section id="proximas-carreras" class="section section-dark">
+    <div class="container">
+        <div class="section-head">
+            <div class="section-head-line"></div>
+            <h2>Próximas Carreras</h2>
+        </div>
+        <div id="upcomingRacesTable" class="upcoming-races-table-wrap">
+            <p class="empty-msg">Cargando próximas carreras...</p>
+        </div>
     </div>
 </section>
 
@@ -192,22 +197,26 @@
             </svg>
         </div>
         <h2 class="modal-title">Próxima Carrera</h2>
-        <div class="modal-fields">
+        <div class="modal-fields" id="nextRaceFields">
             <div class="modal-field">
                 <span class="modal-field-label">Estado</span>
-                <span class="modal-field-value">Por Confirmar</span>
+                <span class="modal-field-value" id="nextRaceStatus">Cargando...</span>
             </div>
             <div class="modal-field">
-                <span class="modal-field-label">Fecha Posible</span>
-                <span class="modal-field-value">12 Junio 2026</span>
+                <span class="modal-field-label">Carrera</span>
+                <span class="modal-field-value" id="nextRaceName">—</span>
             </div>
             <div class="modal-field">
-                <span class="modal-field-label">Lugar</span>
-                <span class="modal-field-value">Autódromo Malecon</span>
+                <span class="modal-field-label">Circuito</span>
+                <span class="modal-field-value" id="nextRaceCircuit">—</span>
+            </div>
+            <div class="modal-field">
+                <span class="modal-field-label">Fecha</span>
+                <span class="modal-field-value" id="nextRaceDate">Por definir</span>
             </div>
             <div class="modal-field">
                 <span class="modal-field-label">Hora</span>
-                <span class="modal-field-value">8:00 PM</span>
+                <span class="modal-field-value" id="nextRaceTime">Por definir</span>
             </div>
         </div>
         <button class="btn-primary btn-full" id="closeModalBtn">Cerrar</button>
@@ -254,7 +263,6 @@
         });
     });
 </script>
-
 <script type="module" src="js/app.js"></script>
 <script type="module" src="js/gameversion.js"></script>
 
