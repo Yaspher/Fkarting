@@ -1,16 +1,17 @@
 # Proyecto FKarting
 
-Version Actual - v2.1.0
+Version Actual - v2.2.0
 
 Usuario: "admin"
+
 Password: "fkarting2026"
 
 ## Ultimo realizado
 
-x.1.0 - tabla y datos para las próximas carreras.
+x.2.0 - tabla y mini juego de reacción.
 
 ## Próximos desarrollos
 
-x.0.5 - caja de Password.
+x.x.1 - caja de Password.
 
-x.3.0 - tabla y mini juego de reacción.
+

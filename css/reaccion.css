@@ -1,0 +1,378 @@
+/* ── FKarting Reaction Test · styles.css ──────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #080808;
+  color: #fff;
+  font-family: "Barlow Condensed", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 1180px;
+  margin: auto;
+  padding: 22px 24px;
+}
+
+/* ── Header ── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #292929;
+  padding-bottom: 18px;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 25px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.fk {
+  background: #e30613;
+  padding: 2px 7px;
+  transform: skew(-12deg);
+  display: inline-block;
+}
+
+.demo {
+  font-size: 13px;
+  color: #8a8a8a;
+  letter-spacing: 2px;
+}
+
+/* ── Hero ── */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 60px 0 35px;
+  gap: 30px;
+}
+
+.eyebrow {
+  color: #ffc400;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin: 0 0 8px;
+}
+
+.hero h1 {
+  font-size: clamp(55px, 9vw, 105px);
+  line-height: .76;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -2px;
+}
+
+.hero h1 span { color: #e30613; }
+
+.intro {
+  color: #aaa;
+  font-size: 18px;
+  max-width: 500px;
+}
+
+/* ── Mode switch ── */
+.mode-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: flex-end;
+}
+
+.mode {
+  background: #121212;
+  border: 1px solid #333;
+  color: #aaa;
+  padding: 11px 15px;
+  font: 700 15px inherit;
+  cursor: pointer;
+  /* BUG-FIX 7: border-radius consistente con el resto del diseño */
+  border-radius: 2px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mode.active {
+  background: #e30613;
+  border-color: #e30613;
+  color: white;
+}
+
+/* ── Layout ── */
+.game-grid {
+  display: grid;
+  grid-template-columns: 2.15fr .85fr;
+  gap: 18px;
+}
+
+.panel {
+  background: #101010;
+  border: 1px solid #292929;
+  padding: 26px;
+}
+
+.panel-title {
+  font-size: 14px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #aaa;
+  border-bottom: 1px solid #292929;
+  padding-bottom: 13px;
+}
+
+.panel-title span {
+  color: #e30613;
+  margin-right: 9px;
+}
+
+/* ── Start panel ── */
+.start-panel {
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.start-panel .panel-title { align-self: stretch; }
+
+/* ── Lights ── */
+.lights {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 75px 20px 38px;
+}
+
+.light {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: #190506;
+  border: 5px solid #272727;
+  box-shadow: inset 0 0 15px #000;
+  transition: background 0.1s, box-shadow 0.1s, border-color 0.1s;
+}
+
+.light.on {
+  background: #e30613;
+  border-color: #650008;
+  box-shadow: 0 0 25px #e30613, inset 0 0 12px #ff5660;
+}
+
+.light.yellow {
+  background: #ffc400;
+  border-color: #8b6b00;
+  box-shadow: 0 0 25px #ffc400;
+}
+
+.light.go {
+  background: #16c76b;
+  border-color: #08763e;
+  box-shadow: 0 0 25px #16c76b;
+}
+
+/* ── Status ── */
+.status {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  min-height: 38px;
+}
+
+/* ── Buttons ── */
+.start,
+.react {
+  width: 100%;
+  margin-top: 18px;
+  border: 0;
+  padding: 16px;
+  font: 800 19px inherit;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.start {
+  background: #e30613;
+  color: white;
+}
+
+.react {
+  background: #ffc400;
+  color: #080808;
+}
+
+/* BUG-FIX 7: pointer-events:none garantiza que el botón
+   sea totalmente inerte en todos los navegadores cuando está disabled */
+.react:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hint {
+  text-align: center;
+  color: #666;
+  font-size: 13px;
+}
+
+.hint kbd {
+  border: 1px solid #444;
+  padding: 2px 5px;
+  color: #aaa;
+  border-radius: 3px;
+}
+
+/* ── Result panel ── */
+.time {
+  text-align: center;
+  font-size: 78px;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: 45px;
+}
+
+.unit {
+  text-align: center;
+  color: #e30613;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.result-message {
+  text-align: center;
+  color: #999;
+  min-height: 52px;
+  padding: 20px 0;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #292929;
+  margin-top: 10px;
+}
+
+.stats div {
+  text-align: center;
+  padding: 18px;
+}
+
+.stats div + div { border-left: 1px solid #292929; }
+
+.stats b {
+  display: block;
+  font-size: 28px;
+}
+
+.stats small {
+  color: #777;
+  letter-spacing: 2px;
+}
+
+/* ── History panel ── */
+.history-panel { margin-top: 18px; }
+
+.history-empty {
+  padding: 24px 0;
+  color: #666;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 140px 120px;
+  padding: 11px 0;
+  border-bottom: 1px solid #222;
+  align-items: center;
+}
+
+.history-row b { font-size: 22px; }
+
+.false { color: #ffc400; }
+
+/* ── Duel panel ── */
+.duel-panel { margin-top: 18px; }
+
+.duel-names,
+.duel-scores {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  text-align: center;
+  align-items: center;
+}
+
+.duel-names { margin-top: 25px; }
+
+.duel-names small {
+  color: #777;
+  display: block;
+  letter-spacing: 2px;
+}
+
+.duel-names strong { font-size: 28px; }
+
+.vs {
+  color: #e30613;
+  font-weight: 800;
+}
+
+.duel-scores {
+  font-size: 42px;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+/* ── Utilities ── */
+.hidden { display: none; }
+
+/* ── Footer ── */
+footer {
+  padding: 30px 0 10px;
+  color: #555;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+footer span {
+  float: right;
+  color: #e30613;
+}
+
+/* ── Responsive ── */
+@media (max-width: 760px) {
+  .hero,
+  .game-grid { display: block; }
+
+  .mode-switch {
+    justify-content: flex-start;
+    margin-top: 25px;
+  }
+
+  .game-grid .panel + .panel { margin-top: 18px; }
+
+  .start-panel { min-height: 500px; }
+
+  .lights {
+    gap: 7px;
+    padding: 55px 5px 30px;
+  }
+
+  .light {
+    width: 48px;
+    height: 48px;
+  }
+
+  .time { font-size: 62px; }
+
+  .history-row {
+    grid-template-columns: 45px 1fr 90px 75px;
+  }
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>FKARTING — Reaction Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reaccion.css">
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="brand"><span class="fk">FK</span><span>FKARTING</span></div>
+    <span class="demo">REACTION TEST · DEMO</span>
+  </header>
+
+  <main>
+
+    <!-- Hero + selector de modo -->
+    <section class="hero">
+      <div>
+        <p class="eyebrow">EN SUS MARCAS · LISTOS · FUERA</p>
+        <h1>REACTION<br><span>TEST</span></h1>
+        <p class="intro">Pon a prueba tus reflejos. Espera a que se apaguen las luces y reacciona.</p>
+      </div>
+      <div class="mode-switch" role="group" aria-label="Seleccionar modo de juego">
+        <button class="mode active" data-mode="training"   aria-pressed="true">ENTRENAMIENTO</button>
+        <button class="mode"        data-mode="qualifying" aria-pressed="false">CLASIFICACIÓN</button>
+        <button class="mode"        data-mode="duel"       aria-pressed="false">DUEL</button>
+      </div>
+    </section>
+
+    <!-- Panel semáforo + panel resultado -->
+    <section class="game-grid">
+
+      <div class="panel start-panel">
+        <div class="panel-title"><span>01</span> SEMÁFORO DE SALIDA</div>
+        <!-- BUG-FIX (accesibilidad): role + aria-label en las luces -->
+        <div class="lights" id="lights" role="img" aria-label="Semáforo de salida de 5 luces">
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+        </div>
+        <div class="status" id="status" aria-live="polite">PRESIONA INICIAR</div>
+        <button id="startBtn" class="start" aria-label="Iniciar secuencia de semáforo">
+          INICIAR <span aria-hidden="true">▶</span>
+        </button>
+        <!-- BUG-FIX (accesibilidad): aria-label descriptivo en el botón de reacción -->
+        <button id="reactBtn" class="react" disabled aria-label="Reaccionar — pulsa cuando las luces se apaguen">
+          ¡FUERA!
+        </button>
+        <p class="hint">También puedes usar <kbd>ESPACIO</kbd></p>
+      </div>
+
+      <div class="panel result-panel">
+        <div class="panel-title"><span>02</span> RESULTADO</div>
+        <div class="time" id="time" aria-live="polite">---</div>
+        <div class="unit">MILISEGUNDOS</div>
+        <div class="result-message" id="resultMessage" aria-live="polite">Tu reacción aparecerá aquí</div>
+        <div class="stats">
+          <div><b id="attemptLabel">0 / ∞</b><small>INTENTOS</small></div>
+          <div><b id="best">---</b><small>MEJOR</small></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Historial -->
+    <section class="panel history-panel">
+      <div class="panel-title"><span>03</span> HISTORIAL</div>
+      <div id="history" class="history-empty" aria-live="polite">Todavía no hay intentos.</div>
+    </section>
+
+    <!-- Panel duelo (oculto por defecto) -->
+    <section id="duelPanel" class="panel duel-panel hidden" aria-hidden="true">
+      <div class="panel-title"><span>04</span> DUELO</div>
+      <div class="duel-names">
+        <div><small>PILOTO A</small><strong>YASPHER</strong></div>
+        <div class="vs">VS</div>
+        <div><small>PILOTO B</small><strong>JUAN</strong></div>
+      </div>
+      <div class="duel-scores">
+        <div id="scoreA">---</div>
+        <div></div>
+        <div id="scoreB">---</div>
+      </div>
+      <p style="margin-top:16px;color:#666;font-size:15px">3 intentos válidos por piloto. Gana el mejor tiempo.</p>
+    </section>
+
+  </main>
+
+  <footer>FKARTING · REACTION TEST <span>DEMO</span></footer>
+
+</div>
+<script src="js/reaccion.js"></script>
+</body>
+</html>
