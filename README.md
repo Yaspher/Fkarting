@@ -14,4 +14,5 @@ x.2.0 - tabla y mini juego de reacción.
 
 x.x.1 - caja de Password.
 
+Pruebas de conexion QA
 
