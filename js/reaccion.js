@@ -1,6 +1,10 @@
 // ── FKarting Reaction Test · reaccion.js ─────────────────────────────────────
 
-import { createGameReaccion, getPilotosActivosAdmin } from "./connection.js";
+import {
+  createGameReaccion,
+  getPilotosVista,
+  getVistaReaccion
+} from "./connection.js";
 
 const lights       = [...document.querySelectorAll(".light")];
 const startBtn     = document.getElementById("startBtn");
@@ -19,6 +23,19 @@ const resetQualifyingBtn    = document.getElementById("resetQualifyingBtn");
 const pilotSelect           = document.getElementById("pilotSelect");
 const submitBestBtn         = document.getElementById("submitBestBtn");
 const resetDuelBtn          = document.getElementById("resetDuelBtn");
+const refreshGlobalHistoryBtn = document.getElementById("refreshGlobalHistoryBtn");
+const globalClassificationHistory = document.getElementById("globalClassificationHistory");
+const globalHistoryView = document.getElementById("globalHistoryView");
+const globalHistoryTitle = document.getElementById("globalHistoryTitle");
+const historyViewSwitch = document.querySelector(".history-view-switch");
+const startPanel = document.querySelector(".start-panel");
+const historyViewButtons = [...document.querySelectorAll(".history-view-btn")];
+const duelPilotASelect = document.getElementById("duelPilotASelect");
+const duelPilotBSelect = document.getElementById("duelPilotBSelect");
+const duelPilotNameA = document.getElementById("duelPilotNameA");
+const duelPilotNameB = document.getElementById("duelPilotNameB");
+const submitDuelBtn = document.getElementById("submitDuelBtn");
+const duelSaveMessage = document.getElementById("duelSaveMessage");
 
 let state     = "idle";   // idle | countdown | go | result | false | done
 let startTime = 0;
@@ -26,12 +43,15 @@ let lightTimer = null;
 let goTimer    = null;
 let attempts  = [];
 let mode      = "training";
+let historyView = "session";
 let turn      = "A";
 let duelA     = [];
 let duelB     = [];
 let pilotsLoaded = false;
+let duelPilotsLoaded = false;
 let isSubmitting = false;
 let hasSubmitted = false;
+let pilotOptions = [];
 
 // En duelo, guardamos el piloto responsable de cada intento para que una
 // salida falsa no altere el turno ni el historial visual.
@@ -59,21 +79,149 @@ function bestAttempt() {
   return valid.length ? Math.min(...valid) : null;
 }
 
-async function loadPilots() {
-  pilotSelect.disabled = true;
+function selectedDuelPilots() {
+  const pilotA = Number(duelPilotASelect.value);
+  const pilotB = Number(duelPilotBSelect.value);
+
+  if (!Number.isSafeInteger(pilotA) || pilotA <= 0
+    || !Number.isSafeInteger(pilotB) || pilotB <= 0
+    || pilotA === pilotB) {
+    return null;
+  }
+
+  return { pilotA, pilotB };
+}
+
+function updateDuelNames() {
+  duelPilotNameA.textContent =
+    duelPilotASelect.selectedOptions[0]?.textContent || "SELECCIONA PILOTO";
+  duelPilotNameB.textContent =
+    duelPilotBSelect.selectedOptions[0]?.textContent || "SELECCIONA PILOTO";
+  if (mode === "duel" && state === "idle" && attempts.length === 0) {
+    const currentPilotName = turn === "A"
+      ? duelPilotNameA.textContent
+      : duelPilotNameB.textContent;
+    statusEl.textContent = `TURNO: PILOTO ${turn} · ${currentPilotName}`;
+  }
+
+  const pilotA = duelPilotASelect.value;
+  const pilotB = duelPilotBSelect.value;
+  for (const option of duelPilotASelect.options) {
+    option.disabled = !!option.value && option.value === pilotB;
+  }
+  for (const option of duelPilotBSelect.options) {
+    option.disabled = !!option.value && option.value === pilotA;
+  }
+}
+
+function updateDuelControls() {
+  const pairSelected = selectedDuelPilots() !== null;
+  const selectionLocked = isSubmitting || hasSubmitted
+    || attempts.length > 0 || state !== "idle";
+
+  duelPilotASelect.disabled = !duelPilotsLoaded || selectionLocked;
+  duelPilotBSelect.disabled = !duelPilotsLoaded || selectionLocked;
+  updateDuelNames();
+  submitDuelBtn.disabled = !(mode === "duel" && pairSelected
+    && duelA.length >= 3 && duelB.length >= 3 && state === "done"
+    && duelPilotsLoaded && !isSubmitting && !hasSubmitted);
+  resetDuelBtn.disabled = isSubmitting;
+}
+
+function renderGlobalHistory(records) {
+  const isDuel = mode === "duel";
+  const matchingRecords = records.filter(record => record.gr_duelo_estado === isDuel);
+
+  if (!matchingRecords.length) {
+    globalClassificationHistory.className = "history-empty";
+    globalClassificationHistory.textContent = isDuel
+      ? "Todavía no hay duelos subidos."
+      : "Todavía no hay tiempos de clasificación.";
+    return;
+  }
+
+  globalClassificationHistory.className = "global-history-list";
+  globalClassificationHistory.replaceChildren();
+
+  matchingRecords.forEach(record => {
+    const row = document.createElement("div");
+    row.className = "global-history-row";
+
+    const date = document.createElement("time");
+    const createdAt = new Date(record.created_at);
+    if (Number.isNaN(createdAt.getTime())) {
+      date.textContent = "Fecha no disponible";
+    } else {
+      date.dateTime = createdAt.toISOString();
+      date.textContent = createdAt.toLocaleString("es-DO", {
+        dateStyle: "short",
+        timeStyle: "short"
+      });
+    }
+
+    const pilot = document.createElement("span");
+    const pilotName = record.piloto_numero === null
+      ? record.piloto_nombre
+      : `${record.piloto_nombre} · #${record.piloto_numero}`;
+    const rivalName = record.rival_numero === null
+      ? record.rival_nombre || "Rival no disponible"
+      : `${record.rival_nombre} · #${record.rival_numero}`;
+    pilot.textContent = isDuel ? `${pilotName} vs ${rivalName}` : pilotName;
+
+    const reaction = document.createElement("strong");
+    reaction.textContent = isDuel
+      ? `${record.gr_reaccion} ms · ${record.gr_rival_reaccion ?? "---"} ms`
+      : `${record.gr_reaccion} ms`;
+
+    row.append(date, pilot, reaction);
+    globalClassificationHistory.append(row);
+  });
+}
+
+async function loadClassificationHistory() {
+  globalClassificationHistory.className = "history-empty";
+  globalClassificationHistory.textContent = mode === "duel"
+    ? "Cargando duelos..."
+    : "Cargando tiempos de clasificación...";
+  globalHistoryTitle.textContent = mode === "duel"
+    ? "HISTORIAL GLOBAL DE DUELOS"
+    : "HISTORIAL GLOBAL DE CLASIFICACIÓN";
+  globalHistoryView.setAttribute("aria-label", mode === "duel"
+    ? "Historial global de duelos"
+    : "Historial global de clasificación");
+  refreshGlobalHistoryBtn.disabled = true;
 
   try {
-    const pilots = await getPilotosActivosAdmin();
-    const options = pilots.map(pilot => {
-      const id = pilot.id_piloto;
-      const name = pilot.pilo_nombre;
-      const number = pilot.pilo_numero;
+    const records = await getVistaReaccion();
+    renderGlobalHistory(records);
+  } catch (error) {
+    console.error("Error al cargar el historial global de reacción:", error);
+    globalClassificationHistory.className = "history-empty";
+    const details = String(error?.message ?? error);
+    globalClassificationHistory.textContent = details.includes("PGRST205")
+      ? "La vista vista_reaccion no está configurada en Supabase. Contacta al administrador."
+      : `No se pudo cargar el historial: ${details}`;
+  } finally {
+    refreshGlobalHistoryBtn.disabled = false;
+  }
+}
+
+async function loadPilots() {
+  pilotSelect.disabled = true;
+  duelPilotASelect.disabled = true;
+  duelPilotBSelect.disabled = true;
+
+  try {
+    pilotOptions = (await getPilotosVista()).map(pilot => {
+      const id = pilot.Id;
+      const name = pilot.Nombre;
+      const number = pilot.Numero;
 
       if (!Number.isSafeInteger(id) || id <= 0) {
-        throw new Error("La tabla de pilotos no devolvió un identificador entero válido.");
+        throw new Error("La vista vista_piloto no devolvió un identificador entero válido.");
       }
       if (typeof name !== "string" || !name.trim()) {
-        throw new Error("La tabla de pilotos devolvió un registro sin nombre.");
+        throw new Error("La vista vista_piloto devolvió un registro sin nombre.");
       }
 
       return {
@@ -82,19 +230,23 @@ async function loadPilots() {
       };
     });
 
-    if (!options.length) {
-      throw new Error("No hay pilotos disponibles para seleccionar.");
+    if (!pilotOptions.length) {
+      throw new Error("La vista vista_piloto no contiene pilotos.");
     }
 
-    pilotSelect.replaceChildren(
-      new Option("SELECCIONAR PILOTO", ""),
-      ...options.map(pilot => new Option(pilot.label, pilot.id))
-    );
+    for (const select of [pilotSelect, duelPilotASelect, duelPilotBSelect]) {
+      select.replaceChildren(new Option("SELECCIONAR PILOTO", ""));
+      select.append(...pilotOptions.map(pilot => new Option(pilot.label, pilot.id)));
+    }
     pilotsLoaded = true;
+    duelPilotsLoaded = true;
   } catch (error) {
-    console.error("Error al cargar pilotos para Reaction Test:", error);
-    pilotSelect.replaceChildren(new Option("NO SE PUDIERON CARGAR PILOTOS", ""));
-    messageEl.textContent = `No fue posible cargar los pilotos: ${error?.message ?? error}`;
+    console.error("Error al cargar pilotos desde vista_piloto:", error);
+    pilotSelect.replaceChildren(new Option("VISTA_PILOTO NO DISPONIBLE", ""));
+    duelPilotASelect.replaceChildren(new Option("VISTA_PILOTO NO DISPONIBLE", ""));
+    duelPilotBSelect.replaceChildren(new Option("VISTA_PILOTO NO DISPONIBLE", ""));
+    messageEl.textContent = `No fue posible cargar pilotos desde vista_piloto: ${error?.message ?? error}`;
+    duelSaveMessage.textContent = `No fue posible cargar pilotos desde vista_piloto: ${error?.message ?? error}`;
   }
 
   updateModeActions();
@@ -119,6 +271,7 @@ function updateModeActions() {
       && pilotsLoaded && !isSubmitting && !hasSubmitted);
   }
   pilotSelect.disabled = !pilotsLoaded || isSubmitting || hasSubmitted;
+  updateDuelControls();
 }
 
 function resetQualifying() {
@@ -130,6 +283,7 @@ function resetQualifying() {
   attempts = [];
   hasSubmitted = false;
   state = "idle";
+  duelSaveMessage.textContent = "";
   resetUI();
 
   statusEl.textContent = "CLASIFICACIÓN REINICIADA";
@@ -156,20 +310,23 @@ function resetDuel() {
   state = "idle";
   resetUI();
 
-  statusEl.textContent = "TURNO: PILOTO A";
+  statusEl.textContent = `TURNO: PILOTO A · ${duelPilotNameA.textContent}`;
   attemptLabel.textContent = "0 / 3";
 
   const scoreA = document.getElementById("scoreA");
   const scoreB = document.getElementById("scoreB");
   if (scoreA) scoreA.textContent = "---";
   if (scoreB) scoreB.textContent = "---";
+  duelSaveMessage.textContent = "";
+  updateDuelControls();
 }
 
 // ── Cambio de modo ────────────────────────────────────────────────────────────
 
-document.querySelectorAll(".mode").forEach(btn => {
+document.querySelectorAll(".mode-switch .mode").forEach(btn => {
   btn.onclick = () => {
-    document.querySelectorAll(".mode").forEach(x => {
+  if (isSubmitting) return;
+  document.querySelectorAll(".mode-switch .mode").forEach(x => {
       x.classList.remove("active");
       x.setAttribute("aria-pressed", "false");
     });
@@ -183,16 +340,52 @@ document.querySelectorAll(".mode").forEach(btn => {
     duelB = [];
     duelAttemptPilots = [];
     turn = "A";
+    hasSubmitted = false;
+    duelSaveMessage.textContent = "";
 
     resetUI();
+    document.getElementById("scoreA").textContent = "---";
+    document.getElementById("scoreB").textContent = "---";
 
     const isDuel = mode === "duel";
     duelPanel.classList.toggle("hidden", !isDuel);
     duelPanel.setAttribute("aria-hidden", String(!isDuel));
+    historyViewSwitch.classList.toggle("hidden", mode === "training");
+    startPanel.classList.toggle("classification-mode", mode === "qualifying");
+
+    if (mode === "training") {
+      historyView = "session";
+      historyViewButtons.forEach(viewButton => {
+        const isSession = viewButton.dataset.historyView === "session";
+        viewButton.classList.toggle("active", isSession);
+        viewButton.setAttribute("aria-pressed", String(isSession));
+      });
+      historyEl.classList.remove("hidden");
+      globalHistoryView.classList.add("hidden");
+    } else if (historyView === "global") {
+      loadClassificationHistory();
+    }
 
     attemptLabel.textContent = mode === "training" ? "0 / ∞" : "0 / 3";
     updateModeActions();
+
   };
+});
+
+historyViewButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    historyView = button.dataset.historyView;
+    historyViewButtons.forEach(viewButton => {
+      const isActive = viewButton === button;
+      viewButton.classList.toggle("active", isActive);
+      viewButton.setAttribute("aria-pressed", String(isActive));
+    });
+
+    const showGlobal = historyView === "global";
+    historyEl.classList.toggle("hidden", showGlobal);
+    globalHistoryView.classList.toggle("hidden", !showGlobal);
+    if (showGlobal) loadClassificationHistory();
+  });
 });
 
 // ── Reset completo de la UI ───────────────────────────────────────────────────
@@ -203,7 +396,12 @@ function resetUI() {
 
   state = "idle";
   lights.forEach(x => x.className = "light");
-  statusEl.textContent  = mode === "duel" ? `TURNO: PILOTO ${turn}` : "PRESIONA INICIAR";
+  const currentPilotName = turn === "A"
+    ? duelPilotNameA.textContent
+    : duelPilotNameB.textContent;
+  statusEl.textContent = mode === "duel"
+    ? `TURNO: PILOTO ${turn} · ${currentPilotName}`
+    : "PRESIONA INICIAR";
   startBtn.disabled     = false;
   reactBtn.disabled     = true;
   timeEl.textContent    = "---";
@@ -227,9 +425,15 @@ function resetUI() {
 function start() {
   if (state !== "idle") return;
 
+  if (mode === "duel" && !selectedDuelPilots()) {
+    messageEl.textContent = "Selecciona dos pilotos diferentes para iniciar el duelo.";
+    return;
+  }
+
   state = "countdown";
   startBtn.disabled = true;
   reactBtn.disabled = false;
+  updateModeActions();
   statusEl.textContent = "PREPÁRATE...";
   lights.forEach(x => x.className = "light");
 
@@ -341,8 +545,8 @@ function addResult(ms, fault) {
 
       state = "done";
       statusEl.textContent =
-        bestA < bestB ? "🏆 GANA PILOTO A" :
-        bestB < bestA ? "🏆 GANA PILOTO B" :
+        bestA < bestB ? `🏆 GANA ${duelPilotNameA.textContent}` :
+        bestB < bestA ? `🏆 GANA ${duelPilotNameB.textContent}` :
                         "EMPATE";
 
       startBtn.disabled = true;
@@ -350,6 +554,7 @@ function addResult(ms, fault) {
 
       document.getElementById("scoreA").textContent = format(bestA);
       document.getElementById("scoreB").textContent = format(bestB);
+      updateModeActions();
       return;
     }
 
@@ -362,7 +567,10 @@ function addResult(ms, fault) {
   state = "idle";
 
   if (mode === "duel") {
-    statusEl.textContent = `TURNO: PILOTO ${turn}`;
+    const currentPilotName = turn === "A"
+      ? duelPilotNameA.textContent
+      : duelPilotNameB.textContent;
+    statusEl.textContent = `TURNO: PILOTO ${turn} · ${currentPilotName}`;
   }
 
   updateModeActions();
@@ -413,6 +621,24 @@ if (pilotSelect) {
   };
 }
 
+function handleDuelPilotChange(changedSelect, otherSelect) {
+  if (changedSelect.value && changedSelect.value === otherSelect.value) {
+    otherSelect.value = "";
+    duelSaveMessage.textContent = "Elige dos pilotos diferentes para el duelo.";
+  } else {
+    duelSaveMessage.textContent = "";
+  }
+
+  updateModeActions();
+}
+
+duelPilotASelect.onchange = () =>
+  handleDuelPilotChange(duelPilotASelect, duelPilotBSelect);
+duelPilotBSelect.onchange = () =>
+  handleDuelPilotChange(duelPilotBSelect, duelPilotASelect);
+
+refreshGlobalHistoryBtn.onclick = loadClassificationHistory;
+
 if (submitBestBtn) {
   submitBestBtn.onclick = async () => {
     if (mode !== "qualifying" || isSubmitting || hasSubmitted) return;
@@ -445,6 +671,7 @@ if (submitBestBtn) {
       await createGameReaccion({ piloto: pilotIdNumber, reaccion: best });
       hasSubmitted = true;
       messageEl.textContent = `MEJOR RESULTADO GUARDADO · ${pilotName} · ${best} ms`;
+      if (historyView === "global" && mode === "qualifying") await loadClassificationHistory();
     } catch (error) {
       console.error("Error al guardar resultado de Reaction Test:", error);
       messageEl.textContent = `No se pudo guardar el resultado: ${error?.message ?? error}`;
@@ -455,6 +682,46 @@ if (submitBestBtn) {
     }
   };
 }
+
+submitDuelBtn.onclick = async () => {
+  if (mode !== "duel" || isSubmitting || hasSubmitted) return;
+
+  const selectedPilots = selectedDuelPilots();
+  const bestA = duelA.length >= 3 ? Math.min(...duelA) : null;
+  const bestB = duelB.length >= 3 ? Math.min(...duelB) : null;
+
+  if (!selectedPilots || bestA === null || bestB === null || state !== "done") {
+    duelSaveMessage.textContent =
+      "Completa los 3 intentos válidos de ambos pilotos y selecciona dos pilotos diferentes.";
+    return;
+  }
+
+  isSubmitting = true;
+  submitDuelBtn.textContent = "SUBIENDO...";
+  duelSaveMessage.textContent = "Guardando los mejores tiempos del duelo...";
+  updateModeActions();
+
+  try {
+    await createGameReaccion({
+      piloto: selectedPilots.pilotA,
+      reaccion: bestA,
+      duelo: true,
+      rival: selectedPilots.pilotB,
+      rivalReaccion: bestB
+    });
+    hasSubmitted = true;
+    duelSaveMessage.textContent =
+      `DUELO GUARDADO · ${duelPilotNameA.textContent}: ${bestA} ms · ${duelPilotNameB.textContent}: ${bestB} ms`;
+    if (historyView === "global") await loadClassificationHistory();
+  } catch (error) {
+    console.error("Error al guardar resultado de duelo:", error);
+    duelSaveMessage.textContent = `No se pudo guardar el duelo: ${error?.message ?? error}`;
+  } finally {
+    isSubmitting = false;
+    submitDuelBtn.textContent = "SUBIR MEJORES TIEMPOS";
+    updateModeActions();
+  }
+};
 
 const hamburger = document.getElementById("hamburger");
 const navMobile = document.getElementById("navMobile");

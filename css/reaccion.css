@@ -120,6 +120,7 @@ body {
   justify-content: center;
 }
 
+.start-panel.classification-mode { justify-content: space-between; }
 .start-panel .panel-title { align-self: stretch; }
 
 /* ── Lights ── */
@@ -258,6 +259,11 @@ body {
 
 /* ── History panel ── */
 .history-panel { margin-top: 18px; }
+.history-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px}
+.history-panel-heading .panel-title{margin:0}
+.history-view-switch{display:flex;gap:7px}
+.history-view-btn{padding:8px 13px;font-size:13px}
+.history-view-content{min-width:0}
 
 .history-empty {
   padding: 24px 0;
@@ -355,6 +361,16 @@ body {
 /* ── Classification / result actions ── */
 .classification-actions{display:none;margin-top:18px;padding-top:18px;border-top:1px solid #292929;gap:12px;flex-direction:column}
 .classification-actions.is-visible{display:flex}
+.global-history{border-top:1px solid #292929;margin-top:8px;padding-top:16px}
+.global-history-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.global-history-heading h3{margin:0;color:#aaa;font-size:13px;letter-spacing:1.5px}
+.history-refresh{flex:0 0 auto;border:1px solid #333;border-radius:2px;padding:7px 10px;background:#151515;color:#aaa;font:700 12px "Barlow Condensed",Arial,sans-serif;letter-spacing:1px;cursor:pointer}
+.history-refresh:hover{border-color:#7f1d1d;color:#fff}
+.global-history-list{max-height:300px;overflow-y:auto}
+.global-history-row{display:grid;grid-template-columns:minmax(95px,1fr) minmax(100px,1.5fr) auto;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid #222;color:#888;font-size:13px}
+.global-history-row span{min-width:0}
+.global-history-row time{font-size:12px;color:#666}
+.global-history-row strong{color:#eee;font-size:19px;font-family:"Barlow Condensed",Arial,sans-serif;white-space:nowrap}
 .secondary-action,.submit-best{border:1px solid #333;border-radius:2px;padding:12px 14px;font:700 14px "Barlow Condensed",Arial,sans-serif;letter-spacing:1.5px;cursor:pointer;transition:background .15s,border-color .15s,color .15s,opacity .15s}
 .secondary-action{width:100%;background:#151515;color:#aaa}
 .secondary-action:hover{background:#202020;border-color:#555;color:#fff}
@@ -370,8 +386,26 @@ body {
 .duel-session-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:16px;padding-top:16px;border-top:1px solid #292929}
 .duel-session-actions p{margin:0;color:#666;font-size:15px}
 .duel-session-actions .secondary-action{width:auto;min-width:210px}
+.duel-pilot-selectors{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.duel-pilot-select:disabled{opacity:.55;cursor:not-allowed}
+.duel-session-actions .submit-best{width:auto}
+.submit-best:disabled{opacity:.35;cursor:not-allowed}
+.duel-save-message{min-height:0;padding:14px 0 0}
 @media(max-width:760px){
+  .history-panel-heading{align-items:flex-start;flex-direction:column}
+  .history-view-switch{width:100%}
+  .history-view-btn{flex:1}
   .pilot-submit-row{grid-template-columns:1fr}
   .duel-session-actions{flex-direction:column;align-items:stretch}
   .duel-session-actions .secondary-action{width:100%}
+  .duel-session-actions .submit-best{width:100%}
+  .duel-pilot-selectors{grid-template-columns:1fr}
+  .global-history-row{grid-template-columns:minmax(85px,1fr) 1.2fr auto;gap:8px}
+  .global-history-row strong{font-size:17px}
+}
+@media(max-width:420px){
+  .global-history-heading{align-items:flex-start}
+  .global-history-heading h3{max-width:210px}
+  .global-history-row{grid-template-columns:1fr auto}
+  .global-history-row time{grid-column:1/-1}
 }

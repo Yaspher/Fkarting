@@ -1,5 +1,5 @@
 
-export const VERSION = 'v2.3.0';
+export const VERSION = 'v2.4.0';
 
 export function applyVersion(scope = document) {
   scope.querySelectorAll('[data-version]').forEach(el => {

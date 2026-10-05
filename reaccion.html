@@ -64,7 +64,7 @@
       <div class="mode-switch" role="group" aria-label="Seleccionar modo de juego">
         <button class="mode active" data-mode="training"   aria-pressed="true">ENTRENAMIENTO</button>
         <button class="mode"        data-mode="qualifying" aria-pressed="false">CLASIFICACIÓN</button>
-        <button class="mode"        data-mode="duel"       aria-pressed="false">DUEL</button>
+        <button class="mode"        data-mode="duel"       aria-pressed="false">DUELO</button>
       </div>
     </section>
 
@@ -122,17 +122,52 @@
 
     <!-- Historial -->
     <section class="panel history-panel">
-      <div class="panel-title"><span>03</span> HISTORIAL</div>
-      <div id="history" class="history-empty" aria-live="polite">Todavía no hay intentos.</div>
+      <div class="history-panel-heading">
+        <div class="panel-title"><span>03</span> HISTORIAL</div>
+        <div class="history-view-switch hidden" role="group" aria-label="Vista del historial">
+          <button class="mode history-view-btn active" type="button" data-history-view="session" aria-pressed="true">
+            SESIÓN
+          </button>
+          <button class="mode history-view-btn" type="button" data-history-view="global" aria-pressed="false">
+            GLOBAL
+          </button>
+        </div>
+      </div>
+      <div class="history-view-content">
+        <div id="history" class="history-empty" aria-live="polite">Todavía no hay intentos.</div>
+        <section id="globalHistoryView" class="global-history hidden" aria-label="Historial global">
+          <div class="global-history-heading">
+            <h3 id="globalHistoryTitle">HISTORIAL GLOBAL DE CLASIFICACIÓN</h3>
+            <button id="refreshGlobalHistoryBtn" class="history-refresh" type="button">ACTUALIZAR</button>
+          </div>
+          <div id="globalClassificationHistory" class="history-empty" aria-live="polite">
+            Pulsa GLOBAL para cargar los resultados.
+          </div>
+        </section>
+      </div>
     </section>
 
     <!-- Panel duelo (oculto por defecto) -->
     <section id="duelPanel" class="panel duel-panel hidden" aria-hidden="true">
       <div class="panel-title"><span>04</span> DUELO</div>
+      <div class="duel-pilot-selectors">
+        <div class="pilot-submit">
+          <label for="duelPilotASelect">PILOTO A</label>
+          <select id="duelPilotASelect" class="pilot-select duel-pilot-select" aria-label="Seleccionar piloto A">
+            <option value="">CARGANDO PILOTOS...</option>
+          </select>
+        </div>
+        <div class="pilot-submit">
+          <label for="duelPilotBSelect">PILOTO B</label>
+          <select id="duelPilotBSelect" class="pilot-select duel-pilot-select" aria-label="Seleccionar piloto B">
+            <option value="">CARGANDO PILOTOS...</option>
+          </select>
+        </div>
+      </div>
       <div class="duel-names">
-        <div><small>PILOTO A</small><strong>YASPHER</strong></div>
+        <div><small>PILOTO A</small><strong id="duelPilotNameA">SELECCIONA PILOTO</strong></div>
         <div class="vs">VS</div>
-        <div><small>PILOTO B</small><strong>JUAN</strong></div>
+        <div><small>PILOTO B</small><strong id="duelPilotNameB">SELECCIONA PILOTO</strong></div>
       </div>
       <div class="duel-scores">
         <div id="scoreA">---</div>
@@ -141,8 +176,10 @@
       </div>
       <div class="duel-session-actions">
         <p>3 intentos válidos por piloto. Gana el mejor tiempo.</p>
+        <button id="submitDuelBtn" class="submit-best" type="button" disabled>SUBIR MEJORES TIEMPOS</button>
         <button id="resetDuelBtn" class="secondary-action" type="button">↻ REINICIAR SECCIÓN</button>
       </div>
+      <div id="duelSaveMessage" class="result-message duel-save-message" aria-live="polite"></div>
     </section>
 
   </main>

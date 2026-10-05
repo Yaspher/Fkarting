@@ -274,22 +274,41 @@ function pilotStat(value) {
     return value === null || value === undefined || Number(value) === 0 ? "~" : value;
 }
 
-function renderPilotos(grid, data, emptyMessage) {
+function renderPilotos(grid, data, emptyMessage, options = {}) {
     if (!data?.length) {
         grid.innerHTML = `<p class="empty-msg">${emptyMessage}</p>`;
         return;
     }
 
-    grid.innerHTML = data.map(d => {
+    const { legendary = false } = options;
+    const ordered = legendary
+        ? [...data].sort((a, b) => {
+            const aChamp = Number(field(a, "Campeonato", "campeonato")) || 0;
+            const bChamp = Number(field(b, "Campeonato", "campeonato")) || 0;
+            if (bChamp !== aChamp) return bChamp - aChamp;
+            return (Number(field(b, "Victorias", "victorias")) || 0) - (Number(field(a, "Victorias", "victorias")) || 0);
+        })
+        : data;
+
+    const legendClass = index => {
+        if (!legendary) return "";
+        if (index === 0) return "driver-card--gold";
+        if (index === 1) return "driver-card--silver";
+        if (index === 2) return "driver-card--bronze";
+        return "";
+    };
+
+    grid.innerHTML = ordered.map((d, index) => {
         const id = field(d, "Id", "id");
         const nombre = field(d, "Nombre", "nombre");
         const numero = field(d, "Numero", "numero");
         const campeonato = field(d, "Campeonato", "campeonato");
         const victorias = field(d, "Victorias", "victorias");
         const podios = field(d, "Podios", "podios");
+        const medalClass = legendClass(index);
 
         return `
-            <div class="driver-card" data-id="${id ?? ""}">
+            <div class="driver-card ${medalClass}" data-id="${id ?? ""}">
                 <div class="driver-num">#${numero ?? "—"}</div>
                 <div class="driver-name">${formatName(nombre)}</div>
                 <div class="driver-stats">
@@ -335,7 +354,7 @@ async function loadPilotos() {
 async function loadPilotosLegendarios() {
     const grid = document.getElementById("legendaryDriversGrid");
     try {
-        renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.");
+        renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.", { legendary: true });
     } catch (err) {
         console.error("Pilotos legendarios:", err);
         const message = String(err?.message ?? "");

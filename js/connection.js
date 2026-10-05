@@ -16,6 +16,11 @@ const BASE_HEADERS = {
 
 const FETCH_TIMEOUT = 10_000; // 10 segundos
 
+function showDatabaseUnavailable() {
+    if (window.location.pathname.endsWith("/estadosweb/database-unavailable.html")) return;
+    window.location.replace(new URL("estadosweb/database-unavailable.html", window.location.href).href);
+}
+
 
 // ════════════════════════════════════════════════════════════════
 //  CORE — fetch con timeout automático
@@ -26,11 +31,21 @@ function fetchWithTimeout(url, options = {}) {
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
     return fetch(url, { ...options, signal: controller.signal })
         .catch(err => {
-            if (err.name === "AbortError")
+            if (err.name === "AbortError") {
+                showDatabaseUnavailable();
                 throw new Error("Tiempo de espera agotado. Verifica tu conexión.");
+            }
+            if (err instanceof TypeError) showDatabaseUnavailable();
             throw err;
         })
         .finally(() => clearTimeout(timer));
+}
+
+async function throwIfRequestFailed(res) {
+    if (res.ok) return;
+    const error = await res.text();
+    if (res.status === 408 || res.status >= 500) showDatabaseUnavailable();
+    throw new Error(error);
 }
 
 
@@ -41,7 +56,7 @@ function fetchWithTimeout(url, options = {}) {
 async function sbGet(table, params = "") {
     const url = `${SUPABASE_URL}/rest/v1/${table}${params ? "?" + params : ""}`;
     const res = await fetchWithTimeout(url, { headers: BASE_HEADERS });
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     return res.json();
 }
 
@@ -50,7 +65,7 @@ async function sbPost(table, body) {
         `${SUPABASE_URL}/rest/v1/${table}`,
         { method: "POST", headers: BASE_HEADERS, body: JSON.stringify(body) }
     );
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     return res.json();
 }
 
@@ -59,7 +74,7 @@ async function sbPatch(table, id, idField, body) {
         `${SUPABASE_URL}/rest/v1/${table}?${idField}=eq.${id}`,
         { method: "PATCH", headers: BASE_HEADERS, body: JSON.stringify(body) }
     );
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     return res.json();
 }
 
@@ -71,7 +86,7 @@ async function sbDelete(table, id, idField) {
             headers: { ...BASE_HEADERS, "Prefer": "return=representation" }
         }
     );
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     const data = await res.json();
     if (!data.length) throw new Error("Registro no encontrado o ya fue eliminado.");
     return data;
@@ -148,10 +163,17 @@ export const getPilotoById          = (id) => sbGet("piloto", `id_piloto=eq.${id
 export const getPilotosActivosAdmin = () => sbGet("piloto", "pilo_activo=eq.true&order=pilo_nombre.asc&select=id_piloto,pilo_nombre,pilo_numero");
 export const getPilotosActivosCount = () => sbGet("piloto", "pilo_activo=eq.true&select=id_piloto");
 
+export const getVistaReaccion = () =>
+    sbGet("vista_reaccion", "select=*&order=created_at.desc");
+
 export const createGameReaccion = (body) => sbPost("Game_Reaccion", {
     GR_piloto: body.piloto,
     GR_Reaccion: body.reaccion,
-    GR_duelo_estado: false
+    GR_duelo_estado: body.duelo ?? false,
+    ...(body.duelo && {
+        GR_Rival: body.rival,
+        GR_Rival_reaccion: body.rivalReaccion
+    })
 });
 
 export const createPiloto = (body) => sbPost("piloto", {
