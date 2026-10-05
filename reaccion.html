@@ -65,6 +65,24 @@
           <div><b id="attemptLabel">0 / ∞</b><small>INTENTOS</small></div>
           <div><b id="best">---</b><small>MEJOR</small></div>
         </div>
+
+        <div id="classificationActions" class="classification-actions" aria-label="Acciones de clasificación">
+          <button id="resetQualifyingBtn" class="secondary-action" type="button">
+            ↻ REINICIAR INTENTOS
+          </button>
+          <div class="pilot-submit">
+            <label for="pilotSelect">PILOTO</label>
+            <div class="pilot-submit-row">
+              <select id="pilotSelect" class="pilot-select" aria-label="Seleccionar piloto">
+                <option value="">SELECCIONAR PILOTO</option>
+                <option value="pilot-1">YASPHER</option>
+                <option value="pilot-2">AMBER</option>
+                <option value="pilot-3">JUAN</option>
+              </select>
+              <button id="submitBestBtn" class="submit-best" type="button">ENVIAR MEJOR</button>
+            </div>
+          </div>
+        </div>
       </div>
 
     </section>
@@ -88,7 +106,10 @@
         <div></div>
         <div id="scoreB">---</div>
       </div>
-      <p style="margin-top:16px;color:#666;font-size:15px">3 intentos válidos por piloto. Gana el mejor tiempo.</p>
+      <div class="duel-session-actions">
+        <p>3 intentos válidos por piloto. Gana el mejor tiempo.</p>
+        <button id="resetDuelBtn" class="secondary-action" type="button">↻ REINICIAR SECCIÓN</button>
+      </div>
     </section>
 
   </main>

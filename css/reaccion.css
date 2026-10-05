@@ -376,3 +376,26 @@ footer span {
     grid-template-columns: 45px 1fr 90px 75px;
   }
 }
+/* ── Classification / result actions ── */
+.classification-actions{display:none;margin-top:18px;padding-top:18px;border-top:1px solid #292929;gap:12px;flex-direction:column}
+.classification-actions.is-visible{display:flex}
+.secondary-action,.submit-best{border:1px solid #333;border-radius:2px;padding:12px 14px;font:700 14px "Barlow Condensed",Arial,sans-serif;letter-spacing:1.5px;cursor:pointer;transition:background .15s,border-color .15s,color .15s,opacity .15s}
+.secondary-action{width:100%;background:#151515;color:#aaa}
+.secondary-action:hover{background:#202020;border-color:#555;color:#fff}
+.pilot-submit{display:flex;flex-direction:column;gap:7px}
+.pilot-submit label{color:#777;font-size:12px;font-weight:700;letter-spacing:2px}
+.pilot-submit-row{display:grid;grid-template-columns:1fr auto;gap:7px}
+.pilot-select{width:100%;min-width:0;background:#080808;border:1px solid #333;border-radius:2px;color:#fff;padding:12px 13px;font:600 15px "Barlow Condensed",Arial,sans-serif;letter-spacing:1px;outline:none;cursor:pointer}
+.pilot-select:focus{border-color:#e30613}
+.pilot-select option{background:#101010;color:#fff}
+.submit-best{background:#e30613;border-color:#e30613;color:#fff;white-space:nowrap}
+.submit-best:hover{background:#b90510;border-color:#b90510}
+.submit-best:disabled{opacity:.35;cursor:not-allowed}
+.duel-session-actions{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:16px;padding-top:16px;border-top:1px solid #292929}
+.duel-session-actions p{margin:0;color:#666;font-size:15px}
+.duel-session-actions .secondary-action{width:auto;min-width:210px}
+@media(max-width:760px){
+  .pilot-submit-row{grid-template-columns:1fr}
+  .duel-session-actions{flex-direction:column;align-items:stretch}
+  .duel-session-actions .secondary-action{width:100%}
+}
