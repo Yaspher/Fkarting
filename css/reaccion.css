@@ -1,4 +1,4 @@
-/* ── FKarting Reaction Test · styles.css ──────────────────────────────────── */
+/* ── FKarting Reaction Test ──────────────────────────────────────────────── */
 
 * { box-sizing: border-box; }
 
@@ -6,49 +6,18 @@ body {
   margin: 0;
   background: #080808;
   color: #fff;
-  font-family: "Barlow Condensed", Arial, sans-serif;
+  font-family: "Barlow", Arial, sans-serif;
   min-height: 100vh;
 }
 
 .page {
   max-width: 1180px;
   margin: auto;
-  padding: 22px 24px;
-}
-
-/* ── Header ── */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #292929;
-  padding-bottom: 18px;
-}
-
-.brand {
-  font-weight: 800;
-  font-size: 25px;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.fk {
-  background: #e30613;
-  padding: 2px 7px;
-  transform: skew(-12deg);
-  display: inline-block;
-}
-
-.demo {
-  font-size: 13px;
-  color: #8a8a8a;
-  letter-spacing: 2px;
+  padding: 0 24px 28px;
 }
 
 /* ── Hero ── */
-.hero {
+.reaction-hero {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -63,15 +32,27 @@ header {
   margin: 0 0 8px;
 }
 
-.hero h1 {
+.reaction-hero h1 {
   font-size: clamp(55px, 9vw, 105px);
   line-height: .76;
   margin: 0;
   font-weight: 800;
   letter-spacing: -2px;
+  font-family: "Barlow Condensed", Arial, sans-serif;
 }
 
-.hero h1 span { color: #e30613; }
+.reaction-hero h1 span { color: #e30613; }
+
+.eyebrow,
+.panel-title,
+.status,
+.time,
+.stats b,
+.history-row b,
+.duel-names strong,
+.duel-scores {
+  font-family: "Barlow Condensed", Arial, sans-serif;
+}
 
 .intro {
   color: #aaa;
@@ -92,9 +73,8 @@ header {
   border: 1px solid #333;
   color: #aaa;
   padding: 11px 15px;
-  font: 700 15px inherit;
+  font: 700 15px "Barlow Condensed", Arial, sans-serif;
   cursor: pointer;
-  /* BUG-FIX 7: border-radius consistente con el resto del diseño */
   border-radius: 2px;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
@@ -194,7 +174,7 @@ header {
   margin-top: 18px;
   border: 0;
   padding: 16px;
-  font: 800 19px inherit;
+  font: 800 19px "Barlow Condensed", Arial, sans-serif;
   letter-spacing: 2px;
   cursor: pointer;
   border-radius: 2px;
@@ -210,8 +190,6 @@ header {
   color: #080808;
 }
 
-/* BUG-FIX 7: pointer-events:none garantiza que el botón
-   sea totalmente inerte en todos los navegadores cuando está disabled */
 .react:disabled {
   opacity: .25;
   cursor: not-allowed;
@@ -333,23 +311,21 @@ header {
 /* ── Utilities ── */
 .hidden { display: none; }
 
-/* ── Footer ── */
-footer {
-  padding: 30px 0 10px;
-  color: #555;
-  font-size: 12px;
-  letter-spacing: 2px;
-}
-
-footer span {
-  float: right;
-  color: #e30613;
+.reaction-footer .logo-wordmark {
+  height: 22px;
 }
 
 /* ── Responsive ── */
 @media (max-width: 760px) {
-  .hero,
+  .reaction-hero,
   .game-grid { display: block; }
+
+  .page {
+    width: 100%;
+    padding: 0 16px 24px;
+  }
+
+  .reaction-hero { padding-top: 42px; }
 
   .mode-switch {
     justify-content: flex-start;

@@ -1,5 +1,7 @@
 // ── FKarting Reaction Test · reaccion.js ─────────────────────────────────────
 
+import { createGameReaccion, getPilotosActivosAdmin } from "./connection.js";
+
 const lights       = [...document.querySelectorAll(".light")];
 const startBtn     = document.getElementById("startBtn");
 const reactBtn     = document.getElementById("reactBtn");
@@ -27,6 +29,9 @@ let mode      = "training";
 let turn      = "A";
 let duelA     = [];
 let duelB     = [];
+let pilotsLoaded = false;
+let isSubmitting = false;
+let hasSubmitted = false;
 
 // En duelo, guardamos el piloto responsable de cada intento para que una
 // salida falsa no altere el turno ni el historial visual.
@@ -54,6 +59,47 @@ function bestAttempt() {
   return valid.length ? Math.min(...valid) : null;
 }
 
+async function loadPilots() {
+  pilotSelect.disabled = true;
+
+  try {
+    const pilots = await getPilotosActivosAdmin();
+    const options = pilots.map(pilot => {
+      const id = pilot.id_piloto;
+      const name = pilot.pilo_nombre;
+      const number = pilot.pilo_numero;
+
+      if (!Number.isSafeInteger(id) || id <= 0) {
+        throw new Error("La tabla de pilotos no devolvió un identificador entero válido.");
+      }
+      if (typeof name !== "string" || !name.trim()) {
+        throw new Error("La tabla de pilotos devolvió un registro sin nombre.");
+      }
+
+      return {
+        id,
+        label: number === null || number === undefined ? name : `${name} · #${number}`
+      };
+    });
+
+    if (!options.length) {
+      throw new Error("No hay pilotos disponibles para seleccionar.");
+    }
+
+    pilotSelect.replaceChildren(
+      new Option("SELECCIONAR PILOTO", ""),
+      ...options.map(pilot => new Option(pilot.label, pilot.id))
+    );
+    pilotsLoaded = true;
+  } catch (error) {
+    console.error("Error al cargar pilotos para Reaction Test:", error);
+    pilotSelect.replaceChildren(new Option("NO SE PUDIERON CARGAR PILOTOS", ""));
+    messageEl.textContent = `No fue posible cargar los pilotos: ${error?.message ?? error}`;
+  }
+
+  updateModeActions();
+}
+
 // ── Acciones de modo ──────────────────────────────────────────────────────────
 
 function updateModeActions() {
@@ -69,17 +115,20 @@ function updateModeActions() {
   if (submitBestBtn) {
     // El envío queda habilitado sólo cuando existe un mejor resultado,
     // hay piloto seleccionado y la serie de clasificación está completa.
-    submitBestBtn.disabled = !(isQualifying && hasBest && hasPilot && complete);
+    submitBestBtn.disabled = !(isQualifying && hasBest && hasPilot && complete
+      && pilotsLoaded && !isSubmitting && !hasSubmitted);
   }
+  pilotSelect.disabled = !pilotsLoaded || isSubmitting || hasSubmitted;
 }
 
 function resetQualifying() {
-  if (mode !== "qualifying") return;
+  if (mode !== "qualifying" || isSubmitting) return;
 
   clearTimeout(lightTimer);
   clearTimeout(goTimer);
 
   attempts = [];
+  hasSubmitted = false;
   state = "idle";
   resetUI();
 
@@ -101,6 +150,7 @@ function resetDuel() {
   duelA = [];
   duelB = [];
   duelAttemptPilots = [];
+  hasSubmitted = false;
   turn = "A";
 
   state = "idle";
@@ -364,12 +414,12 @@ if (pilotSelect) {
 }
 
 if (submitBestBtn) {
-  submitBestBtn.onclick = () => {
-    if (mode !== "qualifying") return;
+  submitBestBtn.onclick = async () => {
+    if (mode !== "qualifying" || isSubmitting || hasSubmitted) return;
 
     const best = bestAttempt();
     const pilotId = pilotSelect?.value || "";
-    const pilotName = pilotSelect?.selectedOptions?.[0]?.textContent || "";
+    const pilotName = pilotSelect?.selectedOptions?.[0]?.textContent?.trim() || "";
 
     if (validCount() < 3 || best === null) {
       messageEl.textContent = "Completa los 3 intentos válidos antes de enviar el mejor resultado.";
@@ -380,20 +430,50 @@ if (submitBestBtn) {
       messageEl.textContent = "Selecciona un piloto antes de enviar el resultado.";
       return;
     }
+    const pilotIdNumber = Number(pilotId);
+    if (!Number.isSafeInteger(pilotIdNumber) || pilotIdNumber <= 0) {
+      messageEl.textContent = "El piloto seleccionado no tiene un identificador válido.";
+      return;
+    }
 
-    // Preparado para la futura integración con Supabase.
-    // Por ahora no se escribe en la base de datos porque este archivo aún no
-    // tiene conexión/configuración de Supabase.
-    const payload = {
-      piloto: pilotId,
-      piloto_nombre: pilotName,
-      reaccion_ms: best
-    };
+    isSubmitting = true;
+    submitBestBtn.textContent = "ENVIANDO...";
+    messageEl.textContent = "Guardando el mejor resultado...";
+    updateModeActions();
 
-    console.log("FKarting · mejor resultado listo para enviar:", payload);
-    messageEl.textContent = `MEJOR RESULTADO PREPARADO · ${pilotName} · ${best} ms`;
+    try {
+      await createGameReaccion({ piloto: pilotIdNumber, reaccion: best });
+      hasSubmitted = true;
+      messageEl.textContent = `MEJOR RESULTADO GUARDADO · ${pilotName} · ${best} ms`;
+    } catch (error) {
+      console.error("Error al guardar resultado de Reaction Test:", error);
+      messageEl.textContent = `No se pudo guardar el resultado: ${error?.message ?? error}`;
+    } finally {
+      isSubmitting = false;
+      submitBestBtn.textContent = "ENVIAR MEJOR";
+      updateModeActions();
+    }
   };
 }
+
+const hamburger = document.getElementById("hamburger");
+const navMobile = document.getElementById("navMobile");
+
+hamburger.addEventListener("click", () => {
+  const isOpen = hamburger.classList.toggle("open");
+  navMobile.classList.toggle("open", isOpen);
+  hamburger.setAttribute("aria-expanded", String(isOpen));
+  hamburger.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+});
+
+navMobile.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", () => {
+    hamburger.classList.remove("open");
+    navMobile.classList.remove("open");
+    hamburger.setAttribute("aria-expanded", "false");
+    hamburger.setAttribute("aria-label", "Abrir menú");
+  });
+});
 
 document.addEventListener("keydown", e => {
   if (e.code !== "Space") return;
@@ -414,3 +494,4 @@ document.addEventListener("keydown", e => {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 resetUI();
+loadPilots();

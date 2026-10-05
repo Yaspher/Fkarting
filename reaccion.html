@@ -3,27 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>FKARTING — Reaction Test</title>
+  <title>FKarting — Reaction Test</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/reaccion.css">
 </head>
-<body>
-<div class="page">
+<body class="reaction-page">
 
-  <header>
-    <div class="brand"><span class="fk">FK</span><span>FKARTING</span></div>
-    <span class="demo">REACTION TEST · DEMO</span>
-  </header>
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo">
+      <picture>
+        <source srcset="img/fkarting-logo-principal.webp" type="image/webp">
+        <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+      </picture>
+    </a>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="index.html#ranking">Ranking</a></li>
+        <li><a href="index.html#proximas-carreras">Próximas</a></li>
+        <li><a href="index.html#top5-global">Top 5</a></li>
+        <li><a href="index.html#pilotoslegendarios">Pilotos Legendarios</a></li>
+        <li><a href="ayuda.html">Ayuda</a></li>
+      </ul>
+    </nav>
+    <a href="login.html" class="navbar-admin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+      </svg>
+      Admin
+    </a>
+    <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMobile">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+  <nav class="nav-mobile" id="navMobile" aria-label="Navegación móvil">
+    <a href="index.html#ranking">Ranking</a>
+    <a href="index.html#proximas-carreras">Próximas</a>
+    <a href="index.html#top5-global">Top 5</a>
+    <a href="index.html#pilotoslegendarios">Pilotos Legendarios</a>
+    <a href="ayuda.html">Ayuda</a>
+  </nav>
+</header>
+
+<div class="page">
 
   <main>
 
     <!-- Hero + selector de modo -->
-    <section class="hero">
+    <section class="reaction-hero">
       <div>
         <p class="eyebrow">EN SUS MARCAS · LISTOS · FUERA</p>
         <h1>REACTION<br><span>TEST</span></h1>
-        <p class="intro">Pon a prueba tus reflejos. Espera a que se apaguen las luces y reacciona.</p>
       </div>
       <div class="mode-switch" role="group" aria-label="Seleccionar modo de juego">
         <button class="mode active" data-mode="training"   aria-pressed="true">ENTRENAMIENTO</button>
@@ -74,10 +110,7 @@
             <label for="pilotSelect">PILOTO</label>
             <div class="pilot-submit-row">
               <select id="pilotSelect" class="pilot-select" aria-label="Seleccionar piloto">
-                <option value="">SELECCIONAR PILOTO</option>
-                <option value="pilot-1">YASPHER</option>
-                <option value="pilot-2">AMBER</option>
-                <option value="pilot-3">JUAN</option>
+                <option value="">CARGANDO PILOTOS...</option>
               </select>
               <button id="submitBestBtn" class="submit-best" type="button">ENVIAR MEJOR</button>
             </div>
@@ -114,9 +147,22 @@
 
   </main>
 
-  <footer>FKARTING · REACTION TEST <span>DEMO</span></footer>
-
 </div>
-<script src="js/reaccion.js"></script>
+
+<footer class="footer reaction-footer">
+  <div class="container footer-inner">
+    <div class="footer-logo">
+      <picture>
+        <source srcset="img/fkarting-logo-principal.webp" type="image/webp">
+        <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+      </picture>
+    </div>
+    <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados — <span data-version></span></p>
+    <a href="login.html" class="footer-admin">Administración</a>
+  </div>
+</footer>
+
+<script type="module" src="js/reaccion.js"></script>
+<script type="module" src="js/gameversion.js"></script>
 </body>
 </html>

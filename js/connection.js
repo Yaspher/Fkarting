@@ -148,6 +148,12 @@ export const getPilotoById          = (id) => sbGet("piloto", `id_piloto=eq.${id
 export const getPilotosActivosAdmin = () => sbGet("piloto", "pilo_activo=eq.true&order=pilo_nombre.asc&select=id_piloto,pilo_nombre,pilo_numero");
 export const getPilotosActivosCount = () => sbGet("piloto", "pilo_activo=eq.true&select=id_piloto");
 
+export const createGameReaccion = (body) => sbPost("Game_Reaccion", {
+    GR_piloto: body.piloto,
+    GR_Reaccion: body.reaccion,
+    GR_duelo_estado: false
+});
+
 export const createPiloto = (body) => sbPost("piloto", {
     pilo_nombre: body.nombre,
     pilo_numero: body.numero ?? null,
