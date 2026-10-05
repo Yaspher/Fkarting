@@ -6,11 +6,9 @@ import {
     getTop5GlobalVista,
     getTop5UltimaCarreraVista,
     getCarreraVista,
-    VERSION
+    getCampeonatoActivo,
+    getProximasCarreras
 } from './connection.js';
-
-document.querySelectorAll('[data-version]')
-  .forEach(el => el.textContent = VERSION);
   
 // ════════════════════════════════════════════════════════════════
 //  HELPERS
@@ -61,6 +59,19 @@ function field(row, ...keys) {
 // Capitaliza cada palabra
 function formatName(name) {
     return name?.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) || "";
+}
+
+function formatFecha(fecha, options = { day: "2-digit", month: "short", year: "numeric" }) {
+    if (!fecha) return "Por definir";
+    return new Date(`${fecha}T00:00:00`).toLocaleDateString("es-DO", options);
+}
+
+function formatHora(hora) {
+    if (!hora) return "Por definir";
+    const [hours, minutes] = hora.split(":");
+    if (hours === undefined || minutes === undefined) return hora;
+    return new Date(2000, 0, 1, Number(hours), Number(minutes))
+        .toLocaleTimeString("es-DO", { hour: "numeric", minute: "2-digit" });
 }
 
 
@@ -263,22 +274,41 @@ function pilotStat(value) {
     return value === null || value === undefined || Number(value) === 0 ? "~" : value;
 }
 
-function renderPilotos(grid, data, emptyMessage) {
+function renderPilotos(grid, data, emptyMessage, options = {}) {
     if (!data?.length) {
         grid.innerHTML = `<p class="empty-msg">${emptyMessage}</p>`;
         return;
     }
 
-    grid.innerHTML = data.map(d => {
+    const { legendary = false } = options;
+    const ordered = legendary
+        ? [...data].sort((a, b) => {
+            const aChamp = Number(field(a, "Campeonato", "campeonato")) || 0;
+            const bChamp = Number(field(b, "Campeonato", "campeonato")) || 0;
+            if (bChamp !== aChamp) return bChamp - aChamp;
+            return (Number(field(b, "Victorias", "victorias")) || 0) - (Number(field(a, "Victorias", "victorias")) || 0);
+        })
+        : data;
+
+    const legendClass = index => {
+        if (!legendary) return "";
+        if (index === 0) return "driver-card--gold";
+        if (index === 1) return "driver-card--silver";
+        if (index === 2) return "driver-card--bronze";
+        return "";
+    };
+
+    grid.innerHTML = ordered.map((d, index) => {
         const id = field(d, "Id", "id");
         const nombre = field(d, "Nombre", "nombre");
         const numero = field(d, "Numero", "numero");
         const campeonato = field(d, "Campeonato", "campeonato");
         const victorias = field(d, "Victorias", "victorias");
         const podios = field(d, "Podios", "podios");
+        const medalClass = legendClass(index);
 
         return `
-            <div class="driver-card" data-id="${id ?? ""}">
+            <div class="driver-card ${medalClass}" data-id="${id ?? ""}">
                 <div class="driver-num">#${numero ?? "—"}</div>
                 <div class="driver-name">${formatName(nombre)}</div>
                 <div class="driver-stats">
@@ -324,7 +354,7 @@ async function loadPilotos() {
 async function loadPilotosLegendarios() {
     const grid = document.getElementById("legendaryDriversGrid");
     try {
-        renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.");
+        renderPilotos(grid, await getPilotosLegendariosVista(), "No hay pilotos legendarios registrados.", { legendary: true });
     } catch (err) {
         console.error("Pilotos legendarios:", err);
         const message = String(err?.message ?? "");
@@ -337,6 +367,78 @@ async function loadPilotosLegendarios() {
                 <br>
                 <small style="opacity:.6">${escapeHtml(message)}</small>
             </p>`;
+    }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  PRÓXIMAS CARRERAS
+// ════════════════════════════════════════════════════════════════
+
+function renderProximasCarreras(container, carreras) {
+    if (!carreras.length) {
+        container.innerHTML = `<p class="empty-msg">No hay carreras pendientes programadas.</p>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="upcoming-races-scroll">
+            <table class="upcoming-races-table">
+                <caption class="sr-only">Carreras pendientes del campeonato activo</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Ronda</th>
+                        <th scope="col">Carrera</th>
+                        <th scope="col">Circuito</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${carreras.map((carrera, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${escapeHtml(carrera.nombre ?? "Sin nombre")}</td>
+                            <td>${escapeHtml(carrera.circuito ?? "Por definir")}${carrera.carrera_hora ? `<span class="upcoming-race-time">${escapeHtml(formatHora(carrera.carrera_hora))}</span>` : ""}</td>
+                            <td>${escapeHtml(formatFecha(carrera.fecha))}</td>
+                            <td><span class="upcoming-race-status ${index === 0 ? "is-next" : ""}">${index === 0 ? "🏁 Próxima" : "Pendiente"}</span></td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+function setModalRace(carrera) {
+    const values = {
+        nextRaceStatus: carrera ? "Pendiente" : "Sin próxima carrera",
+        nextRaceName: carrera?.nombre ?? "No hay carrera pendiente",
+        nextRaceCircuit: carrera?.circuito ?? "Por definir",
+        nextRaceDate: formatFecha(carrera?.fecha, { day: "2-digit", month: "long", year: "numeric" }),
+        nextRaceTime: formatHora(carrera?.carrera_hora)
+    };
+
+    Object.entries(values).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    });
+}
+
+async function loadProximasCarreras() {
+    const container = document.getElementById("upcomingRacesTable");
+    if (!container) return [];
+
+    try {
+        const campeonatos = await getCampeonatoActivo();
+        const camp = campeonatos[0];
+        const carreras = camp ? await getProximasCarreras(camp.id_campeonato) : [];
+        renderProximasCarreras(container, carreras);
+        setModalRace(carreras[0] ?? null);
+        return carreras;
+    } catch (err) {
+        console.error("Próximas carreras:", err);
+        container.innerHTML = `<p class="empty-msg">Error al cargar próximas carreras.</p>`;
+        setModalRace(null);
+        return [];
     }
 }
 
@@ -458,7 +560,8 @@ async function init() {
         loadTop5UltimaCarrera(),
         loadUltimaCarrera(),
         loadPilotos(),
-        loadPilotosLegendarios()
+        loadPilotosLegendarios(),
+        loadProximasCarreras()
     ]);
 }
 

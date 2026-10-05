@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FKarting — En construcción</title>
+    <meta name="description" content="FKarting, página en construcción. Muy pronto estará disponible el nuevo sitio del campeonato.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808;
+            --bg-dark: #0a0a0a;
+            --bg-card: #111111;
+            --bg-alt: #0c0c0c;
+            --border: rgba(127, 29, 29, 0.30);
+            --border-soft: rgba(127, 29, 29, 0.20);
+            --border-dim: rgba(127, 29, 29, 0.12);
+            --red: #dc2626;
+            --red-700: #b91c1c;
+            --red-500: #ef4444;
+            --red-900: #7f1d1d;
+            --white: #ffffff;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gold: #eab308;
+            --silver: #d1d5db;
+            --bronze: #d97706;
+            --font-display: 'Barlow Condensed', sans-serif;
+            --font-body: 'Barlow', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: var(--font-body);
+            color: var(--gray-300);
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.1)),
+                radial-gradient(circle at 50% 25%, rgba(127, 29, 29, 0.28), transparent 44%),
+                var(--bg);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(220, 38, 38, 0.14) 0%, transparent 68%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        a { text-decoration: none; }
+        ul { list-style: none; }
+
+        .container {
+            width: min(92%, 1200px);
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 10, 10, 0.96);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+        }
+
+        .navbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            gap: 24px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .logo-wordmark {
+            display: block;
+            height: 30px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+        }
+
+        .navbar nav ul {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .navbar nav a {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+
+        .navbar nav a:hover {
+            color: var(--white);
+            background: rgba(127, 29, 29, 0.15);
+        }
+
+        .navbar-admin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid var(--border);
+            color: var(--gray-600);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .navbar-admin:hover {
+            color: var(--red-500);
+            border-color: var(--red-900);
+        }
+
+        .navbar-admin svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .hamburger {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: var(--white);
+            border-radius: 999px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .hamburger.is-open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger.is-open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.is-open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .nav-mobile {
+            display: none;
+            flex-direction: column;
+            background: rgba(10, 10, 10, 0.98);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-mobile.is-open { display: flex; }
+
+        .nav-mobile a {
+            color: var(--gray-400);
+            font-weight: 600;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-dim);
+        }
+
+        .nav-mobile a:last-child { border-bottom: none; }
+
+        .nav-mobile a:hover {
+            color: var(--white);
+            background: rgba(127, 29, 29, 0.10);
+        }
+
+        .page-hero {
+            position: relative;
+            padding: 72px 0 32px;
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(234, 179, 8, 0.8), transparent);
+        }
+
+        .construction-shell {
+            position: relative;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 46px 32px 42px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            background: rgba(17, 17, 17, 0.72);
+            box-shadow: 0 18px 80px rgba(0, 0, 0, 0.35);
+        }
+
+        .construction-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(220, 38, 38, 0.12), transparent 42%, rgba(234, 179, 8, 0.10));
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .construction-inner {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 14px;
+            border: 1px solid rgba(234, 179, 8, 0.45);
+            border-radius: 999px;
+            color: var(--gold);
+            background: rgba(234, 179, 8, 0.06);
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero-logo {
+            height: 60px;
+            width: auto;
+            max-width: 300px;
+            margin: 0 auto 18px;
+            display: block;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(234, 179, 8, 0.14));
+        }
+
+        h1 {
+            margin: 0;
+            font-family: var(--font-display);
+            font-size: clamp(2.4rem, 7vw, 5rem);
+            line-height: 0.95;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        .subtitle {
+            max-width: 680px;
+            margin: 18px auto 0;
+            color: var(--gray-400);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(140px, 1fr));
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .status-item {
+            border: 1px solid var(--border-soft);
+            border-radius: 14px;
+            padding: 16px 14px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-label {
+            display: block;
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 6px;
+        }
+
+        .status-value {
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .road {
+            height: 10px;
+            margin: 30px auto 0;
+            width: min(100%, 540px);
+            background: repeating-linear-gradient(
+                90deg,
+                var(--gold) 0 42px,
+                rgba(234, 179, 8, 0.15) 42px 72px
+            );
+            border-radius: 999px;
+            opacity: 0.9;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .btn-primary,
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .btn-primary {
+            background: var(--red-700);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover,
+        .btn-ghost:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:hover {
+            background: var(--red);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray-300);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--red-900);
+            color: var(--white);
+        }
+
+        .footer {
+            padding: 26px 0 36px;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-copy {
+            color: var(--gray-500);
+            font-size: 0.82rem;
+            text-align: center;
+        }
+
+        .footer-admin {
+            color: var(--gray-400);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .footer-admin:hover {
+            color: var(--white);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-inner {
+                gap: 12px;
+                height: 58px;
+            }
+
+            .navbar nav { display: none; }
+            .navbar-admin { display: none; }
+            .hamburger { display: flex; }
+
+            .construction-shell {
+                padding: 32px 20px 28px;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-inner">
+            <a href="../index.html" class="logo" aria-label="FKarting Home">
+                <picture>
+                    <source srcset="../img/fkarting-logo-principal.webp" type="image/webp">
+                    <img src="../img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+                </picture>
+            </a>
+
+            <nav aria-label="Navegación principal">
+                <ul>
+                    <li><a href="../index.html#ranking">Ranking</a></li>
+                    <li><a href="../index.html#proximas-carreras">Próximas</a></li>
+                    <li><a href="../index.html#top5-global">Top 5</a></li>
+                    <li><a href="../index.html#pilotoslegendarios">Pilotos Legendarios</a></li>
+                    
+                </ul>
+            </nav>
+
+            <a href="../login.html" class="navbar-admin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                </svg>
+                Admin
+            </a>
+
+            <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMobile">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <nav class="nav-mobile" id="navMobile" aria-label="Navegación móvil">
+            <a href="../index.html#ranking">Ranking</a>
+            <a href="../index.html#proximas-carreras">Próximas</a>
+            <a href="../index.html#top5-global">Top 5</a>
+            <a href="../index.html#pilotoslegendarios">Pilotos Legendarios</a>
+            
+        </nav>
+    </header>
+
+    <main class="page-hero">
+        <div class="container">
+            <section class="construction-shell" aria-labelledby="construction-title">
+                <div class="construction-inner">
+                    <span class="eyebrow">Web en mantenimiento</span>
+                    <h1 id="construction-title">Estamos preparando Grandes experiencias</h1>
+                    <p class="subtitle">
+                        Estamos afinando detalles, resultados y contenido para que la experiencia completa del campeonato esté lista muy pronto.
+                    </p>
+
+                    <h3 id="construction-subtitle">
+                        Vuelve a visitarnos en breve
+                    </h3>
+
+                    <!-- <div class="status-grid" aria-label="Estado del sitio">
+                        <div class="status-item">
+                            <span class="status-label">Estado</span>
+                            <span class="status-value">En desarrollo</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Próxima actualización</span>
+                            <span class="status-value">24h</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Experiencia</span>
+                            <span class="status-value">FKarting</span>
+                        </div>
+                    </div> -->
+
+                    <div class="road" aria-hidden="true"></div>
+
+                    <div class="actions">
+                        <a href="../index.html" class="btn-primary">Volver a inicio</a>
+                        <a href="../ayuda.html" class="btn-ghost">Ayuda</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-logo">
+                <img src="../img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+            </div>
+            <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados — <span data-version></span></p>
+            <a href="../login.html" class="footer-admin">Administración</a>
+        </div>
+    </footer>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navMobile = document.getElementById('navMobile');
+
+        if (hamburger && navMobile) {
+            hamburger.addEventListener('click', () => {
+                const isOpen = hamburger.classList.toggle('is-open');
+                navMobile.classList.toggle('is-open', isOpen);
+                hamburger.setAttribute('aria-expanded', String(isOpen));
+            });
+
+            navMobile.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('is-open');
+                    navMobile.classList.remove('is-open');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                });
+            });
+        }
+    </script>
+
+    
+<script type="module" src="../js/gameversion.js"></script>
+</body>
+</html>

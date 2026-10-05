@@ -3,7 +3,7 @@
 ## Identidad y estado
 
 - **Nombre:** FKarting.
-- **Versión del proyecto:** v2.0.0.
+- **Versión del proyecto:** v2.3.2.
 - **Tipo:** sitio web estático para un campeonato de karting, con vista
   pública y panel administrativo.
 - **Objetivo:** publicar el campeonato activo, el ranking general, los mejores
@@ -13,15 +13,16 @@
   Supabase mediante su API REST.
 
 El código contiene referencias históricas a versiones anteriores. La versión
-visible de la aplicación debe mantenerse en `js/connection.js` (`VERSION`) y
-se muestra en los elementos con `data-version`.
+visible de la aplicación se mantiene en `js/gameversion.js` (`VERSION`) y se
+muestra en los elementos con `data-version`.
 
 ## Arquitectura y despliegue
 
 - Frontend sin framework: HTML, CSS y JavaScript nativo con módulos ES.
 - No existe backend propio.
 - `js/connection.js` centraliza las llamadas REST a Supabase, el timeout de
-  red y las operaciones CRUD.
+  red y las operaciones CRUD. Si la base de datos no está disponible,
+  redirige a `estadosweb/database-unavailable.html`.
 - `js/app.js` carga y renderiza la experiencia pública.
 - `js/admin.js` protege y opera el panel administrativo.
 - `css/styles.css` contiene los estilos públicos; `css/admin.css` los estilos
@@ -43,9 +44,19 @@ se muestra en los elementos con `data-version`.
   listado de pilotos, modal de próxima carrera y acceso a la ruleta.
 - `ayuda.html`: guía del campeonato, sistema de puntos, ranking y vuelta
   rápida.
+- `reaccion.html`: juego de reacción y clasificación de tiempos, con historial
+  global y duelos entre pilotos; requiere la vista `vista_reaccion` en Supabase.
 - `ruleta.html`: utilidad visual de ruleta racing; no forma parte del CRUD
   administrativo.
 - La navegación es responsive y ofrece variantes para desktop y móvil.
+
+### Páginas de estado
+
+- `estadosweb/EnConstruccion.html` y
+  `estadosweb/database-unavailable.html`: páginas de estado. Sus enlaces y
+  recursos apuntan a las páginas y carpetas de la raíz.
+- `js/connection.js` redirige a `estadosweb/database-unavailable.html` cuando
+  la base de datos no está disponible.
 
 ### Administración
 
@@ -73,9 +84,8 @@ se muestra en los elementos con `data-version`.
 - El panel valida posiciones, pilotos repetidos y tiempos antes de guardar.
   La integridad definitiva debe reforzarse también con índices y constraints
   en la base de datos.
-- `doc/refresh_ranking.sql` define el recálculo del ranking mediante función,
-  trigger sobre `resultado` y backfill inicial. Debe ejecutarse en Supabase
-  por un rol con permisos suficientes.
+- El recálculo del ranking y otras automatizaciones deben estar configurados
+  en Supabase; este repositorio no conserva scripts SQL para aplicarlos.
 
 ## Modelo de datos y vistas Supabase
 
@@ -98,8 +108,7 @@ Vistas públicas esperadas:
 - `vista_ranking`
 - `vista_tiempos`
 - `vista_piloto`
-- `vista_pilotos_legendarios` (script pendiente de ejecutar cuando Supabase
-  vuelva a estar disponible)
+- `vista_pilotos_legendarios` (debe estar configurada en Supabase)
 - `vista_carrera`
 
 Los nombres y las mayúsculas de las columnas de las vistas deben respetarse,
@@ -130,9 +139,8 @@ de consulta.
   de referencia.
 - `doc/AUTOMATION.md`: oportunidades de automatización, validaciones,
   índices, constraints, vistas, seed, pruebas e importación/exportación.
-- `doc/refresh_ranking.sql`: automatización SQL del ranking.
-- `doc/sync_pilot_stats.sql`: trigger que mantiene las victorias y podios
-  históricos de `piloto` sincronizados con todos sus registros de `ranking`.
+- Las vistas, funciones, triggers y demás objetos de base de datos se
+  administran en Supabase; no hay archivos `.sql` en el repositorio.
 
 Durante esta verificación se confirma que:
 

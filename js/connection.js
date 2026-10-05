@@ -1,5 +1,9 @@
 
-export const VERSION  = 'v2.0.0';
+
+// ════════════════════════════════════════════════════════════════
+//  Conexión a Supabase
+// ════════════════════════════════════════════════════════════════
+
 const SUPABASE_URL = "https://kgzqqaxhqcydrvzqnxmk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_svTNXiFYYvt9mZy1eXf_Gg_NXMoVvhg";
 
@@ -12,6 +16,11 @@ const BASE_HEADERS = {
 
 const FETCH_TIMEOUT = 10_000; // 10 segundos
 
+function showDatabaseUnavailable() {
+    if (window.location.pathname.endsWith("/estadosweb/database-unavailable.html")) return;
+    window.location.replace(new URL("estadosweb/database-unavailable.html", window.location.href).href);
+}
+
 
 // ════════════════════════════════════════════════════════════════
 //  CORE — fetch con timeout automático
@@ -22,11 +31,21 @@ function fetchWithTimeout(url, options = {}) {
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
     return fetch(url, { ...options, signal: controller.signal })
         .catch(err => {
-            if (err.name === "AbortError")
+            if (err.name === "AbortError") {
+                showDatabaseUnavailable();
                 throw new Error("Tiempo de espera agotado. Verifica tu conexión.");
+            }
+            if (err instanceof TypeError) showDatabaseUnavailable();
             throw err;
         })
         .finally(() => clearTimeout(timer));
+}
+
+async function throwIfRequestFailed(res) {
+    if (res.ok) return;
+    const error = await res.text();
+    if (res.status === 408 || res.status >= 500) showDatabaseUnavailable();
+    throw new Error(error);
 }
 
 
@@ -37,7 +56,7 @@ function fetchWithTimeout(url, options = {}) {
 async function sbGet(table, params = "") {
     const url = `${SUPABASE_URL}/rest/v1/${table}${params ? "?" + params : ""}`;
     const res = await fetchWithTimeout(url, { headers: BASE_HEADERS });
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     return res.json();
 }
 
@@ -46,7 +65,7 @@ async function sbPost(table, body) {
         `${SUPABASE_URL}/rest/v1/${table}`,
         { method: "POST", headers: BASE_HEADERS, body: JSON.stringify(body) }
     );
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     return res.json();
 }
 
@@ -55,7 +74,7 @@ async function sbPatch(table, id, idField, body) {
         `${SUPABASE_URL}/rest/v1/${table}?${idField}=eq.${id}`,
         { method: "PATCH", headers: BASE_HEADERS, body: JSON.stringify(body) }
     );
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     return res.json();
 }
 
@@ -67,7 +86,7 @@ async function sbDelete(table, id, idField) {
             headers: { ...BASE_HEADERS, "Prefer": "return=representation" }
         }
     );
-    if (!res.ok) throw new Error(await res.text());
+    await throwIfRequestFailed(res);
     const data = await res.json();
     if (!data.length) throw new Error("Registro no encontrado o ya fue eliminado.");
     return data;
@@ -144,6 +163,19 @@ export const getPilotoById          = (id) => sbGet("piloto", `id_piloto=eq.${id
 export const getPilotosActivosAdmin = () => sbGet("piloto", "pilo_activo=eq.true&order=pilo_nombre.asc&select=id_piloto,pilo_nombre,pilo_numero");
 export const getPilotosActivosCount = () => sbGet("piloto", "pilo_activo=eq.true&select=id_piloto");
 
+export const getVistaReaccion = () =>
+    sbGet("vista_reaccion", "select=*&order=created_at.desc");
+
+export const createGameReaccion = (body) => sbPost("Game_Reaccion", {
+    GR_piloto: body.piloto,
+    GR_Reaccion: body.reaccion,
+    GR_duelo_estado: body.duelo ?? false,
+    ...(body.duelo && {
+        GR_Rival: body.rival,
+        GR_Rival_reaccion: body.rivalReaccion
+    })
+});
+
 export const createPiloto = (body) => sbPost("piloto", {
     pilo_nombre: body.nombre,
     pilo_numero: body.numero ?? null,
@@ -170,11 +202,41 @@ export const deletePiloto = (id) => sbDelete("piloto", id, "id_piloto");
 
 export const getCarrerasByCampeonato   = (id) => sbGet("carrera", `id_campeonato=eq.${id}&order=fecha.asc`);
 export const getCarrerasByCampeonatoId = (id) => sbGet("carrera", `id_campeonato=eq.${id}&order=fecha.asc&select=id_carrera,nombre,circuito,fecha,completada`);
+export const getProximasCarreras       = async (id) => {
+    const params = `id_campeonato=eq.${id}&completada=eq.false&order=fecha.asc.nullslast&select=id_carrera,id_campeonato,nombre,circuito,fecha,carrera_hora,completada`;
+    try {
+        return await sbGet("carrera", params);
+    } catch (err) {
+        // Older databases do not have the optional time column yet.
+        if (!String(err?.message ?? "").includes("carrera.carrera_hora does not exist")) throw err;
+        return sbGet("carrera", `id_campeonato=eq.${id}&completada=eq.false&order=fecha.asc.nullslast&select=id_carrera,id_campeonato,nombre,circuito,fecha,completada`);
+    }
+};
 export const getUltimaCarreraCompletada = (id) => sbGet("carrera", `id_campeonato=eq.${id}&completada=eq.true&order=fecha.desc&limit=1`);
 export const getCarreraById            = (id) => sbGet("carrera", `id_carrera=eq.${id}`);
 
-export const createCarrera = (body) => sbPost("carrera", body);
-export const updateCarrera = (id, body) => sbPatch("carrera", id, "id_carrera", body);
+const carreraHoraMissing = err =>
+    String(err?.message ?? "").includes("carrera.carrera_hora does not exist");
+
+export const createCarrera = async (body) => {
+    try {
+        return await sbPost("carrera", body);
+    } catch (err) {
+        if (!carreraHoraMissing(err)) throw err;
+        const { carrera_hora, ...legacyBody } = body;
+        return sbPost("carrera", legacyBody);
+    }
+};
+
+export const updateCarrera = async (id, body) => {
+    try {
+        return await sbPatch("carrera", id, "id_carrera", body);
+    } catch (err) {
+        if (!carreraHoraMissing(err)) throw err;
+        const { carrera_hora, ...legacyBody } = body;
+        return sbPatch("carrera", id, "id_carrera", legacyBody);
+    }
+};
 export const deleteCarrera = (id) => sbDelete("carrera", id, "id_carrera");
 
 

@@ -3,7 +3,7 @@
    Estilo oscuro racing, coherente con admin-panel.css
    ============================================================ */
 
-/* ✅ @import de Google Fonts eliminado — se carga en el <head> de cada HTML */
+/* 
 
 /* ── VARIABLES ── */
 :root {
@@ -70,6 +70,17 @@ body::before {
 
 a { text-decoration: none; }
 ul { list-style: none; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar       { width: 4px; }
@@ -230,6 +241,48 @@ ul { list-style: none; }
 }
 
 .btn-full { width: 100%; justify-content: center; }
+
+/* ── BOTÓN GOLDEN (hero — guía rápida y próxima carrera) ── */
+.btn-golden {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 11px 22px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1a0a00;
+  background: radial-gradient(
+    ellipse at 0% 50%,
+    #fff 0%,
+    #ffd700 25%,
+    #b8860b 60%,
+    #b8860b 100%
+  );
+  background-size: 200% 100%;
+  animation: btn-shine 2s linear infinite;
+  box-shadow: 0 0 18px rgba(234,179,8,0.30);
+  transition: transform 0.1s, box-shadow 0.15s;
+}
+
+.btn-golden svg { width: 16px; height: 16px; }
+
+.btn-golden:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(234,179,8,0.55);
+}
+
+.btn-golden:active { transform: translateY(0); }
+
+@keyframes btn-shine {
+  0%   { background-position: -50% 50%; }
+  100% { background-position: 150% 50%; }
+}
 
 
 /* ============================================================
@@ -393,6 +446,70 @@ ul { list-style: none; }
   background: var(--bg-dark);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+}
+
+.upcoming-races-table-wrap {
+  width: 100%;
+}
+
+.upcoming-races-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.upcoming-races-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.upcoming-races-table th,
+.upcoming-races-table td {
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.upcoming-races-table th {
+  color: var(--gray-500);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.upcoming-races-table td {
+  color: var(--gray-300);
+}
+
+.upcoming-races-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.upcoming-races-table tbody tr:hover {
+  background: rgba(127, 29, 29, 0.08);
+}
+
+.upcoming-race-time {
+  display: block;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+}
+
+.upcoming-race-status {
+  display: inline-flex;
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--gray-400);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.upcoming-race-status.is-next {
+  border-color: rgba(234, 179, 8, 0.4);
+  color: var(--gold);
 }
 
 /* Section heading */
@@ -630,24 +747,6 @@ ul { list-style: none; }
   background: rgba(225, 6, 0, 0.07);
 }
 
-.top5-row.top5-pos-1 {
-  border-color: var(--gold);
-  background: rgba(234,179,8,0.06);
-  box-shadow: 0 0 18px rgba(234,179,8,0.08);
-}
-
-.top5-row.top5-pos-2 {
-  border-color: rgba(209,213,219,0.65);
-}
-
-.top5-row.top5-pos-3 {
-  border-color: rgba(217,119,6,0.65);
-}
-
-.top5-row.top5-pos-1 .tiempo-pos { color: var(--gold); }
-.top5-row.top5-pos-2 .tiempo-pos { color: var(--silver); }
-.top5-row.top5-pos-3 .tiempo-pos { color: var(--bronze); }
-
 .tiempo-pos {
   font-family: var(--font-display);
   font-size: 22px;
@@ -822,6 +921,72 @@ ul { list-style: none; }
 }
 
 .driver-card:hover::before { opacity: 1; }
+
+.driver-card--gold,
+.driver-card--silver,
+.driver-card--bronze {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.driver-card--gold {
+  border-color: rgba(234, 179, 8, 0.8);
+  background: linear-gradient(180deg, rgba(234, 179, 8, 0.10), rgba(14, 14, 14, 1));
+}
+
+.driver-card--gold::before {
+  opacity: 1;
+  background: linear-gradient(to right, transparent, rgba(234, 179, 8, 0.9), transparent);
+}
+
+.driver-card--gold:hover {
+  border-color: rgba(234, 179, 8, 0.8);
+  background: linear-gradient(180deg, rgba(234, 179, 8, 0.10), rgba(14, 14, 14, 1));
+}
+
+.driver-card--gold .driver-num,
+.driver-card--gold .driver-stat-value {
+  color: var(--gold);
+}
+
+.driver-card--silver {
+  border-color: rgba(209, 213, 219, 0.75);
+  background: linear-gradient(180deg, rgba(209, 213, 219, 0.10), rgba(14, 14, 14, 1));
+}
+
+.driver-card--silver::before {
+  opacity: 1;
+  background: linear-gradient(to right, transparent, rgba(209, 213, 219, 0.9), transparent);
+}
+
+.driver-card--silver:hover {
+  border-color: rgba(209, 213, 219, 0.75);
+  background: linear-gradient(180deg, rgba(209, 213, 219, 0.10), rgba(14, 14, 14, 1));
+}
+
+.driver-card--silver .driver-num,
+.driver-card--silver .driver-stat-value {
+  color: var(--silver);
+}
+
+.driver-card--bronze {
+  border-color: rgba(217, 119, 6, 0.8);
+  background: linear-gradient(180deg, rgba(217, 119, 6, 0.10), rgba(14, 14, 14, 1));
+}
+
+.driver-card--bronze::before {
+  opacity: 1;
+  background: linear-gradient(to right, transparent, rgba(217, 119, 6, 0.9), transparent);
+}
+
+.driver-card--bronze:hover {
+  border-color: rgba(217, 119, 6, 0.8);
+  background: linear-gradient(180deg, rgba(217, 119, 6, 0.10), rgba(14, 14, 14, 1));
+}
+
+.driver-card--bronze .driver-num,
+.driver-card--bronze .driver-stat-value {
+  color: var(--bronze);
+}
 
 .driver-num {
   font-family: var(--font-display);
@@ -1257,6 +1422,87 @@ ul { list-style: none; }
   max-width: 200px;
   object-fit: contain;
   display: block;
+}
+
+/* ============================================================
+   DATABASE UNAVAILABLE
+   ============================================================ */
+
+.db-outage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.db-outage-card {
+  width: min(100%, 620px);
+  padding: clamp(28px, 7vw, 56px);
+  text-align: center;
+  background: linear-gradient(160deg, rgba(20, 20, 20, 0.96), rgba(10, 10, 10, 0.98));
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--red);
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 36px rgba(127, 29, 29, 0.12);
+}
+
+.db-outage-logo {
+  width: min(220px, 70%);
+  height: auto;
+  margin: 0 auto 36px;
+}
+
+.db-outage-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+  color: var(--red-500);
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 50%;
+}
+
+.db-outage-icon svg { width: 30px; height: 30px; }
+
+.db-outage-card .db-outage-kicker {
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.db-outage-card h1 {
+  margin: 8px 0 14px;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
+  font-weight: 900;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.db-outage-card p {
+  max-width: 430px;
+  margin: 0 auto;
+  color: var(--gray-400);
+  font-size: 1rem;
+}
+
+.db-outage-card .btn-primary {
+  margin-top: 28px;
+  justify-content: center;
+}
+
+.db-outage-copy {
+  margin-top: 32px !important;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-dim);
+  font-size: 0.78rem !important;
+  letter-spacing: 0.04em;
 }
 @media (max-width: 768px) {
   .logo-wordmark { height: 24px; max-width: 160px; }

@@ -188,6 +188,19 @@
           </div>
         </div>
 
+        <div class="dash-card dash-card-full" id="dashProximasCarreras">
+          <p class="dash-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sm">
+              <circle cx="12" cy="12" r="9"/>
+              <polyline points="12 7 12 12 15 14"/>
+            </svg>
+            Próximas Carreras Pendientes
+          </p>
+          <div id="dashProximasCarrerasBody">
+            <p class="dash-empty">Cargando...</p>
+          </div>
+        </div>
+
         <div class="dash-row" style="margin-top:16px">
 
           <div class="dash-card" id="dashMasRapido">
@@ -527,6 +540,10 @@
         <div class="modal-field">
           <label class="form-label">Fecha</label>
           <input type="date" id="carreraFecha" class="form-input">
+        </div>
+        <div class="modal-field">
+          <label class="form-label">Hora <span style="color:var(--gray-500);font-size:0.7rem;text-transform:none;letter-spacing:0">(opcional)</span></label>
+          <input type="time" id="carreraHora" class="form-input">
         </div>
         <div class="modal-field">
           <label class="form-label">Estado</label>

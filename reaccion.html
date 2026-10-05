@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>FKarting — Reaction Test</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/reaccion.css">
+</head>
+<body class="reaction-page">
+
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo">
+      <picture>
+        <source srcset="img/fkarting-logo-principal.webp" type="image/webp">
+        <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+      </picture>
+    </a>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="index.html#ranking">Ranking</a></li>
+        <li><a href="index.html#proximas-carreras">Próximas</a></li>
+        <li><a href="index.html#top5-global">Top 5</a></li>
+        <li><a href="index.html#pilotoslegendarios">Pilotos Legendarios</a></li>
+        <li><a href="ayuda.html">Ayuda</a></li>
+      </ul>
+    </nav>
+    <a href="login.html" class="navbar-admin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+      </svg>
+      Admin
+    </a>
+    <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMobile">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+  <nav class="nav-mobile" id="navMobile" aria-label="Navegación móvil">
+    <a href="index.html#ranking">Ranking</a>
+    <a href="index.html#proximas-carreras">Próximas</a>
+    <a href="index.html#top5-global">Top 5</a>
+    <a href="index.html#pilotoslegendarios">Pilotos Legendarios</a>
+    <a href="ayuda.html">Ayuda</a>
+  </nav>
+</header>
+
+<div class="page">
+
+  <main>
+
+    <!-- Hero + selector de modo -->
+    <section class="reaction-hero">
+      <div>
+        <p class="eyebrow">EN SUS MARCAS · LISTOS · FUERA</p>
+        <h1>REACTION<br><span>TEST</span></h1>
+      </div>
+      <div class="mode-switch" role="group" aria-label="Seleccionar modo de juego">
+        <button class="mode active" data-mode="training"   aria-pressed="true">ENTRENAMIENTO</button>
+        <button class="mode"        data-mode="qualifying" aria-pressed="false">CLASIFICACIÓN</button>
+        <button class="mode"        data-mode="duel"       aria-pressed="false">DUELO</button>
+      </div>
+    </section>
+
+    <!-- Panel semáforo + panel resultado -->
+    <section class="game-grid">
+
+      <div class="panel start-panel">
+        <div class="panel-title"><span>01</span> SEMÁFORO DE SALIDA</div>
+        <!-- BUG-FIX (accesibilidad): role + aria-label en las luces -->
+        <div class="lights" id="lights" role="img" aria-label="Semáforo de salida de 5 luces">
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+          <div class="light" aria-hidden="true"></div>
+        </div>
+        <div class="status" id="status" aria-live="polite">PRESIONA INICIAR</div>
+        <button id="startBtn" class="start" aria-label="Iniciar secuencia de semáforo">
+          INICIAR <span aria-hidden="true">▶</span>
+        </button>
+        <!-- BUG-FIX (accesibilidad): aria-label descriptivo en el botón de reacción -->
+        <button id="reactBtn" class="react" disabled aria-label="Reaccionar — pulsa cuando las luces se apaguen">
+          ¡FUERA!
+        </button>
+        <p class="hint">También puedes usar <kbd>ESPACIO</kbd></p>
+      </div>
+
+      <div class="panel result-panel">
+        <div class="panel-title"><span>02</span> RESULTADO</div>
+        <div class="time" id="time" aria-live="polite">---</div>
+        <div class="unit">MILISEGUNDOS</div>
+        <div class="result-message" id="resultMessage" aria-live="polite">Tu reacción aparecerá aquí</div>
+        <div class="stats">
+          <div><b id="attemptLabel">0 / ∞</b><small>INTENTOS</small></div>
+          <div><b id="best">---</b><small>MEJOR</small></div>
+        </div>
+
+        <div id="classificationActions" class="classification-actions" aria-label="Acciones de clasificación">
+          <button id="resetQualifyingBtn" class="secondary-action" type="button">
+            ↻ REINICIAR INTENTOS
+          </button>
+          <div class="pilot-submit">
+            <label for="pilotSelect">PILOTO</label>
+            <div class="pilot-submit-row">
+              <select id="pilotSelect" class="pilot-select" aria-label="Seleccionar piloto">
+                <option value="">CARGANDO PILOTOS...</option>
+              </select>
+              <button id="submitBestBtn" class="submit-best" type="button">ENVIAR MEJOR</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Historial -->
+    <section class="panel history-panel">
+      <div class="history-panel-heading">
+        <div class="panel-title"><span>03</span> HISTORIAL</div>
+        <div class="history-view-switch hidden" role="group" aria-label="Vista del historial">
+          <button class="mode history-view-btn active" type="button" data-history-view="session" aria-pressed="true">
+            SESIÓN
+          </button>
+          <button class="mode history-view-btn" type="button" data-history-view="global" aria-pressed="false">
+            GLOBAL
+          </button>
+        </div>
+      </div>
+      <div class="history-view-content">
+        <div id="history" class="history-empty" aria-live="polite">Todavía no hay intentos.</div>
+        <section id="globalHistoryView" class="global-history hidden" aria-label="Historial global">
+          <div class="global-history-heading">
+            <h3 id="globalHistoryTitle">HISTORIAL GLOBAL DE CLASIFICACIÓN</h3>
+            <button id="refreshGlobalHistoryBtn" class="history-refresh" type="button">ACTUALIZAR</button>
+          </div>
+          <div id="globalClassificationHistory" class="history-empty" aria-live="polite">
+            Pulsa GLOBAL para cargar los resultados.
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- Panel duelo (oculto por defecto) -->
+    <section id="duelPanel" class="panel duel-panel hidden" aria-hidden="true">
+      <div class="panel-title"><span>04</span> DUELO</div>
+      <div class="duel-pilot-selectors">
+        <div class="pilot-submit">
+          <label for="duelPilotASelect">PILOTO A</label>
+          <select id="duelPilotASelect" class="pilot-select duel-pilot-select" aria-label="Seleccionar piloto A">
+            <option value="">CARGANDO PILOTOS...</option>
+          </select>
+        </div>
+        <div class="pilot-submit">
+          <label for="duelPilotBSelect">PILOTO B</label>
+          <select id="duelPilotBSelect" class="pilot-select duel-pilot-select" aria-label="Seleccionar piloto B">
+            <option value="">CARGANDO PILOTOS...</option>
+          </select>
+        </div>
+      </div>
+      <div class="duel-names">
+        <div><small>PILOTO A</small><strong id="duelPilotNameA">SELECCIONA PILOTO</strong></div>
+        <div class="vs">VS</div>
+        <div><small>PILOTO B</small><strong id="duelPilotNameB">SELECCIONA PILOTO</strong></div>
+      </div>
+      <div class="duel-scores">
+        <div id="scoreA">---</div>
+        <div></div>
+        <div id="scoreB">---</div>
+      </div>
+      <div class="duel-session-actions">
+        <p>3 intentos válidos por piloto. Gana el mejor tiempo.</p>
+        <button id="submitDuelBtn" class="submit-best" type="button" disabled>SUBIR MEJORES TIEMPOS</button>
+        <button id="resetDuelBtn" class="secondary-action" type="button">↻ REINICIAR SECCIÓN</button>
+      </div>
+      <div id="duelSaveMessage" class="result-message duel-save-message" aria-live="polite"></div>
+    </section>
+
+  </main>
+
+</div>
+
+<footer class="footer reaction-footer">
+  <div class="container footer-inner">
+    <div class="footer-logo">
+      <picture>
+        <source srcset="img/fkarting-logo-principal.webp" type="image/webp">
+        <img src="img/fkarting-logo-principal.png" alt="FKarting" class="logo-wordmark">
+      </picture>
+    </div>
+    <p class="footer-copy">© 2026 FKarting — Todos los derechos reservados — <span data-version></span></p>
+    <a href="login.html" class="footer-admin">Administración</a>
+  </div>
+</footer>
+
+<script type="module" src="js/reaccion.js"></script>
+<script type="module" src="js/gameversion.js"></script>
+</body>
+</html>
